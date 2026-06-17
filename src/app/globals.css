@@ -215,6 +215,40 @@ body {
   color: var(--color-white);
 }
 
+/* ─── Keyframes — ElegantShape (HeroGeometric) ──────────────────────────────── */
+@keyframes adm-shape-enter {
+  from { opacity: 0; transform: translateY(32px) scale(0.92); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+@keyframes adm-shape-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  33%       { transform: translateY(-14px) rotate(1.5deg); }
+  66%       { transform: translateY(8px) rotate(-1deg); }
+}
+
+@keyframes adm-sweep {
+  0%   { opacity: 1; clip-path: inset(0 100% 0 0); }
+  50%  { opacity: 1; clip-path: inset(0 0% 0 0); }
+  100% { opacity: 0; clip-path: inset(0 0% 0 0); }
+}
+
+@keyframes adm-scroll-pulse {
+  0%, 100% { opacity: 0.6; transform: scaleY(1); }
+  50%       { opacity: 1;   transform: scaleY(1.18); }
+}
+
+/* ─── MarketGate + MarketSwitcher ───────────────────────────────────────────── */
+.adm-gate-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(184, 150, 12, 0.7) !important;
+}
+
+.adm-mkt-btn:hover {
+  background-color: rgba(184, 150, 12, 0.12) !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+
 /* ─── Scrollbar personalizada ────────────────────────────────────────────────── */
 ::-webkit-scrollbar {
   width: 6px;
