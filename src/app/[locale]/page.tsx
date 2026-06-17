@@ -9,6 +9,7 @@ import {
 } from '@/sanity/queries'
 import type { ImovelCard, Bairro, CondominioCard } from '@/types/sanity'
 import HeroHome from '@/components/home/HeroHome'
+import VideoHeroScroll from '@/components/home/VideoHeroScroll'
 import ImoveisDestaque from '@/components/home/ImoveisDestaque'
 import BairrosGrid from '@/components/home/BairrosGrid'
 import CondominiosDestaque from '@/components/home/CondominiosDestaque'
@@ -66,6 +67,7 @@ export default async function HomePage({
   return (
     <main id="main-content">
       <HeroHome />
+      <VideoHeroScroll />
       <ImoveisDestaque imoveis={imoveis} />
       <CondominiosDestaque condominios={condominios} />
       <BairrosGrid bairros={bairros} />
