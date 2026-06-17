@@ -1,0 +1,158 @@
+{
+  "nav": {
+    "imoveis": "Propriétés",
+    "condominios": "Résidences",
+    "bairros": "Quartiers",
+    "blog": "Blog",
+    "favoritos": "Favoris",
+    "skipToContent": "Passer au contenu principal",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu",
+    "mainNav": "Navigation principale",
+    "mobileMenu": "Menu de navigation",
+    "contact": "WhatsApp",
+    "favCount": "Favoris ({count})"
+  },
+  "hero": {
+    "label": "Propriétés sélectionnées",
+    "title": "Immobilier de",
+    "titleAccent": "prestige",
+    "markets": "Rio de Janeiro · Gramado · Canela",
+    "cta1": "Explorer les biens",
+    "cta2": "Nous contacter",
+    "scroll": "Défiler"
+  },
+  "home": {
+    "featured": {
+      "label": "Sélection exclusive",
+      "title": "Biens en vedette",
+      "viewAll": "Voir tout",
+      "viewAllMobile": "Voir toutes les propriétés"
+    },
+    "neighborhoods": {
+      "label": "Emplacements",
+      "title": "Nos quartiers"
+    },
+    "condominios": {
+      "label": "Résidences sélectionnées",
+      "title": "Où se trouvent les meilleures propriétés",
+      "viewAll": "Voir tout"
+    }
+  },
+  "imoveis": {
+    "title": "Propriétés",
+    "subtitle": "Rio de Janeiro · Gramado · Canela",
+    "noFilters": "Nouveaux biens bientôt disponibles",
+    "noFiltersDesc": "Notre portefeuille est en cours de mise à jour. Contactez-nous pour en savoir plus.",
+    "noMatch": "Aucun bien ne correspond à vos filtres",
+    "noMatchDesc": "Essayez d'élargir vos critères de recherche ou supprimez certains filtres.",
+    "viewAll": "Voir toutes les propriétés →"
+  },
+  "filters": {
+    "all": "Tous",
+    "market": "Marché",
+    "bedrooms": "Chambres",
+    "clear": "Effacer les filtres",
+    "byType": "Filtrer par type",
+    "byMarket": "Filtrer par marché",
+    "byBedrooms": "Filtrer par chambres",
+    "results": "{count} propriétés disponibles",
+    "result": "1 propriété disponible",
+    "noResults": "Aucun bien trouvé pour les filtres sélectionnés."
+  },
+  "bairros": {
+    "title": "Quartiers & Emplacements",
+    "subtitle": "Sélection exclusive des meilleures adresses de Rio de Janeiro et Serra Gaúcha",
+    "label": "Admirata Immobilier",
+    "empty": "Bientôt disponible",
+    "neighborhood": "quartier",
+    "neighborhoods": "quartiers",
+    "about": "À propos du quartier",
+    "poi": "Points d'intérêt",
+    "poiLabel": "Localisation",
+    "curation": "Sélection exclusive",
+    "propertiesIn": "Propriétés à {neighborhood}",
+    "viewAll": "Voir tout →",
+    "viewAllProperties": "Voir toutes les propriétés →",
+    "talkToAgent": "Parler à un agent",
+    "comingSoon": "Bientôt de nouveaux biens à {neighborhood}",
+    "contactForOpportunities": "Contactez-nous pour découvrir des opportunités exclusives",
+    "interested": "Intéressé par {neighborhood} ?",
+    "teamKnows": "Notre équipe connaît chaque opportunité disponible.",
+    "whatsapp": "Contacter sur WhatsApp",
+    "availableProperty": "1 propriété disponible",
+    "availableProperties": "{count} propriétés disponibles",
+    "breadcrumb": "Quartiers",
+    "home": "Accueil"
+  },
+  "blog": {
+    "title": "Lifestyle & Marché",
+    "label": "Curation éditoriale",
+    "subtitle": "Contenu exclusif sur le meilleur de Rio de Janeiro, Serra Gaúcha et le marché immobilier de luxe.",
+    "empty": "Bientôt disponible",
+    "emptyDesc": "Nouveaux articles en cours de publication.",
+    "readArticle": "Lire l'article",
+    "backToBlog": "Retour au Blog",
+    "featured": "À la une",
+    "specialist": "Parler à un expert",
+    "specialistDesc": "Intéressé par des propriétés dans la région ? Notre équipe peut vous aider à trouver le bien idéal.",
+    "discoverNeighborhood": "Découvrir le quartier",
+    "viewProperties": "Voir les propriétés"
+  },
+  "favoritos": {
+    "label": "Votre liste personnelle",
+    "title": "Propriétés sauvegardées",
+    "clearAll": "Tout effacer",
+    "empty": "Aucune propriété sauvegardée",
+    "emptyDesc": "Cliquez sur le cœur d'une propriété pour la sauvegarder ici.",
+    "viewProperties": "Voir les propriétés"
+  },
+  "condominios": {
+    "label": "Références en exclusivité",
+    "title": "Résidences Premium & Développements",
+    "subtitle": "Résidences fermées, quartiers planifiés et développements premium sélectionnés par Admirata à Rio de Janeiro et Serra Gaúcha.",
+    "empty": "Bientôt disponible.",
+    "property": "propriété",
+    "properties": "propriétés"
+  },
+  "pdi": {
+    "home": "Accueil",
+    "properties": "Propriétés",
+    "about": "À propos du bien",
+    "contact": "Parler à un expert",
+    "whatsapp": "WhatsApp",
+    "schedule": "Planifier une visite",
+    "priceConsult": "Prix sur demande",
+    "notFound": "Propriété non trouvée"
+  },
+  "footer": {
+    "description": "Spécialistes de l'immobilier de luxe à Rio de Janeiro et Serra Gaúcha. Sélection exclusive pour acheteurs et investisseurs exigeants.",
+    "imoveis": "Propriétés",
+    "empresa": "Entreprise",
+    "localizacoes": "Emplacements",
+    "maisBuscados": "Les plus recherchés",
+    "copyright": "Copyright {year} Admirata Negócios Imobiliários Ltda",
+    "creci": "CRECI-F 58308 · CRECI RJ-008553/O",
+    "privacy": "Confidentialité",
+    "terms": "Conditions"
+  },
+  "cookie": {
+    "label": "Avis sur les cookies",
+    "message": "Nous utilisons des cookies pour améliorer votre expérience et analyser le trafic. Consultez notre",
+    "privacy": "Politique de confidentialité",
+    "decline": "Refuser",
+    "accept": "Accepter"
+  },
+  "common": {
+    "property": "propriété",
+    "properties": "propriétés",
+    "bedroom": "chambre",
+    "bedrooms": "chambres",
+    "suite": "suite",
+    "suites": "suites",
+    "garage": "parking",
+    "garages": "parkings",
+    "forSale": "À vendre",
+    "forRent": "À louer"
+  }
+}

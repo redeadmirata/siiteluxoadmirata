@@ -1,0 +1,105 @@
+version: '3.8'
+
+# ─── Admirata — Stack Hetzner ──────────────────────────────────────────────────
+# Gerenciado via Portainer no VPS Hetzner.
+# Traefik faz proxy reverso com SSL automático via Let's Encrypt.
+# Para fazer deploy:
+#   1. Copiar este arquivo para o VPS
+#   2. Criar .env.production com todas as variáveis
+#   3. docker compose --env-file .env.production up -d
+
+services:
+
+  # ─── Traefik — Proxy + SSL ──────────────────────────────────────
+  traefik:
+    image: traefik:v3.1
+    container_name: traefik
+    restart: unless-stopped
+    command:
+      - "--api.insecure=false"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      # Redirecionar HTTP → HTTPS
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - letsencrypt:/letsencrypt
+    networks:
+      - web
+
+  # ─── Next.js App ────────────────────────────────────────────────
+  next-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_SANITY_PROJECT_ID: ${NEXT_PUBLIC_SANITY_PROJECT_ID}
+        NEXT_PUBLIC_SANITY_DATASET: ${NEXT_PUBLIC_SANITY_DATASET}
+        NEXT_PUBLIC_SANITY_API_VERSION: ${NEXT_PUBLIC_SANITY_API_VERSION}
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+        NEXT_PUBLIC_MAPBOX_TOKEN: ${NEXT_PUBLIC_MAPBOX_TOKEN}
+        NEXT_PUBLIC_GA_ID: ${NEXT_PUBLIC_GA_ID}
+    container_name: admirata-next
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - SANITY_API_TOKEN=${SANITY_API_TOKEN}
+      - LEAD_WEBHOOK_URL=${LEAD_WEBHOOK_URL}
+      - REVALIDATION_SECRET=${REVALIDATION_SECRET}
+      - NEXT_PUBLIC_SANITY_PROJECT_ID=${NEXT_PUBLIC_SANITY_PROJECT_ID}
+      - NEXT_PUBLIC_SANITY_DATASET=${NEXT_PUBLIC_SANITY_DATASET}
+      - NEXT_PUBLIC_SANITY_API_VERSION=${NEXT_PUBLIC_SANITY_API_VERSION}
+      - NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
+      - NEXT_PUBLIC_MAPBOX_TOKEN=${NEXT_PUBLIC_MAPBOX_TOKEN}
+      - NEXT_PUBLIC_GA_ID=${NEXT_PUBLIC_GA_ID}
+    labels:
+      - "traefik.enable=true"
+      # HTTP
+      - "traefik.http.routers.admirata-http.rule=Host(`admirata.com.br`) || Host(`www.admirata.com.br`)"
+      - "traefik.http.routers.admirata-http.entrypoints=web"
+      # HTTPS
+      - "traefik.http.routers.admirata.rule=Host(`admirata.com.br`) || Host(`www.admirata.com.br`)"
+      - "traefik.http.routers.admirata.entrypoints=websecure"
+      - "traefik.http.routers.admirata.tls=true"
+      - "traefik.http.routers.admirata.tls.certresolver=letsencrypt"
+      # Redirect www → apex
+      - "traefik.http.middlewares.admirata-www-redirect.redirectregex.regex=^https://www\\.admirata\\.com\\.br(.*)"
+      - "traefik.http.middlewares.admirata-www-redirect.redirectregex.replacement=https://admirata.com.br$${1}"
+      - "traefik.http.middlewares.admirata-www-redirect.redirectregex.permanent=true"
+      - "traefik.http.routers.admirata.middlewares=admirata-www-redirect"
+      # Porta interna
+      - "traefik.http.services.admirata.loadbalancer.server.port=3000"
+    networks:
+      - web
+    depends_on:
+      - traefik
+
+  # ─── Redis — cache de sessões e rate-limit ──────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: admirata-redis
+    restart: unless-stopped
+    command: redis-server --maxmemory 128mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    networks:
+      - web
+
+networks:
+  web:
+    external: true
+    name: web
+
+volumes:
+  letsencrypt:
+  redis_data:

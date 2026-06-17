@@ -1,0 +1,158 @@
+{
+  "nav": {
+    "imoveis": "Imóveis",
+    "condominios": "Condomínios",
+    "bairros": "Bairros",
+    "blog": "Blog",
+    "favoritos": "Favoritos",
+    "skipToContent": "Pular para o conteúdo principal",
+    "openMenu": "Abrir menu",
+    "closeMenu": "Fechar menu",
+    "mainNav": "Navegação principal",
+    "mobileMenu": "Menu de navegação",
+    "contact": "WhatsApp",
+    "favCount": "Favoritos ({count})"
+  },
+  "hero": {
+    "label": "Imóveis selecionados",
+    "title": "Imóveis de",
+    "titleAccent": "alto padrão",
+    "markets": "Rio de Janeiro · Gramado · Canela",
+    "cta1": "Explorar imóveis",
+    "cta2": "Fale conosco",
+    "scroll": "Scroll"
+  },
+  "home": {
+    "featured": {
+      "label": "Seleção exclusiva",
+      "title": "Imóveis em destaque",
+      "viewAll": "Ver todos",
+      "viewAllMobile": "Ver todos os imóveis"
+    },
+    "neighborhoods": {
+      "label": "Localidades",
+      "title": "Nossos bairros"
+    },
+    "condominios": {
+      "label": "Condomínios selecionados",
+      "title": "Onde os melhores imóveis estão",
+      "viewAll": "Ver todos"
+    }
+  },
+  "imoveis": {
+    "title": "Imóveis",
+    "subtitle": "Rio de Janeiro · Gramado · Canela",
+    "noFilters": "Em breve novos imóveis",
+    "noFiltersDesc": "Nossa carteira está sendo atualizada. Entre em contato para saber sobre as próximas novidades.",
+    "noMatch": "Nenhum imóvel corresponde aos filtros",
+    "noMatchDesc": "Tente ampliar os critérios de busca ou remover alguns filtros.",
+    "viewAll": "Ver todos os imóveis →"
+  },
+  "filters": {
+    "all": "Todos",
+    "market": "Mercado",
+    "bedrooms": "Quartos",
+    "clear": "Limpar filtros",
+    "byType": "Filtrar por tipo",
+    "byMarket": "Filtrar por mercado",
+    "byBedrooms": "Filtrar por número de quartos",
+    "results": "{count} imóveis disponíveis",
+    "result": "1 imóvel disponível",
+    "noResults": "Nenhum imóvel encontrado para os filtros selecionados."
+  },
+  "bairros": {
+    "title": "Bairros & Localizações",
+    "subtitle": "Curadoria exclusiva nas melhores localizações do Rio de Janeiro e Serra Gaúcha",
+    "label": "Admirata Imóveis",
+    "empty": "Em breve",
+    "neighborhood": "bairro",
+    "neighborhoods": "bairros",
+    "about": "Sobre o bairro",
+    "poi": "Pontos de referência",
+    "poiLabel": "Localização",
+    "curation": "Curadoria exclusiva",
+    "propertiesIn": "Imóveis em {neighborhood}",
+    "viewAll": "Ver todos →",
+    "viewAllProperties": "Ver todos os imóveis →",
+    "talkToAgent": "Falar com corretor",
+    "comingSoon": "Em breve novos imóveis em {neighborhood}",
+    "contactForOpportunities": "Fale conosco para conhecer oportunidades exclusivas",
+    "interested": "Interesse em {neighborhood}?",
+    "teamKnows": "Nossa equipe conhece cada oportunidade disponível.",
+    "whatsapp": "Falar pelo WhatsApp",
+    "availableProperty": "1 imóvel disponível",
+    "availableProperties": "{count} imóveis disponíveis",
+    "breadcrumb": "Bairros",
+    "home": "Início"
+  },
+  "blog": {
+    "title": "Lifestyle & Mercado",
+    "label": "Curadoria editorial",
+    "subtitle": "Conteúdo exclusivo sobre o melhor do Rio de Janeiro, Serra Gaúcha e o mercado imobiliário de alto padrão.",
+    "empty": "Em breve",
+    "emptyDesc": "Novos artigos sendo publicados.",
+    "readArticle": "Ler artigo",
+    "backToBlog": "Voltar ao Blog",
+    "featured": "Destaque",
+    "specialist": "Fale com um especialista",
+    "specialistDesc": "Tem interesse em imóveis na região? Nossa equipe pode te ajudar a encontrar o imóvel ideal.",
+    "discoverNeighborhood": "Conheça o bairro",
+    "viewProperties": "Ver imóveis"
+  },
+  "favoritos": {
+    "label": "Sua lista pessoal",
+    "title": "Imóveis Favoritos",
+    "clearAll": "Limpar todos",
+    "empty": "Nenhum imóvel salvo",
+    "emptyDesc": "Clique no coração de qualquer imóvel para salvá-lo aqui.",
+    "viewProperties": "Ver imóveis"
+  },
+  "condominios": {
+    "label": "Referências em exclusividade",
+    "title": "Condomínios e Empreendimentos de Alto Padrão",
+    "subtitle": "Condomínios fechados, bairros planejados e empreendimentos premium selecionados pela Admirata no Rio de Janeiro e Serra Gaúcha.",
+    "empty": "Em breve — condomínios sendo cadastrados.",
+    "property": "imóvel",
+    "properties": "imóveis"
+  },
+  "pdi": {
+    "home": "Início",
+    "properties": "Imóveis",
+    "about": "Sobre o imóvel",
+    "contact": "Fale com um especialista",
+    "whatsapp": "WhatsApp",
+    "schedule": "Agendar visita",
+    "priceConsult": "Sob consulta",
+    "notFound": "Imóvel não encontrado"
+  },
+  "footer": {
+    "description": "Especialistas em imóveis de alto padrão no Rio de Janeiro e Serra Gaúcha. Curadoria exclusiva para compradores e investidores exigentes.",
+    "imoveis": "Imóveis",
+    "empresa": "Empresa",
+    "localizacoes": "Localizações",
+    "maisBuscados": "Mais buscados",
+    "copyright": "Copyright {year} Admirata Negócios Imobiliários Ltda",
+    "creci": "CRECI-F 58308 · CRECI RJ-008553/O",
+    "privacy": "Privacidade",
+    "terms": "Termos"
+  },
+  "cookie": {
+    "label": "Aviso de cookies",
+    "message": "Utilizamos cookies para melhorar sua experiência, personalizar conteúdo e analisar o tráfego. Consulte nossa",
+    "privacy": "Política de Privacidade",
+    "decline": "Recusar",
+    "accept": "Aceitar"
+  },
+  "common": {
+    "property": "imóvel",
+    "properties": "imóveis",
+    "bedroom": "quarto",
+    "bedrooms": "quartos",
+    "suite": "suíte",
+    "suites": "suítes",
+    "garage": "vaga",
+    "garages": "vagas",
+    "forSale": "Venda",
+    "forRent": "Locação"
+  }
+}
