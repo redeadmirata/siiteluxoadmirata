@@ -9,6 +9,7 @@ import {
 } from '@/sanity/queries'
 import type { ImovelCard, Bairro, CondominioCard } from '@/types/sanity'
 import HeroHome from '@/components/home/HeroHome'
+import ScrollExpandMedia from '@/components/home/ScrollExpandMedia'
 import VideoHeroScroll from '@/components/home/VideoHeroScroll'
 import CidadesDestaque from '@/components/home/CidadesDestaque'
 import PropertyShowcase from '@/components/home/PropertyShowcase'
@@ -70,6 +71,42 @@ export default async function HomePage({
   return (
     <main id="main-content">
       <HeroHome />
+      <ScrollExpandMedia
+        mediaType="video"
+        mediaSrc="https://www.youtube.com/embed/dvQXRyfHmTY"
+        bgImageSrc="/images/background-luxo.jpg"
+        title="ADMIRATA EXCLUSIVO"
+        date="2026"
+        scrollToExpand="Deslize para descobrir"
+        textBlend
+      >
+        <div className="flex flex-col items-center justify-center text-center px-8">
+          <h3
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontWeight: 300,
+              fontSize: 'clamp(1.8rem, 4vw, 3.5rem)',
+              color: 'var(--color-gold, #b8960c)',
+              letterSpacing: '0.12em',
+              marginBottom: '1.5rem',
+            }}
+          >
+            A Essência do Luxo
+          </h3>
+          <p
+            style={{
+              color: 'rgba(255,255,255,0.72)',
+              maxWidth: '38rem',
+              fontSize: 'clamp(0.95rem, 1.4vw, 1.1rem)',
+              fontWeight: 300,
+              lineHeight: 1.78,
+            }}
+          >
+            Bem-vindo à Admirata. Mais do que imóveis, entregamos uma experiência
+            desenhada sob medida para quem exige a perfeição em cada detalhe.
+          </p>
+        </div>
+      </ScrollExpandMedia>
       <VideoHeroScroll />
       <CidadesDestaque />
       <PropertyShowcase />
