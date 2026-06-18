@@ -60,7 +60,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description: descricao,
       type: 'website',
       url: canonicalUrl,
-      images: cond.fotoCapa
+      images: cond.fotoCapa?.asset?.url
         ? [{ url: cond.fotoCapa.asset.url, alt: cond.nome }]
         : [],
     },
@@ -97,8 +97,8 @@ export default async function CondominioPage({ params }: PageProps) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://admirata.com.br'
   const localePrefix = params.locale === 'pt-BR' ? '' : `/${params.locale}`
   const pageUrl = `${siteUrl}${localePrefix}/condominios/${params.slug}`
-  const capaSrc = cond.fotoCapa?.asset.url
-  const capaLqip = cond.fotoCapa?.asset.metadata?.lqip
+  const capaSrc = cond.fotoCapa?.asset?.url
+  const capaLqip = cond.fotoCapa?.asset?.metadata?.lqip
 
   // ── JSON-LD ────────────────────────────────────────────────────────────────
   const graph: object[] = [
@@ -290,7 +290,7 @@ export default async function CondominioPage({ params }: PageProps) {
               <div className="mb-12">
                 <h2 className="text-display-sm text-ink mb-4">Galeria</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {cond.galeria.slice(0, 6).map((img, i) => (
+                  {cond.galeria.filter((img) => img.url).slice(0, 6).map((img, i) => (
                     <div
                       key={img._id ?? i}
                       className="relative aspect-[4/3] overflow-hidden rounded-xl"
