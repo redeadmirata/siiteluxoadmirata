@@ -179,7 +179,7 @@ export const CONDOMINIO_QUERY = groq`
     sobre,
     bairro->{ _id, nome, slug, cidade, estado, mercado },
     "fotoCapa": fotoCapa { asset->{ _id, url, metadata { lqip, dimensions } }, hotspot, crop },
-    galeria[]{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },
+    galeria[]{ "asset": asset.asset->{ _id, url, metadata { lqip, dimensions } }, alt, legenda },
     faqs[] { pergunta, resposta },
     geo { lat, lng, proximidades },
     "tipologiasDisponiveis": array::unique(*[_type == "imovel" && condominioRef._ref == ^._id && status == "Disponível"].tipologia),
@@ -208,7 +208,7 @@ export const CONDOMINIO_POR_BAIRRO_QUERY = groq`
     _id, nome, slug, tipo, descricao, infraestrutura, areaTotal, totalLotes,
     bairro->{ _id, nome, slug, cidade, estado, mercado },
     "fotoCapa": fotoCapa.asset->{ _id, url, metadata { lqip, dimensions } },
-    galeria[]{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },
+    galeria[]{ "asset": asset.asset->{ _id, url, metadata { lqip, dimensions } }, alt, legenda },
     "tipologiasDisponiveis": array::unique(*[_type == "imovel" && condominioRef._ref == ^._id && status == "Disponível"].tipologia),
     "totalImoveis": count(*[_type == "imovel" && condominioRef._ref == ^._id && status == "Disponível"])
   }
@@ -399,7 +399,7 @@ export const BAIRRO_PLANEJADO_QUERY = groq`
       prazoEntrega, tipologiasDisponiveis, videoTour,
       comissao, vgv, whatsappCorretor, mensagemCorretorWhatsapp,
       visibilidadeCorretor,
-      "imagemCapa": fotoCapa.asset { url, metadata { lqip } },
+      "imagemCapa": fotoCapa.asset->{ url, metadata { lqip } },
       "plantasBaixas": plantasBaixas[] {
         nome, quartos, area,
         "imagem": imagem { asset->{ url, metadata { lqip } } }

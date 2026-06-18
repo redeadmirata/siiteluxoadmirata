@@ -259,15 +259,10 @@ export const condominio = defineType({
     defineField({
       name: 'fotoCapa',
       title: 'Foto de capa',
-      type: 'object',
+      type: 'image',
       group: 'midia',
+      options: { hotspot: true },
       fields: [
-        defineField({
-          name: 'asset',
-          title: 'Imagem',
-          type: 'image',
-          options: { hotspot: true },
-        }),
         defineField({ name: 'alt', title: 'Texto alternativo', type: 'string' }),
       ],
     }),
