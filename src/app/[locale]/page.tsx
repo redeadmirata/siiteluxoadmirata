@@ -75,8 +75,7 @@ export default async function HomePage({
         mediaType="video"
         mediaSrc="https://www.youtube.com/embed/dvQXRyfHmTY"
         bgImageSrc="/images/background-luxo.jpg"
-        title="ADMIRATA EXCLUSIVO"
-        date="2026"
+        title=""
         scrollToExpand="Deslize para descobrir"
         textBlend
       >
