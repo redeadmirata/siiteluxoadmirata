@@ -367,3 +367,42 @@ export const BAIRRO_MINIMAL_QUERY = groq`
     "totalImoveis": count(*[_type == "imovel" && bairro._ref == ^._id && status == "Disponível"])
   }
 `
+
+/** Bairros planejados — listagem /bairros-planejados */
+export const BAIRROS_PLANEJADOS_QUERY = groq`
+  *[_type == "bairro" && bairroplanejado == true] | order(ordem asc) {
+    _id, nome, slug, cidade, estado, mercado, regiao,
+    incorporadora, areaTotal, anoInauguracao, introTexto,
+    "fotoCapa": fotoCapa { asset->{ url, metadata { lqip } }, hotspot, crop },
+    "fotoAerea": fotoAerea { asset->{ url, metadata { lqip } }, hotspot, crop },
+    "totalImoveis": count(*[_type == "imovel" && bairro._ref == ^._id && status == "Disponível"]),
+    "totalCondominios": count(*[_type == "condominio" && bairro._ref == ^._id]),
+    metaTitle, metaDescription
+  }
+`
+
+/** Detalhe de um bairro planejado — /bairros-planejados/[slug] */
+export const BAIRRO_PLANEJADO_QUERY = groq`
+  *[_type == "bairro" && slug.current == $slug && bairroplanejado == true][0] {
+    _id, nome, slug, cidade, estado, mercado, regiao,
+    incorporadora, areaTotal, anoInauguracao,
+    introTexto, porQueMorar, descricao, caracteristicas,
+    faixaPreco, amenidades, faqs,
+    bairrosProximos[]->{ _id, nome, slug, cidade },
+    "fotoCapa": fotoCapa { asset->{ url, metadata { lqip } }, hotspot, crop },
+    "fotoAerea": fotoAerea { asset->{ url, metadata { lqip } }, hotspot, crop },
+    "ogImage": ogImage { asset->{ url } },
+    "condominios": *[_type == "condominio" && bairro._ref == ^._id] | order(nome asc) {
+      _id, nome, slug, tipologia, status,
+      "imagemCapa": imagemCapa { asset->{ url, metadata { lqip } }, hotspot, crop }
+    },
+    "totalImoveis": count(*[_type == "imovel" && bairro._ref == ^._id && status == "Disponível"]),
+    geo, pontosDeInteresse,
+    metaTitle, metaDescription
+  }
+`
+
+/** Slugs de bairros planejados — generateStaticParams */
+export const BAIRROS_PLANEJADOS_SLUGS_QUERY = groq`
+  *[_type == "bairro" && bairroplanejado == true && defined(slug.current)] { "slug": slug.current }
+`

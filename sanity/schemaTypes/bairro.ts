@@ -91,6 +91,57 @@ export const bairro = defineType({
       group: 'basico',
       initialValue: 99,
     }),
+    defineField({
+      name: 'bairroplanejado',
+      title: 'Bairro Planejado?',
+      type: 'boolean',
+      group: 'basico',
+      description: 'Marcar se este bairro é um empreendimento de bairro planejado (ex: Ilha Pura, Península, Rio2)',
+      initialValue: false,
+    }),
+    defineField({
+      name: 'incorporadora',
+      title: 'Incorporadora / Desenvolvedor',
+      type: 'string',
+      group: 'basico',
+      description: 'Ex: Carvalho Hosken, Odebrecht, Even',
+    }),
+    defineField({
+      name: 'areaTotal',
+      title: 'Área total do bairro (m²)',
+      type: 'number',
+      group: 'basico',
+      description: 'Área total do empreendimento em m²',
+    }),
+    defineField({
+      name: 'anoInauguracao',
+      title: 'Ano de inauguração',
+      type: 'number',
+      group: 'basico',
+    }),
+    defineField({
+      name: 'amenidades',
+      title: 'Amenidades do bairro planejado',
+      type: 'array',
+      group: 'conteudo',
+      description: 'Ex: Parque 72mil m², Escola, Shopping, Segurança 24h',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            { name: 'titulo', title: 'Título', type: 'string' },
+            { name: 'descricao', title: 'Descrição curta', type: 'string' },
+            {
+              name: 'icone',
+              title: 'Ícone (emoji ou nome)',
+              type: 'string',
+              description: 'Ex: 🌿 ou "parque"',
+            },
+          ],
+          preview: { select: { title: 'titulo', subtitle: 'descricao' } },
+        },
+      ],
+    }),
 
     // ─── Imagens ───────────────────────────────────────────────────
     defineField({
