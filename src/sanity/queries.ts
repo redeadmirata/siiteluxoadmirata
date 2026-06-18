@@ -71,6 +71,7 @@ export const IMOVEL_PDI_QUERY = groq`
       ambientes[] { nome, tipo, area, x, y }
     },
     caracteristicas[] { grupo, nome },
+    tourVirtual, videoUrl,
     descricaoPtBr, descricaoEnUs, descricaoFrFr,
     seo, publicadoEm
   }

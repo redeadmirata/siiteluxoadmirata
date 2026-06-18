@@ -137,6 +137,8 @@ export interface ImovelPDI extends ImovelCard {
   imagens?: ImovelImagem[]
   plantas?: ImovelPlanta[]
   caracteristicas?: ImovelCaracteristica[]
+  tourVirtual?: string
+  videoUrl?: string
   descricaoPtBr?: string
   descricaoEnUs?: string
   descricaoFrFr?: string

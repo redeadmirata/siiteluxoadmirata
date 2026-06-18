@@ -317,6 +317,22 @@ export const imovel = defineType({
       ],
     }),
 
+    // ─── Tour Virtual e Vídeo ─────────────────────────────────────
+    defineField({
+      name: 'tourVirtual',
+      title: 'Tour Virtual 360° (URL)',
+      description: 'Cole o link do Kuula, Matterport, iGuide ou qualquer plataforma de tour virtual.',
+      type: 'url',
+      group: 'midia',
+    }),
+    defineField({
+      name: 'videoUrl',
+      title: 'Vídeo do imóvel (YouTube ou Vimeo)',
+      description: 'Cole o link do YouTube (youtube.com/watch?v=... ou youtu.be/...) ou Vimeo.',
+      type: 'url',
+      group: 'midia',
+    }),
+
     // ─── Plantas ───────────────────────────────────────────────────
     defineField({
       name: 'plantas',

@@ -7,34 +7,46 @@ interface TourVirtualProps {
   titulo?: string
 }
 
+/** Detecta a plataforma pelo domínio da URL */
+function detectProvider(url: string): { label: string; poweredBy: string } {
+  if (url.includes('kuula.co')) return { label: 'Tour Virtual 360°', poweredBy: 'Kuula' }
+  if (url.includes('matterport.com')) return { label: 'Tour Virtual 3D', poweredBy: 'Matterport' }
+  if (url.includes('iguide.tours')) return { label: 'Tour Virtual iGuide', poweredBy: 'iGuide' }
+  if (url.includes('roundme.com')) return { label: 'Tour Virtual 360°', poweredBy: 'Roundme' }
+  return { label: 'Tour Virtual 360°', poweredBy: '' }
+}
+
 /**
- * Tour virtual 3D — suporta Matterport e qualquer iframe compatível.
- * Carregado com lazy click para não penalizar o LCP.
+ * Tour virtual — suporta Kuula, Matterport, iGuide e qualquer iframe.
+ * Lazy load via click para não penalizar LCP.
+ * Mobile-first: aspect-[4/3] em telas pequenas, aspect-video em md+.
  */
 export default function TourVirtual({ url, titulo }: TourVirtualProps) {
   const [ativado, setAtivado] = useState(false)
+  const { label, poweredBy } = detectProvider(url)
 
   return (
-    <section className="section-padding" aria-label="Tour virtual 3D">
-      <h2 className="text-xs tracking-widest uppercase text-gold mb-6">Tour Virtual 3D</h2>
+    <section className="section-padding" aria-label={label}>
+      <h2 className="text-xs tracking-widest uppercase text-gold mb-4">{label}</h2>
 
-      <div className="relative aspect-video overflow-hidden bg-ink group">
+      {/* aspect-[4/3] em mobile (mais alto, toque mais fácil), 16/9 em md+ */}
+      <div className="relative aspect-[4/3] md:aspect-video overflow-hidden bg-ink group rounded-sm">
         {ativado ? (
           <iframe
             src={url}
-            title={titulo ? `Tour virtual — ${titulo}` : 'Tour virtual 3D do imóvel'}
-            allow="fullscreen; vr; xr-spatial-tracking"
+            title={titulo ? `${label} — ${titulo}` : label}
+            allow="fullscreen; vr; xr-spatial-tracking; gyroscope; accelerometer"
             allowFullScreen
             className="absolute inset-0 w-full h-full border-0"
           />
         ) : (
           <button
             onClick={() => setAtivado(true)}
-            className="absolute inset-0 w-full h-full flex flex-col items-center justify-center gap-4 bg-ink text-white hover:bg-ink/90 transition-colors"
-            aria-label="Iniciar tour virtual"
+            className="absolute inset-0 w-full h-full flex flex-col items-center justify-center gap-5 bg-ink text-white hover:bg-ink/90 active:bg-ink/80 transition-colors touch-manipulation"
+            aria-label={`Iniciar ${label}`}
           >
             {/* Ícone 360° */}
-            <div className="relative w-20 h-20 rounded-full border border-gold/40 flex items-center justify-center group-hover:border-gold transition-colors duration-300">
+            <div className="relative w-20 h-20 rounded-full border border-gold/40 flex items-center justify-center group-hover:border-gold group-hover:scale-105 transition-all duration-300">
               <svg
                 viewBox="0 0 48 48"
                 fill="none"
@@ -57,16 +69,24 @@ export default function TourVirtual({ url, titulo }: TourVirtualProps) {
                 <circle cx="24" cy="24" r="3" fill="currentColor" />
               </svg>
             </div>
-            <span className="text-xs uppercase tracking-[0.2em] text-white/70 group-hover:text-white/90 transition-colors">
-              Explorar em 360°
-            </span>
+
+            <div className="text-center">
+              <span className="block text-sm font-medium text-white mb-1">
+                Explorar em 360°
+              </span>
+              <span className="block text-xs uppercase tracking-[0.2em] text-white/50">
+                Toque para iniciar
+              </span>
+            </div>
           </button>
         )}
       </div>
 
-      <p className="mt-2 text-[10px] text-muted/60 text-right tracking-wide">
-        Powered by Matterport
-      </p>
+      {poweredBy && (
+        <p className="mt-2 text-[10px] text-muted/50 text-right tracking-wide">
+          Powered by {poweredBy}
+        </p>
+      )}
     </section>
   )
 }

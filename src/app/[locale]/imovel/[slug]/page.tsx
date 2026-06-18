@@ -16,6 +16,7 @@ import PlantaViewer from '@/components/pdi/PlantaViewer'
 import CTACard from '@/components/pdi/CTACard'
 import CTAFixo from '@/components/pdi/CTAFixo'
 import TourVirtual from '@/components/pdi/TourVirtual'
+import VideoPlayer from '@/components/pdi/VideoPlayer'
 import SchemaJSONLD from '@/components/SchemaJSONLD'
 import PDIAnalyticsEvents from '@/components/pdi/PDIAnalyticsEvents'
 
@@ -99,7 +100,8 @@ export default async function ImovelPDIPage({ params }: PageProps) {
 
   const imagens = imovel.imagens ?? []
   const bairroSlug = imovel.bairro?.slug?.current
-  const urlMatterport = imagens.find((i) => i.arquivo.urlMatterport)?.arquivo.urlMatterport
+  // Tour: prefere campo top-level, fallback para urlMatterport em imagens (legado)
+  const tourUrl = imovel.tourVirtual ?? imagens.find((i) => i.arquivo.urlMatterport)?.arquivo.urlMatterport
 
   return (
     <>
@@ -167,8 +169,12 @@ export default async function ImovelPDIPage({ params }: PageProps) {
               />
             )}
 
-            {urlMatterport && (
-              <TourVirtual url={urlMatterport} titulo={imovel.titulo} />
+            {tourUrl && (
+              <TourVirtual url={tourUrl} titulo={imovel.titulo} />
+            )}
+
+            {imovel.videoUrl && (
+              <VideoPlayer url={imovel.videoUrl} titulo={imovel.titulo} />
             )}
 
             {imagens.length > 0 && (
