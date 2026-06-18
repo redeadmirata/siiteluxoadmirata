@@ -21,45 +21,45 @@ const NAV_EMPRESA = [
 ]
 
 const MERCADOS = [
-  { label: 'Barra da Tijuca', href: '/imoveis?bairro=barra-da-tijuca' },
-  { label: 'Recreio dos Bandeirantes', href: '/imoveis?bairro=recreio-dos-bandeirantes' },
+  { label: 'Barra da Tijuca', href: '/imoveis?bairroSlug=barra-da-tijuca' },
+  { label: 'Recreio dos Bandeirantes', href: '/imoveis?bairroSlug=recreio-dos-bandeirantes' },
   { label: 'Leblon / Ipanema', href: '/imoveis?mercado=Rio+de+Janeiro' },
-  { label: 'Jacarepaguá', href: '/imoveis?bairro=jacarepagua' },
-  { label: 'Gramado / Canela', href: '/imoveis?mercado=Serra+Gaucha' },
+  { label: 'Jacarepaguá', href: '/imoveis?bairroSlug=jacarepagua' },
+  { label: 'Gramado / Canela', href: '/gramado' },
 ]
 
 const MAIS_BUSCADOS = [
   {
     titulo: 'Apartamentos',
     links: [
-      { label: 'Apartamento Barra da Tijuca', href: '/imoveis?tipo=Apartamento&bairro=barra-da-tijuca' },
-      { label: 'Apartamento Recreio', href: '/imoveis?tipo=Apartamento&bairro=recreio-dos-bandeirantes' },
-      { label: 'Apartamento Leblon', href: '/imoveis?tipo=Apartamento&bairro=leblon' },
-      { label: 'Apartamento Ipanema', href: '/imoveis?tipo=Apartamento&bairro=ipanema' },
-      { label: 'Apartamento Gramado', href: '/imoveis?tipo=Apartamento&mercado=Serra+Gaucha' },
+      { label: 'Apartamento Barra da Tijuca', href: '/imoveis?tipo=Apartamento&bairroSlug=barra-da-tijuca' },
+      { label: 'Apartamento Recreio', href: '/imoveis?tipo=Apartamento&bairroSlug=recreio-dos-bandeirantes' },
+      { label: 'Apartamento Leblon', href: '/imoveis?tipo=Apartamento&bairroSlug=leblon' },
+      { label: 'Apartamento Ipanema', href: '/imoveis?tipo=Apartamento&bairroSlug=ipanema' },
+      { label: 'Apartamento Gramado', href: '/imoveis?tipo=Apartamento&bairroSlug=gramado' },
       { label: 'Apartamento alto padrão RJ', href: '/imoveis?tipo=Apartamento&mercado=Rio+de+Janeiro' },
     ],
   },
   {
     titulo: 'Coberturas',
     links: [
-      { label: 'Cobertura Barra da Tijuca', href: '/imoveis?tipo=Cobertura&bairro=barra-da-tijuca' },
-      { label: 'Cobertura duplex Recreio', href: '/imoveis?tipo=Cobertura&bairro=recreio-dos-bandeirantes' },
-      { label: 'Cobertura Leblon', href: '/imoveis?tipo=Cobertura&bairro=leblon' },
-      { label: 'Penthouse Barra da Tijuca', href: '/imoveis?tipo=Penthouse&bairro=barra-da-tijuca' },
-      { label: 'Penthouse Recreio', href: '/imoveis?tipo=Penthouse&bairro=recreio-dos-bandeirantes' },
+      { label: 'Cobertura Barra da Tijuca', href: '/imoveis?tipo=Cobertura&bairroSlug=barra-da-tijuca' },
+      { label: 'Cobertura duplex Recreio', href: '/imoveis?tipo=Cobertura&bairroSlug=recreio-dos-bandeirantes' },
+      { label: 'Cobertura Leblon', href: '/imoveis?tipo=Cobertura&bairroSlug=leblon' },
+      { label: 'Penthouse Barra da Tijuca', href: '/imoveis?tipo=Penthouse&bairroSlug=barra-da-tijuca' },
+      { label: 'Penthouse Recreio', href: '/imoveis?tipo=Penthouse&bairroSlug=recreio-dos-bandeirantes' },
       { label: 'Cobertura de luxo RJ', href: '/imoveis?tipo=Cobertura&mercado=Rio+de+Janeiro' },
     ],
   },
   {
     titulo: 'Casas',
     links: [
-      { label: 'Casa Barra da Tijuca', href: '/imoveis?tipo=Casa&bairro=barra-da-tijuca' },
-      { label: 'Casa em condomínio Recreio', href: '/imoveis?tipo=Casa&bairro=recreio-dos-bandeirantes' },
-      { label: 'Casa Gramado RS', href: '/imoveis?tipo=Casa&mercado=Serra+Gaucha' },
+      { label: 'Casa Barra da Tijuca', href: '/imoveis?tipo=Casa&bairroSlug=barra-da-tijuca' },
+      { label: 'Casa em condomínio Recreio', href: '/imoveis?tipo=Casa&bairroSlug=recreio-dos-bandeirantes' },
+      { label: 'Casa Gramado RS', href: '/imoveis?tipo=Casa&bairroSlug=gramado' },
       { label: 'Casa de luxo Rio de Janeiro', href: '/imoveis?tipo=Casa&mercado=Rio+de+Janeiro' },
-      { label: 'Casa Canela RS', href: '/imoveis?tipo=Casa&bairro=canela' },
-      { label: 'Casa Jacarepaguá', href: '/imoveis?tipo=Casa&bairro=jacarepagua' },
+      { label: 'Casa Canela RS', href: '/imoveis?tipo=Casa&bairroSlug=canela' },
+      { label: 'Casa Jacarepaguá', href: '/imoveis?tipo=Casa&bairroSlug=jacarepagua' },
     ],
   },
   {
@@ -68,20 +68,20 @@ const MAIS_BUSCADOS = [
       { label: 'Condomínio fechado Barra da Tijuca', href: '/condominios' },
       { label: 'Bairro planejado Rio de Janeiro', href: '/condominios' },
       { label: 'Condomínio fechado Recreio', href: '/condominios' },
-      { label: 'Condomínio de luxo Serra Gaúcha', href: '/condominios' },
-      { label: 'Alphaville Rio de Janeiro', href: '/condominios' },
+      { label: 'Ilha Pura Barra da Tijuca', href: '/condominios' },
       { label: 'Empreendimento alto padrão RJ', href: '/condominios' },
+      { label: 'Lançamentos Ilha Pura', href: '/lancamentos' },
     ],
   },
   {
     titulo: 'Bairros',
     links: [
-      { label: 'Imóveis Barra da Tijuca', href: '/imoveis/barra-da-tijuca' },
-      { label: 'Imóveis Recreio dos Bandeirantes', href: '/imoveis/recreio-dos-bandeirantes' },
-      { label: 'Imóveis Leblon', href: '/imoveis/leblon' },
-      { label: 'Imóveis Ipanema', href: '/imoveis/ipanema' },
-      { label: 'Imóveis Gramado RS', href: '/imoveis/gramado' },
-      { label: 'Imóveis Jacarepaguá', href: '/imoveis/jacarepagua' },
+      { label: 'Imóveis Barra da Tijuca', href: '/imoveis?bairroSlug=barra-da-tijuca' },
+      { label: 'Imóveis Recreio dos Bandeirantes', href: '/imoveis?bairroSlug=recreio-dos-bandeirantes' },
+      { label: 'Imóveis Leblon', href: '/imoveis?bairroSlug=leblon' },
+      { label: 'Imóveis Ipanema', href: '/imoveis?bairroSlug=ipanema' },
+      { label: 'Imóveis Gramado RS', href: '/gramado' },
+      { label: 'Imóveis Jacarepaguá', href: '/imoveis?bairroSlug=jacarepagua' },
     ],
   },
   {

@@ -92,6 +92,22 @@ const nextConfig = {
         destination: '/fr/imoveis',
         permanent: true,
       },
+      // Páginas ainda não construídas — temporário até criação das páginas reais
+      {
+        source: '/videos',
+        destination: 'https://www.youtube.com/@admirataimoveis',
+        permanent: false,
+      },
+      {
+        source: '/anuncie',
+        destination: '/contato',
+        permanent: false,
+      },
+      {
+        source: '/cliente',
+        destination: '/contato',
+        permanent: false,
+      },
     ]
   },
 }

@@ -120,7 +120,17 @@ export default function HeroHome() {
           )}
 
           <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 14 }}>
-            <NeonButton variant="solid" size="lg" href={mercado === 'Serra Gaúcha' ? '/gramado' : '/imoveis'}>
+            <NeonButton
+              variant="solid"
+              size="lg"
+              href={
+                mercado === 'Serra Gaúcha'
+                  ? '/gramado'
+                  : mercado === 'Rio de Janeiro'
+                  ? '/imoveis?mercado=Rio+de+Janeiro'
+                  : '/imoveis'
+              }
+            >
               {mercado === 'Serra Gaúcha' ? 'Ver imoveis em Gramado' : 'Explorar imoveis'}
             </NeonButton>
             <NeonButton variant="ghost" size="lg" tone="onDark" href={wa} target="_blank" rel="noopener noreferrer">
