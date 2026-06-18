@@ -392,9 +392,22 @@ export const BAIRRO_PLANEJADO_QUERY = groq`
     "fotoCapa": fotoCapa { asset->{ url, metadata { lqip } }, hotspot, crop },
     "fotoAerea": fotoAerea { asset->{ url, metadata { lqip } }, hotspot, crop },
     "ogImage": ogImage { asset->{ url } },
-    "condominios": *[_type == "condominio" && bairro._ref == ^._id] | order(nome asc) {
-      _id, nome, slug, tipologia, status,
-      "imagemCapa": imagemCapa { asset->{ url, metadata { lqip } }, hotspot, crop }
+    "condominios": *[_type == "condominio" && bairro._ref == ^._id] | order(ordem asc) {
+      _id, nome, slug, status, construtora,
+      precoMinimo, precoMaximo, areaPrivativaMin, areaPrivativaMax,
+      prazoEntrega, tipologiasDisponiveis, videoTour,
+      comissao, vgv, whatsappCorretor, mensagemCorretorWhatsapp,
+      visibilidadeCorretor,
+      "imagemCapa": fotoCapa.asset { url, metadata { lqip } },
+      "plantasBaixas": plantasBaixas[] {
+        nome, quartos, area,
+        "imagem": imagem { asset->{ url, metadata { lqip } } }
+      },
+      "tabelaPreco": tabelaPreco { asset->{ url } },
+      "materialMarketing": materialMarketing[] {
+        titulo, tipo, url,
+        "arquivo": arquivo { asset->{ url } }
+      }
     },
     "totalImoveis": count(*[_type == "imovel" && bairro._ref == ^._id && status == "Disponível"]),
     geo, pontosDeInteresse,

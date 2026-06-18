@@ -8,6 +8,7 @@ export const condominio = defineType({
     { name: 'basico', title: 'Dados Básicos', default: true },
     { name: 'conteudo', title: 'Conteúdo SEO' },
     { name: 'midia', title: 'Mídia' },
+    { name: 'corretor', title: '🏷 Área do Corretor' },
     { name: 'localizacao', title: 'Localização' },
     { name: 'seo', title: 'SEO / Meta' },
   ],
@@ -127,6 +128,61 @@ export const condominio = defineType({
       description: 'Tipologias existentes — usadas para gerar páginas de tipologia (Nível 3 da hierarquia).',
     }),
     defineField({
+      name: 'status',
+      title: 'Status do empreendimento',
+      type: 'string',
+      group: 'basico',
+      options: {
+        list: [
+          { title: '🥂 Lançamento', value: 'Lançamento' },
+          { title: '🔨 Em obras', value: 'Em obras' },
+          { title: '🔑 Pronto para morar', value: 'Pronto' },
+          { title: '🔥 Últimas unidades', value: 'Últimas unidades' },
+          { title: '🚫 Esgotado', value: 'Esgotado' },
+        ],
+        layout: 'radio',
+      },
+    }),
+    defineField({
+      name: 'precoMinimo',
+      title: 'Preço mínimo (R$)',
+      type: 'number',
+      group: 'basico',
+      description: 'Menor preço de tabela atual. Ex: 841856',
+    }),
+    defineField({
+      name: 'precoMaximo',
+      title: 'Preço máximo (R$)',
+      type: 'number',
+      group: 'basico',
+    }),
+    defineField({
+      name: 'areaPrivativaMin',
+      title: 'Área privativa mínima (m²)',
+      type: 'number',
+      group: 'basico',
+    }),
+    defineField({
+      name: 'areaPrivativaMax',
+      title: 'Área privativa máxima (m²)',
+      type: 'number',
+      group: 'basico',
+    }),
+    defineField({
+      name: 'prazoEntrega',
+      title: 'Prazo de entrega',
+      type: 'string',
+      group: 'basico',
+      description: 'Ex: Dezembro/2026, Pronto, Em obras — Previsão 2027',
+    }),
+    defineField({
+      name: 'videoTour',
+      title: 'Vídeo tour (YouTube URL)',
+      type: 'url',
+      group: 'basico',
+      description: 'URL completa do YouTube. Ex: https://www.youtube.com/watch?v=xxx',
+    }),
+    defineField({
       name: 'ordem',
       title: 'Ordem de exibição',
       type: 'number',
@@ -243,6 +299,145 @@ export const condominio = defineType({
       type: 'image',
       group: 'midia',
       options: { hotspot: true },
+    }),
+
+    // ─── Área do Corretor ──────────────────────────────────────────
+    defineField({
+      name: 'comissao',
+      title: 'Comissão (%)',
+      type: 'number',
+      group: 'corretor',
+      description: 'Percentual sobre o valor de venda. Ex: 6',
+    }),
+    defineField({
+      name: 'vgv',
+      title: 'VGV estimado (R$)',
+      type: 'number',
+      group: 'corretor',
+      description: 'Valor geral de vendas do empreendimento.',
+    }),
+    defineField({
+      name: 'plantasBaixas',
+      title: 'Plantas baixas',
+      type: 'array',
+      group: 'corretor',
+      description: 'Plantas para compartilhar com clientes. Uma por tipologia.',
+      of: [
+        defineArrayMember({
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'nome',
+              title: 'Nome da planta',
+              type: 'string',
+              description: 'Ex: Apartamento 3 suítes — 148m²',
+              validation: (r) => r.required(),
+            }),
+            defineField({
+              name: 'quartos',
+              title: 'Quartos / Suítes',
+              type: 'string',
+              description: 'Ex: 3 suítes | 4 quartos',
+            }),
+            defineField({
+              name: 'area',
+              title: 'Área privativa (m²)',
+              type: 'number',
+            }),
+            defineField({
+              name: 'imagem',
+              title: 'Imagem da planta',
+              type: 'image',
+              options: { hotspot: false },
+            }),
+          ],
+          preview: {
+            select: { title: 'nome', subtitle: 'area', media: 'imagem' },
+            prepare({ title, subtitle, media }) {
+              return { title, subtitle: subtitle ? `${subtitle} m²` : '', media }
+            },
+          },
+        }),
+      ],
+    }),
+    defineField({
+      name: 'tabelaPreco',
+      title: 'Tabela de preços (PDF)',
+      type: 'file',
+      group: 'corretor',
+      description: 'PDF da tabela atualizada. Visível apenas para corretores logados (futuramente).',
+      options: { accept: '.pdf' },
+    }),
+    defineField({
+      name: 'materialMarketing',
+      title: 'Materiais de marketing',
+      type: 'array',
+      group: 'corretor',
+      description: 'Book, memorial, folder, apresentação. Links ou PDFs.',
+      of: [
+        defineArrayMember({
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'titulo',
+              title: 'Título do material',
+              type: 'string',
+              description: 'Ex: Book do Empreendimento, Tabela de Preços Junho/2026',
+              validation: (r) => r.required(),
+            }),
+            defineField({
+              name: 'tipo',
+              title: 'Tipo',
+              type: 'string',
+              options: {
+                list: [
+                  { title: 'PDF para download', value: 'pdf' },
+                  { title: 'Link externo', value: 'link' },
+                  { title: 'WhatsApp', value: 'whatsapp' },
+                ],
+                layout: 'radio',
+              },
+            }),
+            defineField({
+              name: 'arquivo',
+              title: 'Arquivo (PDF)',
+              type: 'file',
+              options: { accept: '.pdf' },
+            }),
+            defineField({
+              name: 'url',
+              title: 'URL (se link externo)',
+              type: 'url',
+            }),
+          ],
+          preview: {
+            select: { title: 'titulo', subtitle: 'tipo' },
+          },
+        }),
+      ],
+    }),
+    defineField({
+      name: 'whatsappCorretor',
+      title: 'WhatsApp dedicado para corretores',
+      type: 'string',
+      group: 'corretor',
+      description: 'Número com DDI. Ex: 5521999999999 — pode ser diferente do WhatsApp de clientes.',
+    }),
+    defineField({
+      name: 'mensagemCorretorWhatsapp',
+      title: 'Mensagem pré-preenchida WhatsApp (corretor)',
+      type: 'text',
+      group: 'corretor',
+      rows: 2,
+      description: 'Ex: Olá, sou corretor e tenho interesse em parceria no Elos — Ilha Pura.',
+    }),
+    defineField({
+      name: 'visibilidadeCorretor',
+      title: 'Mostrar seção de corretor publicamente',
+      type: 'boolean',
+      group: 'corretor',
+      initialValue: true,
+      description: 'Se desmarcado, a seção fica oculta até implementação de login.',
     }),
 
     // ─── Localização ───────────────────────────────────────────────

@@ -46,9 +46,34 @@ interface BairroData {
     _id: string
     nome: string
     slug: { current: string }
-    tipologia?: string
     status?: string
-    imagemCapa?: { asset?: { url: string; metadata?: { lqip?: string } } }
+    construtora?: string
+    precoMinimo?: number
+    precoMaximo?: number
+    areaPrivativaMin?: number
+    areaPrivativaMax?: number
+    prazoEntrega?: string
+    tipologiasDisponiveis?: string[]
+    videoTour?: string
+    comissao?: number
+    vgv?: number
+    whatsappCorretor?: string
+    mensagemCorretorWhatsapp?: string
+    visibilidadeCorretor?: boolean
+    imagemCapa?: { url: string; metadata?: { lqip?: string } }
+    plantasBaixas?: Array<{
+      nome: string
+      quartos?: string
+      area?: number
+      imagem?: { asset?: { url: string; metadata?: { lqip?: string } } }
+    }>
+    tabelaPreco?: { asset?: { url: string } }
+    materialMarketing?: Array<{
+      titulo: string
+      tipo?: string
+      url?: string
+      arquivo?: { asset?: { url: string } }
+    }>
   }>
   totalImoveis: number
   geo?: { lat: number; lng: number }
@@ -417,58 +442,202 @@ export default async function BairroPlanejadiSlugPage({ params, searchParams }: 
               Condomínios em {bairro.nome}
             </h2>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '1.5rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
               {bairro.condominios.map((c) => (
-                <Link
+                <div
                   key={c._id}
-                  href={`/condominios/${c.slug.current}`}
-                  style={{ textDecoration: 'none', display: 'block', color: 'inherit' }}
+                  style={{
+                    border: '1px solid rgba(0,0,0,0.07)',
+                    borderRadius: 6,
+                    overflow: 'hidden',
+                  }}
                 >
-                  <div
-                    style={{
-                      border: '1px solid rgba(0,0,0,0.08)',
-                      borderRadius: 4,
-                      overflow: 'hidden',
-                    }}
-                  >
+                  {/* Header do condomínio */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1.2fr) minmax(0,1fr)', gap: 0 }}>
                     {/* Foto */}
-                    <div
-                      style={{
-                        position: 'relative',
-                        aspectRatio: '16/10',
-                        background: '#1a1a2e',
-                        overflow: 'hidden',
-                      }}
-                    >
-                      {c.imagemCapa?.asset?.url && (
+                    <div style={{ position: 'relative', aspectRatio: '16/10', background: '#1a1a2e', overflow: 'hidden', minHeight: 220 }}>
+                      {c.imagemCapa?.url && (
                         <Image
-                          src={c.imagemCapa.asset.url}
+                          src={c.imagemCapa.url}
                           alt={c.nome}
                           fill
                           className="object-cover"
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                          placeholder={c.imagemCapa.asset.metadata?.lqip ? 'blur' : 'empty'}
-                          blurDataURL={c.imagemCapa.asset.metadata?.lqip}
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                          placeholder={c.imagemCapa.metadata?.lqip ? 'blur' : 'empty'}
+                          blurDataURL={c.imagemCapa.metadata?.lqip}
                         />
                       )}
                       {c.status && (
-                        <div style={{ position: 'absolute', top: '0.75rem', left: '0.75rem', padding: '0.25rem 0.6rem', background: 'rgba(9,11,21,0.8)', borderRadius: 2 }}>
-                          <span style={{ fontSize: 9, letterSpacing: '0.25em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.7)' }}>{c.status}</span>
+                        <div style={{ position: 'absolute', top: '1rem', left: '1rem', padding: '0.3rem 0.8rem', background: 'rgba(9,11,21,0.85)', borderRadius: 2 }}>
+                          <span style={{ fontSize: 9, letterSpacing: '0.25em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.8)' }}>{c.status}</span>
                         </div>
                       )}
                     </div>
-                    <div style={{ padding: '1rem 1.25rem' }}>
-                      <p style={{ fontFamily: 'var(--font-display)', fontSize: '1.05rem', fontWeight: 300, color: 'var(--color-ink, #1a1a2e)', marginBottom: 3 }}>
-                        {c.nome}
-                      </p>
-                      {c.tipologia && (
-                        <p style={{ fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--color-muted, #8a8a9a)' }}>
-                          {c.tipologia}
-                        </p>
-                      )}
+
+                    {/* Dados principais */}
+                    <div style={{ padding: 'clamp(1.5rem, 3vw, 2.5rem)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: '#fff' }}>
+                      <div>
+                        {c.construtora && (
+                          <p style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--color-muted, #8a8a9a)', marginBottom: '0.5rem' }}>
+                            {c.construtora}
+                          </p>
+                        )}
+                        <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.3rem, 2vw, 1.8rem)', fontWeight: 300, color: 'var(--color-ink, #1a1a2e)', lineHeight: 1.1, marginBottom: '1.25rem' }}>
+                          {c.nome}
+                        </h3>
+
+                        {/* Métricas */}
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+                          {c.precoMinimo && (
+                            <div>
+                              <p style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', color: 'var(--color-gold, #b8960c)', lineHeight: 1 }}>
+                                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(c.precoMinimo)}
+                              </p>
+                              <p style={{ fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--color-muted, #8a8a9a)', marginTop: 3 }}>
+                                A partir de
+                              </p>
+                            </div>
+                          )}
+                          {(c.areaPrivativaMin || c.areaPrivativaMax) && (
+                            <div>
+                              <p style={{ fontSize: '1rem', fontWeight: 500, color: 'var(--color-ink, #1a1a2e)', lineHeight: 1 }}>
+                                {c.areaPrivativaMin}{c.areaPrivativaMax && c.areaPrivativaMax !== c.areaPrivativaMin ? `–${c.areaPrivativaMax}` : ''} m²
+                              </p>
+                              <p style={{ fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--color-muted, #8a8a9a)', marginTop: 3 }}>
+                                Área privativa
+                              </p>
+                            </div>
+                          )}
+                          {c.prazoEntrega && (
+                            <div>
+                              <p style={{ fontSize: '0.9rem', fontWeight: 500, color: 'var(--color-ink, #1a1a2e)', lineHeight: 1 }}>{c.prazoEntrega}</p>
+                              <p style={{ fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--color-muted, #8a8a9a)', marginTop: 3 }}>Entrega</p>
+                            </div>
+                          )}
+                          {c.tipologiasDisponiveis && c.tipologiasDisponiveis.length > 0 && (
+                            <div>
+                              <p style={{ fontSize: '0.85rem', color: 'var(--color-ink, #1a1a2e)', lineHeight: 1.3 }}>
+                                {c.tipologiasDisponiveis.join(', ')}
+                              </p>
+                              <p style={{ fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--color-muted, #8a8a9a)', marginTop: 3 }}>Tipologias</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* CTAs */}
+                      <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                        <Link
+                          href={`/condominios/${c.slug.current}`}
+                          style={{
+                            fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase',
+                            padding: '0.7rem 1.4rem',
+                            background: 'var(--color-ink, #1a1a2e)',
+                            color: '#fff',
+                            borderRadius: 2, textDecoration: 'none',
+                          }}
+                        >
+                          Ver imóveis
+                        </Link>
+                        <a
+                          href={`https://wa.me/${c.whatsappCorretor ?? '5521999999999'}?text=${encodeURIComponent(c.mensagemCorretorWhatsapp ?? `Olá, tenho interesse em ${c.nome} — ${bairro.nome}`)}`}
+                          target="_blank" rel="noopener noreferrer"
+                          style={{
+                            fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase',
+                            padding: '0.7rem 1.4rem',
+                            border: '1px solid rgba(0,0,0,0.15)',
+                            color: 'var(--color-ink, #1a1a2e)',
+                            borderRadius: 2, textDecoration: 'none',
+                          }}
+                        >
+                          WhatsApp
+                        </a>
+                      </div>
                     </div>
                   </div>
-                </Link>
+
+                  {/* Plantas + Materiais do Corretor */}
+                  {c.visibilidadeCorretor !== false && (
+                    <div style={{ background: 'var(--color-stone, #F5F0E8)', borderTop: '1px solid rgba(0,0,0,0.06)', padding: 'clamp(1.25rem, 3vw, 2rem) clamp(1.5rem, 3vw, 2.5rem)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
+                        <span style={{ fontSize: 9, letterSpacing: '0.35em', textTransform: 'uppercase', color: 'var(--color-gold, #b8960c)', padding: '0.2rem 0.6rem', border: '1px solid rgba(184,150,12,0.4)', borderRadius: 2 }}>
+                          Área do Corretor
+                        </span>
+                        {c.comissao && (
+                          <span style={{ fontSize: 11, color: 'var(--color-muted, #8a8a9a)' }}>
+                            Comissão: <strong style={{ color: 'var(--color-ink, #1a1a2e)' }}>{c.comissao}%</strong>
+                          </span>
+                        )}
+                        {c.vgv && (
+                          <span style={{ fontSize: 11, color: 'var(--color-muted, #8a8a9a)' }}>
+                            VGV: <strong style={{ color: 'var(--color-ink, #1a1a2e)' }}>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', notation: 'compact', maximumFractionDigits: 1 }).format(c.vgv)}</strong>
+                          </span>
+                        )}
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1.5fr) minmax(0,1fr)', gap: '2rem' }}>
+                        {/* Plantas baixas */}
+                        {c.plantasBaixas && c.plantasBaixas.length > 0 && (
+                          <div>
+                            <p style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--color-muted, #8a8a9a)', marginBottom: '0.75rem' }}>
+                              Plantas baixas
+                            </p>
+                            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                              {c.plantasBaixas.map((p, i) => (
+                                <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem', cursor: 'pointer' }}>
+                                  {p.imagem?.asset?.url ? (
+                                    <a href={p.imagem.asset.url} target="_blank" rel="noopener noreferrer">
+                                      <div style={{ position: 'relative', width: 80, height: 80, background: '#fff', border: '1px solid rgba(0,0,0,0.1)', borderRadius: 3, overflow: 'hidden' }}>
+                                        <Image src={p.imagem.asset.url} alt={p.nome} fill className="object-contain" sizes="80px" />
+                                      </div>
+                                    </a>
+                                  ) : (
+                                    <div style={{ width: 80, height: 80, background: '#fff', border: '1px dashed rgba(0,0,0,0.15)', borderRadius: 3, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                      <span style={{ fontSize: 18, color: 'rgba(0,0,0,0.2)' }}>⬜</span>
+                                    </div>
+                                  )}
+                                  <p style={{ fontSize: 9, textAlign: 'center', color: 'var(--color-muted, #8a8a9a)', lineHeight: 1.3, maxWidth: 80 }}>
+                                    {p.quartos && `${p.quartos}`}{p.area && ` · ${p.area}m²`}
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Materiais */}
+                        {c.materialMarketing && c.materialMarketing.length > 0 && (
+                          <div>
+                            <p style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--color-muted, #8a8a9a)', marginBottom: '0.75rem' }}>
+                              Materiais
+                            </p>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                              {c.tabelaPreco?.asset?.url && (
+                                <a
+                                  href={c.tabelaPreco.asset.url}
+                                  target="_blank" rel="noopener noreferrer"
+                                  style={{ fontSize: 11, color: 'var(--color-gold, #b8960c)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                                >
+                                  ↓ Tabela de preços (PDF)
+                                </a>
+                              )}
+                              {c.materialMarketing.map((m, i) => (
+                                <a
+                                  key={i}
+                                  href={m.tipo === 'pdf' ? (m.arquivo?.asset?.url ?? '#') : (m.url ?? '#')}
+                                  target="_blank" rel="noopener noreferrer"
+                                  style={{ fontSize: 11, color: 'var(--color-ink, #1a1a2e)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', opacity: 0.75 }}
+                                >
+                                  {m.tipo === 'pdf' ? '↓' : '↗'} {m.titulo}
+                                </a>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
               ))}
             </div>
           </div>

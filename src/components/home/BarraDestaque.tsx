@@ -129,7 +129,7 @@ const CONFIG: Record<string, { text: string; copy: string; btn: string; href: st
     text: 'BARRA DA TIJUCA',
     copy: 'Orla de 18 km, condominios planejados e a maior concentracao de imoveis de alto padrao do Rio. Da praia a lagoa, a Barra reune seguranca, lazer completo e arquitetura contemporanea.',
     btn: 'Ver imoveis na Barra',
-    href: '/imoveis',
+    href: '/imoveis/venda/barra-da-tijuca',
   },
 }
 
