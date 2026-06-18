@@ -152,12 +152,10 @@ async function uploadImage(filePath, filename) {
 }
 
 function makeGaleriaItem(assetId, alt, legenda) {
+  // GROQ: galeria[]{ asset->{ ... } } → asset deve ser referência direta
   return {
     _key: key(),
-    asset: {
-      _type: 'image',
-      asset: { _type: 'reference', _ref: assetId },
-    },
+    asset: { _type: 'reference', _ref: assetId },
     alt,
     legenda,
   }
@@ -196,12 +194,10 @@ async function processCondominio(condo) {
   }
 
   // fotoCapa = primeira imagem da galeria
+  // GROQ: fotoCapa.asset->{ ... } → fotoCapa deve ser image type com asset referência
   const fotoCapa = {
-    asset: {
-      _type: 'image',
-      asset: { _type: 'reference', _ref: galeria[0].asset.asset._ref },
-    },
-    alt: `${condo.nome} — foto de capa`,
+    _type: 'image',
+    asset: { _type: 'reference', _ref: galeria[0].asset._ref },
   }
 
   try {

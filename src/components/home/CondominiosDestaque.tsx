@@ -56,9 +56,9 @@ export default async function CondominiosDestaque({ condominios }: Props) {
                   blurDataURL={c.fotoCapa.metadata?.lqip}
                 />
               ) : (
-                <div className="w-full h-full bg-white/5 flex items-center justify-center">
-                  <span className="font-display text-5xl text-white/20">
-                    {c.nome.charAt(0)}
+                <div className="w-full h-full bg-white/5 flex items-center justify-center px-4">
+                  <span className="font-display text-2xl text-white/20 text-center leading-tight">
+                    {c.nome}
                   </span>
                 </div>
               )}

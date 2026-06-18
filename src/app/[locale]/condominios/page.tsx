@@ -174,8 +174,8 @@ function CondominioCardItem({
             blurDataURL={fotoCapa.metadata?.lqip}
           />
         ) : (
-          <div className="w-full h-full bg-stone flex items-center justify-center">
-            <span className="font-display text-4xl text-muted/30">{nome.charAt(0)}</span>
+          <div className="w-full h-full bg-stone flex items-center justify-center px-4">
+            <span className="font-display text-2xl text-muted/30 text-center leading-tight">{nome}</span>
           </div>
         )}
 
