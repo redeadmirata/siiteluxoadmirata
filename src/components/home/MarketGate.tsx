@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import type { Mercado } from './MarketSwitcher'
 
 const MKT_KEY = 'admirata_mercado'

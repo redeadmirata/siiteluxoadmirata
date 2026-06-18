@@ -3,6 +3,8 @@
 import { useTranslations } from 'next-intl'
 import { useQueryStates, parseAsString, parseAsInteger } from 'nuqs'
 
+const FINALIDADES = ['Venda', 'Locação', 'Temporada'] as const
+
 const TIPOS_IMOVEL = [
   'Apartamento',
   'Cobertura',
@@ -18,22 +20,42 @@ const QUARTOS_OPTIONS = [1, 2, 3, 4] as const
 
 interface FiltrosSearchProps {
   totalResultados: number
+  hideFinalidade?: boolean
 }
 
-export default function FiltrosSearch({ totalResultados }: FiltrosSearchProps) {
+export default function FiltrosSearch({ totalResultados, hideFinalidade = false }: FiltrosSearchProps) {
   const t = useTranslations('filters')
 
   const [filters, setFilters] = useQueryStates({
+    finalidade: parseAsString.withDefault(''),
     tipo: parseAsString.withDefault(''),
     mercado: parseAsString.withDefault(''),
     quartos: parseAsInteger.withDefault(0),
   })
 
   const temFiltros =
-    filters.tipo !== '' || filters.mercado !== '' || filters.quartos !== 0
+    filters.finalidade !== '' || filters.tipo !== '' || filters.mercado !== '' || filters.quartos !== 0
 
   return (
     <div className="mb-12">
+      {/* ── Finalidade (Venda / Locação / Temporada) ── */}
+      {!hideFinalidade && <div className="flex gap-3 mb-6 border-b border-stone pb-5" role="group" aria-label="Finalidade">
+        {FINALIDADES.map((f) => (
+          <button
+            key={f}
+            className={`text-[11px] uppercase tracking-[0.16em] font-medium pb-1 transition-colors border-b-2 ${
+              filters.finalidade === f
+                ? 'text-gold border-gold'
+                : 'text-muted border-transparent hover:text-ink hover:border-stone'
+            }`}
+            onClick={() => setFilters({ finalidade: filters.finalidade === f ? null : f })}
+            aria-pressed={filters.finalidade === f}
+          >
+            {f}
+          </button>
+        ))}
+      </div>}
+
       {/* ── Filtros por tipo ── */}
       <div className="flex flex-wrap gap-2 mb-5" role="group" aria-label={t('byType')}>
         <button
@@ -109,7 +131,7 @@ export default function FiltrosSearch({ totalResultados }: FiltrosSearchProps) {
         {temFiltros && (
           <button
             className="text-[11px] text-muted hover:text-ink underline underline-offset-2 transition-colors ml-auto"
-            onClick={() => setFilters({ tipo: null, mercado: null, quartos: null })}
+            onClick={() => setFilters({ finalidade: null, tipo: null, mercado: null, quartos: null })}
           >
             {t('clear')}
           </button>

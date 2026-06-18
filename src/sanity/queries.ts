@@ -357,3 +357,13 @@ export const BLOG_POST_QUERY = groq`
 export const BLOG_SLUGS_QUERY = groq`
   *[_type == "post" && defined(slug.current)] { "slug": slug.current }
 `
+
+/** Bairro minimal — cabeçalho e meta das páginas /imoveis/[finalidade]/[bairro] */
+export const BAIRRO_MINIMAL_QUERY = groq`
+  *[_type == "bairro" && slug.current == $slug][0] {
+    _id, nome, slug, cidade, estado, mercado,
+    "fotoCapa": fotoCapa { asset->{ url, metadata { lqip } }, hotspot, crop },
+    metaTitle, metaDescription,
+    "totalImoveis": count(*[_type == "imovel" && bairro._ref == ^._id && status == "Disponível"])
+  }
+`

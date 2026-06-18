@@ -10,7 +10,10 @@ import {
 import type { ImovelCard, Bairro, CondominioCard } from '@/types/sanity'
 import HeroHome from '@/components/home/HeroHome'
 import VideoHeroScroll from '@/components/home/VideoHeroScroll'
+import CidadesDestaque from '@/components/home/CidadesDestaque'
+import PropertyShowcase from '@/components/home/PropertyShowcase'
 import ImoveisDestaque from '@/components/home/ImoveisDestaque'
+import BarraDestaque from '@/components/home/BarraDestaque'
 import BairrosGrid from '@/components/home/BairrosGrid'
 import CondominiosDestaque from '@/components/home/CondominiosDestaque'
 
@@ -68,7 +71,10 @@ export default async function HomePage({
     <main id="main-content">
       <HeroHome />
       <VideoHeroScroll />
+      <CidadesDestaque />
+      <PropertyShowcase />
       <ImoveisDestaque imoveis={imoveis} />
+      <BarraDestaque />
       <CondominiosDestaque condominios={condominios} />
       <BairrosGrid bairros={bairros} />
     </main>
