@@ -13,7 +13,8 @@ export const config = {
   // - /opengraph-image (Next.js image generation)
   // - Google Search Console verification
   matcher: [
-    '/((?!studio|api|_next|_vercel|opengraph-image|google[0-9a-f]+\\.html).*)',
+    // Exclui: studio, api, _next, _vercel, opengraph, arquivos estáticos (.html, .xml, .txt, .png, etc.)
+    '/((?!studio|api|_next|_vercel|opengraph-image|.*\\.html|.*\\.xml|.*\\.txt|.*\\.png|.*\\.jpg|.*\\.ico|.*\\.svg|.*\\.webp).*)',
     '/',
   ],
 }
