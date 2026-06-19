@@ -1,0 +1,91 @@
+{
+  "name": "Admirata | 01 — Criar Bairro",
+  "nodes": [
+    {
+      "id": "webhook-criar-bairro",
+      "name": "Webhook — Receber dados do bairro",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "criar-bairro",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "webhookId": "criar-bairro-admirata"
+    },
+    {
+      "id": "code-montar-mutation",
+      "name": "Montar mutation Sanity",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [500, 300],
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body;\n\n// Gera slug automático a partir do nome se não fornecido\nconst slug = body.slug || body.nome\n  .toLowerCase()\n  .normalize('NFD').replace(/[\\u0300-\\u036f]/g, '')\n  .replace(/[^a-z0-9]+/g, '-')\n  .replace(/^-|-$/g, '');\n\nconst id = `bairro-${slug}`;\n\nreturn [{\n  json: {\n    mutations: [\n      {\n        createOrReplace: {\n          _id: id,\n          _type: 'bairro',\n          nome: body.nome,\n          slug: { _type: 'slug', current: slug },\n          cidade: body.cidade || 'Rio de Janeiro',\n          estado: body.estado || 'RJ',\n          mercado: body.mercado || 'barra',\n          regiao: body.regiao || '',\n          zona: body.zona || '',\n          ordem: body.ordem ? Number(body.ordem) : 99,\n          bairroplanejado: false\n        }\n      }\n    ]\n  }\n}];"
+      }
+    },
+    {
+      "id": "http-sanity-mutate",
+      "name": "Sanity — Criar bairro",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [740, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "https://gvf51tpc.api.sanity.io/v2024-06-01/data/mutate/production",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "Authorization", "value": "Bearer {{$vars.SANITY_TOKEN}}" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify($json) }}"
+      }
+    },
+    {
+      "id": "respond-webhook",
+      "name": "Resposta",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [980, 300],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: true, result: $json.results, timestamp: new Date().toISOString() }) }}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook — Receber dados do bairro": {
+      "main": [[{ "node": "Montar mutation Sanity", "type": "main", "index": 0 }]]
+    },
+    "Montar mutation Sanity": {
+      "main": [[{ "node": "Sanity — Criar bairro", "type": "main", "index": 0 }]]
+    },
+    "Sanity — Criar bairro": {
+      "main": [[{ "node": "Resposta", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "__admirata_docs": {
+    "descricao": "Cria um bairro no Sanity via Webhook POST.",
+    "payload_exemplo": {
+      "nome": "Jacarepaguá",
+      "slug": "jacarepagua",
+      "mercado": "barra",
+      "regiao": "Zona Oeste",
+      "zona": "Oeste",
+      "cidade": "Rio de Janeiro",
+      "estado": "RJ",
+      "ordem": 20
+    },
+    "configuracao": "Defina a variável de ambiente SANITY_TOKEN no N8n com o token da Sanity."
+  }
+}

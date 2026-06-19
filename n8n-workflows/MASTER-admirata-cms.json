@@ -1,0 +1,422 @@
+{
+  "name": "Admirata CMS — Master Dispatcher",
+  "nodes": [
+    {
+      "id": "n1",
+      "name": "Webhook — Entrada HTTP",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 200],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "admirata-cms",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "webhookId": "admirata-cms-master",
+      "notes": "Endpoint público: POST /webhook/admirata-cms\nPayload: { acao: string, dados: object }"
+    },
+    {
+      "id": "n2",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [0, 380],
+      "parameters": {},
+      "notes": "Permite que outros workflows (ex: Fluxo de Atendimento) chamem este como sub-fluxo"
+    },
+    {
+      "id": "n3",
+      "name": "Merge — Unificar entradas",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [220, 290],
+      "parameters": {
+        "mode": "passThrough",
+        "output": "input1"
+      }
+    },
+    {
+      "id": "n4",
+      "name": "Router — Parsear e validar ação",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 290],
+      "parameters": {
+        "jsCode": "// Suporte a webhook (body aninhado) e executeWorkflow (json direto)\nconst raw = $input.first().json;\nconst body = raw.body || raw;\nconst acao = body.acao;\nconst dados = body.dados || {};\n\nif (!acao) throw new Error('Campo \"acao\" é obrigatório. Valores aceitos: criar_bairro, criar_bairro_planejado, criar_imovel, editar_imovel, buscar_imoveis, upload_foto, gerar_descricao');\n\nfunction slugify(nome) {\n  return (nome || '').toLowerCase()\n    .normalize('NFD').replace(/[\\u0300-\\u036f]/g, '')\n    .replace(/[^a-z0-9]+/g, '-')\n    .replace(/^-|-$/g, '');\n}\n\nlet result = { acao, operationType: 'mutation', revalidateTag: 'imovel' };\n\nswitch(acao) {\n\n  case 'criar_bairro': {\n    const slug = dados.slug || slugify(dados.nome);\n    result.mutations = [{ createOrReplace: {\n      _id: `bairro-${slug}`,\n      _type: 'bairro',\n      nome: dados.nome,\n      slug: { _type: 'slug', current: slug },\n      cidade: dados.cidade || 'Rio de Janeiro',\n      estado: dados.estado || 'RJ',\n      mercado: dados.mercado || 'barra',\n      regiao: dados.regiao || '',\n      zona: dados.zona || '',\n      ordem: Number(dados.ordem) || 99,\n      bairroplanejado: false\n    }}];\n    result.revalidateTag = 'bairro';\n    break;\n  }\n\n  case 'criar_bairro_planejado': {\n    const slug = dados.slug || slugify(dados.nome);\n    result.mutations = [{ createOrReplace: {\n      _id: `bairro-${slug}`,\n      _type: 'bairro',\n      nome: dados.nome,\n      slug: { _type: 'slug', current: slug },\n      cidade: dados.cidade || 'Rio de Janeiro',\n      estado: dados.estado || 'RJ',\n      mercado: dados.mercado || 'barra',\n      regiao: dados.regiao || 'Zona Oeste',\n      zona: dados.zona || 'Oeste',\n      ordem: Number(dados.ordem) || 99,\n      bairroplanejado: true,\n      incorporadora: dados.incorporadora || '',\n      introTexto: dados.introTexto || '',\n      anoInauguracao: dados.anoInauguracao ? Number(dados.anoInauguracao) : null,\n      metaTitle: dados.metaTitle || `${dados.nome} | Bairro Planejado | Admirata`,\n      metaDescription: dados.metaDescription || ''\n    }}];\n    result.revalidateTag = 'bairro';\n    break;\n  }\n\n  case 'criar_imovel': {\n    if (!dados.titulo) throw new Error('criar_imovel requer dados.titulo');\n    if (!dados.bairroId) throw new Error('criar_imovel requer dados.bairroId');\n    const slug = dados.slug || slugify(dados.titulo);\n    const doc = {\n      _id: `imovel-${slug}`,\n      _type: 'imovel',\n      titulo: dados.titulo,\n      slug: { _type: 'slug', current: slug },\n      status: dados.status || 'Disponível',\n      finalidade: dados.finalidade || 'Venda',\n      tipo: dados.tipo || 'Apartamento',\n      destaque: dados.destaque === true || dados.destaque === 'true',\n      preco: dados.preco ? Number(dados.preco) : null,\n      precoCondominio: dados.precoCondominio ? Number(dados.precoCondominio) : null,\n      quartos: dados.quartos ? Number(dados.quartos) : null,\n      suites: dados.suites ? Number(dados.suites) : null,\n      banheiros: dados.banheiros ? Number(dados.banheiros) : null,\n      vagas: dados.vagas ? Number(dados.vagas) : null,\n      areaUtil: dados.areaUtil ? Number(dados.areaUtil) : null,\n      areaTotal: dados.areaTotal ? Number(dados.areaTotal) : null,\n      descricao: dados.descricao || '',\n      endereco: dados.endereco || ''\n    };\n    if (dados.bairroId) doc.bairro = { _type: 'reference', _ref: dados.bairroId };\n    if (dados.condominioId) doc.condominio = { _type: 'reference', _ref: dados.condominioId };\n    result.mutations = [{ createOrReplace: doc }];\n    break;\n  }\n\n  case 'editar_imovel': {\n    if (!dados._id) throw new Error('editar_imovel requer dados._id');\n    const set = {};\n    const numericos = ['preco','precoCondominio','quartos','suites','banheiros','vagas','areaUtil','areaTotal','andar'];\n    const campos = [...numericos,'titulo','status','tipo','finalidade','descricao','endereco','destaque','metaTitle','metaDescription'];\n    for (const c of campos) {\n      if (dados[c] !== undefined) set[c] = numericos.includes(c) ? Number(dados[c]) : dados[c];\n    }\n    if (dados.bairroId) set.bairro = { _type: 'reference', _ref: dados.bairroId };\n    if (dados.condominioId) set.condominio = { _type: 'reference', _ref: dados.condominioId };\n    result.mutations = [{ patch: { id: dados._id, set } }];\n    break;\n  }\n\n  case 'buscar_imoveis': {\n    const filtros = [\n      `_type == 'imovel'`,\n      `finalidade == '${dados.finalidade || 'Venda'}'`,\n      `status == 'Disponível'`\n    ];\n    if (dados.bairro) filtros.push(`bairro->slug.current == '${dados.bairro}'`);\n    if (dados.tipo) filtros.push(`tipo == '${dados.tipo}'`);\n    if (dados.quartos) filtros.push(`quartos >= ${Number(dados.quartos)}`);\n    if (dados.precoMin) filtros.push(`preco >= ${Number(dados.precoMin)}`);\n    if (dados.precoMax) filtros.push(`preco <= ${Number(dados.precoMax)}`);\n    if (dados.destaque) filtros.push(`destaque == true`);\n    const por = Number(dados.por_pagina) || 20;\n    const pag = Number(dados.pagina) || 1;\n    const offset = (pag - 1) * por;\n    result.groq = encodeURIComponent(\n      `*[${filtros.join(' && ')}]|order(destaque desc,_createdAt desc)[${offset}...${offset+por}]{_id,titulo,slug,status,tipo,preco,precoCondominio,quartos,suites,banheiros,vagas,areaUtil,areaTotal,destaque,'bairro':bairro->{nome,slug},'condominio':condominio->{nome,slug},'fotoCapa':fotoCapa{asset->{url,metadata{lqip}},hotspot,crop}}`\n    );\n    result.operationType = 'query';\n    break;\n  }\n\n  case 'upload_foto': {\n    if (!dados.documentoId) throw new Error('upload_foto requer dados.documentoId');\n    if (!dados.imagemUrl) throw new Error('upload_foto requer dados.imagemUrl');\n    result.operationType = 'upload';\n    result.dados = dados;\n    break;\n  }\n\n  case 'gerar_descricao': {\n    if (!dados._id) throw new Error('gerar_descricao requer dados._id');\n    result.operationType = 'descricao';\n    result.dados = dados;\n    break;\n  }\n\n  default:\n    throw new Error(`Ação desconhecida: \"${acao}\". Válidas: criar_bairro, criar_bairro_planejado, criar_imovel, editar_imovel, buscar_imoveis, upload_foto, gerar_descricao`);\n}\n\nreturn [{ json: result }];"
+      }
+    },
+    {
+      "id": "n5",
+      "name": "IF — é mutation?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [700, 290],
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [{ "id": "c1", "leftValue": "={{ $json.operationType }}", "rightValue": "mutation", "operator": { "type": "string", "operation": "equals" } }],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "n6",
+      "name": "Sanity — Executar mutation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [940, 140],
+      "parameters": {
+        "method": "POST",
+        "url": "https://gvf51tpc.api.sanity.io/v2024-06-01/data/mutate/production",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "Authorization", "value": "=Bearer {{ $vars.SANITY_TOKEN }}" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ mutations: $json.mutations }) }}"
+      }
+    },
+    {
+      "id": "n7",
+      "name": "Next.js — Revalidar cache",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1160, 140],
+      "parameters": {
+        "method": "GET",
+        "url": "https://admirata.com.br/api/revalidate",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [{ "name": "tag", "value": "={{ $('Router — Parsear e validar ação').item.json.revalidateTag || 'imovel' }}" }]
+        }
+      }
+    },
+    {
+      "id": "n8",
+      "name": "Respond — Sucesso mutation",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1380, 140],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: true, acao: $('Router — Parsear e validar ação').item.json.acao, resultado: $('Sanity — Executar mutation').item.json.results, timestamp: new Date().toISOString() }) }}"
+      }
+    },
+    {
+      "id": "n9",
+      "name": "IF — é query?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [940, 340],
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [{ "id": "c2", "leftValue": "={{ $json.operationType }}", "rightValue": "query", "operator": { "type": "string", "operation": "equals" } }],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "n10",
+      "name": "Sanity — Executar query GROQ",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1160, 280],
+      "parameters": {
+        "method": "GET",
+        "url": "=https://gvf51tpc.apicdn.sanity.io/v2024-06-01/data/query/production?query={{ $json.groq }}"
+      }
+    },
+    {
+      "id": "n11",
+      "name": "Respond — Sucesso query",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1380, 280],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: true, acao: 'buscar_imoveis', imoveis: $json.result, timestamp: new Date().toISOString() }) }}"
+      }
+    },
+    {
+      "id": "n12",
+      "name": "IF — é upload foto?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1160, 460],
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [{ "id": "c3", "leftValue": "={{ $json.operationType }}", "rightValue": "upload", "operator": { "type": "string", "operation": "equals" } }],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "n13",
+      "name": "HTTP — Baixar imagem",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1400, 380],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json.dados.imagemUrl }}",
+        "options": {
+          "response": { "response": { "responseFormat": "file" } }
+        }
+      }
+    },
+    {
+      "id": "n14",
+      "name": "Sanity — Upload asset",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1620, 380],
+      "parameters": {
+        "method": "POST",
+        "url": "https://gvf51tpc.api.sanity.io/v2024-06-01/assets/images/production",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "image/jpeg" },
+            { "name": "Authorization", "value": "=Bearer {{ $vars.SANITY_TOKEN }}" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data"
+      }
+    },
+    {
+      "id": "n15",
+      "name": "Code — Montar patch foto",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1840, 380],
+      "parameters": {
+        "jsCode": "const assetId = $input.first().json.document._id;\nconst d = $('Router — Parsear e validar ação').item.json.dados;\nconst campo = d.campo || 'fotoCapa';\n\nconst mutations = campo === 'fotos'\n  ? [{ patch: { id: d.documentoId, insert: { after: 'fotos[-1]', items: [{ _type: 'foto', _key: `foto_${Date.now()}`, asset: { _type: 'reference', _ref: assetId }, legenda: d.legenda || '' }] } } }]\n  : [{ patch: { id: d.documentoId, set: { [campo]: { _type: 'image', asset: { _type: 'reference', _ref: assetId } } } } }];\n\nreturn [{ json: { mutations, assetId, documentoId: d.documentoId, campo } }];"
+      }
+    },
+    {
+      "id": "n16",
+      "name": "Sanity — Patch foto no documento",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2060, 380],
+      "parameters": {
+        "method": "POST",
+        "url": "https://gvf51tpc.api.sanity.io/v2024-06-01/data/mutate/production",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "Authorization", "value": "=Bearer {{ $vars.SANITY_TOKEN }}" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ mutations: $json.mutations }) }}"
+      }
+    },
+    {
+      "id": "n17",
+      "name": "Respond — Upload OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [2280, 380],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: true, acao: 'upload_foto', assetId: $('Code — Montar patch foto').item.json.assetId, campo: $('Code — Montar patch foto').item.json.campo, timestamp: new Date().toISOString() }) }}"
+      }
+    },
+    {
+      "id": "n18",
+      "name": "Sanity — Buscar dados do imóvel",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1400, 560],
+      "parameters": {
+        "method": "GET",
+        "url": "=https://gvf51tpc.apicdn.sanity.io/v2024-06-01/data/query/production?query={{ encodeURIComponent(`*[_id == '${$json.dados._id}'][0]{ _id, titulo, tipo, finalidade, preco, quartos, suites, banheiros, vagas, areaUtil, areaTotal, andar, descricao, 'bairro': bairro->{ nome }, 'condominio': condominio->{ nome } }`) }}"
+      }
+    },
+    {
+      "id": "n19",
+      "name": "Code — Montar prompt IA",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1620, 560],
+      "parameters": {
+        "jsCode": "const imovel = $('Sanity — Buscar dados do imóvel').item.json.result;\nconst d = $('Router — Parsear e validar ação').item.json.dados;\n\nif (!imovel) throw new Error(`Imóvel não encontrado: ${d._id}`);\n\nconst tom = d.tom || 'sofisticado';\nconst foco = d.focusSEO || `${imovel.tipo || 'imóvel'} ${(imovel.finalidade || 'venda').toLowerCase()} ${imovel.bairro?.nome || ''}`;\n\nconst toms = {\n  sofisticado: 'Tom refinado e aspiracional para compradores de alto padrão que valorizam exclusividade.',\n  direto: 'Tom objetivo e informativo, destacando os principais atributos sem rodeios.',\n  emocional: 'Tom envolvente que cria conexão emocional e pinta um quadro vívido da vida no imóvel.'\n};\n\nconst detalhes = [\n  imovel.tipo && `Tipo: ${imovel.tipo}`,\n  imovel.finalidade && `Finalidade: ${imovel.finalidade}`,\n  imovel.quartos && `${imovel.quartos} quartos${imovel.suites ? `, ${imovel.suites} suíte(s)` : ''}`,\n  imovel.banheiros && `${imovel.banheiros} banheiro(s)`,\n  imovel.vagas && `${imovel.vagas} vaga(s)`,\n  imovel.areaUtil && `${imovel.areaUtil}m² úteis`,\n  imovel.areaTotal && `${imovel.areaTotal}m² totais`,\n  imovel.andar && `${imovel.andar}º andar`,\n  imovel.bairro?.nome && `Bairro: ${imovel.bairro.nome}`,\n  imovel.condominio?.nome && `Condomínio: ${imovel.condominio.nome}`\n].filter(Boolean).join('\\n');\n\nconst prompt = `Você é especialista em copywriting imobiliário de luxo para o mercado do Rio de Janeiro.\\n\\n${toms[tom]}\\n\\nCrie uma descrição de 200 a 260 palavras em português brasileiro para o imóvel abaixo.\\nRegras:\\n- Otimizada para SEO com foco em: \"${foco}\"\\n- Sem bullet points\\n- Sem mencionar preço\\n- Termine com chamada para ação discreta\\n\\nDados:\\n${detalhes}\\n\\nRetorne APENAS o texto da descrição.`;\n\nreturn [{ json: { prompt, imovelId: imovel._id } }];"
+      }
+    },
+    {
+      "id": "n20",
+      "name": "OpenAI — Gerar descrição SEO",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1840, 560],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "Authorization", "value": "=Bearer {{ $vars.OPENAI_API_KEY }}" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ model: 'gpt-4o', messages: [{ role: 'system', content: 'Você é um copywriter especialista em imóveis de luxo no Rio de Janeiro.' }, { role: 'user', content: $json.prompt }], temperature: 0.72, max_tokens: 600 }) }}"
+      }
+    },
+    {
+      "id": "n21",
+      "name": "Code — Extrair e salvar descrição",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2060, 560],
+      "parameters": {
+        "jsCode": "const texto = $input.first().json.choices?.[0]?.message?.content?.trim() || '';\nconst imovelId = $('Code — Montar prompt IA').item.json.imovelId;\nif (!texto) throw new Error('OpenAI não retornou conteúdo');\nreturn [{ json: { mutations: [{ patch: { id: imovelId, set: { descricao: texto } } }], descricao: texto, imovelId } }];"
+      }
+    },
+    {
+      "id": "n22",
+      "name": "Sanity — Salvar descrição",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2280, 560],
+      "parameters": {
+        "method": "POST",
+        "url": "https://gvf51tpc.api.sanity.io/v2024-06-01/data/mutate/production",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "Authorization", "value": "=Bearer {{ $vars.SANITY_TOKEN }}" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ mutations: $json.mutations }) }}"
+      }
+    },
+    {
+      "id": "n23",
+      "name": "Respond — Descrição gerada",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [2500, 560],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: true, acao: 'gerar_descricao', imovelId: $('Code — Extrair e salvar descrição').item.json.imovelId, descricao: $('Code — Extrair e salvar descrição').item.json.descricao, timestamp: new Date().toISOString() }) }}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook — Entrada HTTP": {
+      "main": [[{ "node": "Merge — Unificar entradas", "type": "main", "index": 0 }]]
+    },
+    "Execute Workflow Trigger": {
+      "main": [[{ "node": "Merge — Unificar entradas", "type": "main", "index": 1 }]]
+    },
+    "Merge — Unificar entradas": {
+      "main": [[{ "node": "Router — Parsear e validar ação", "type": "main", "index": 0 }]]
+    },
+    "Router — Parsear e validar ação": {
+      "main": [[{ "node": "IF — é mutation?", "type": "main", "index": 0 }]]
+    },
+    "IF — é mutation?": {
+      "main": [
+        [{ "node": "Sanity — Executar mutation", "type": "main", "index": 0 }],
+        [{ "node": "IF — é query?", "type": "main", "index": 0 }]
+      ]
+    },
+    "Sanity — Executar mutation": {
+      "main": [[{ "node": "Next.js — Revalidar cache", "type": "main", "index": 0 }]]
+    },
+    "Next.js — Revalidar cache": {
+      "main": [[{ "node": "Respond — Sucesso mutation", "type": "main", "index": 0 }]]
+    },
+    "IF — é query?": {
+      "main": [
+        [{ "node": "Sanity — Executar query GROQ", "type": "main", "index": 0 }],
+        [{ "node": "IF — é upload foto?", "type": "main", "index": 0 }]
+      ]
+    },
+    "Sanity — Executar query GROQ": {
+      "main": [[{ "node": "Respond — Sucesso query", "type": "main", "index": 0 }]]
+    },
+    "IF — é upload foto?": {
+      "main": [
+        [{ "node": "HTTP — Baixar imagem", "type": "main", "index": 0 }],
+        [{ "node": "Sanity — Buscar dados do imóvel", "type": "main", "index": 0 }]
+      ]
+    },
+    "HTTP — Baixar imagem": {
+      "main": [[{ "node": "Sanity — Upload asset", "type": "main", "index": 0 }]]
+    },
+    "Sanity — Upload asset": {
+      "main": [[{ "node": "Code — Montar patch foto", "type": "main", "index": 0 }]]
+    },
+    "Code — Montar patch foto": {
+      "main": [[{ "node": "Sanity — Patch foto no documento", "type": "main", "index": 0 }]]
+    },
+    "Sanity — Patch foto no documento": {
+      "main": [[{ "node": "Respond — Upload OK", "type": "main", "index": 0 }]]
+    },
+    "Sanity — Buscar dados do imóvel": {
+      "main": [[{ "node": "Code — Montar prompt IA", "type": "main", "index": 0 }]]
+    },
+    "Code — Montar prompt IA": {
+      "main": [[{ "node": "OpenAI — Gerar descrição SEO", "type": "main", "index": 0 }]]
+    },
+    "OpenAI — Gerar descrição SEO": {
+      "main": [[{ "node": "Code — Extrair e salvar descrição", "type": "main", "index": 0 }]]
+    },
+    "Code — Extrair e salvar descrição": {
+      "main": [[{ "node": "Sanity — Salvar descrição", "type": "main", "index": 0 }]]
+    },
+    "Sanity — Salvar descrição": {
+      "main": [[{ "node": "Respond — Descrição gerada", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "__admirata_docs": {
+    "versao": "2.0 — Master Dispatcher",
+    "descricao": "Único workflow que centraliza todas as operações de CMS da Admirata. Recebe via Webhook HTTP ou sub-fluxo (Execute Workflow) e roteia por acao.",
+    "acoes_disponiveis": {
+      "criar_bairro": { "campos_obrigatorios": ["dados.nome"], "campos_opcionais": ["dados.slug", "dados.mercado", "dados.regiao", "dados.zona", "dados.cidade", "dados.estado", "dados.ordem"] },
+      "criar_bairro_planejado": { "campos_obrigatorios": ["dados.nome"], "campos_opcionais": ["dados.incorporadora", "dados.introTexto", "dados.anoInauguracao", "dados.metaTitle", "dados.metaDescription"] },
+      "criar_imovel": { "campos_obrigatorios": ["dados.titulo", "dados.bairroId"], "campos_opcionais": ["dados.tipo", "dados.finalidade", "dados.status", "dados.preco", "dados.quartos", "dados.suites", "dados.banheiros", "dados.vagas", "dados.areaUtil", "dados.condominioId", "dados.destaque", "dados.descricao"] },
+      "editar_imovel": { "campos_obrigatorios": ["dados._id"], "campos_opcionais": ["qualquer campo do imóvel"] },
+      "buscar_imoveis": { "campos_opcionais": ["dados.finalidade (Venda|Locação)", "dados.bairro", "dados.tipo", "dados.quartos", "dados.precoMin", "dados.precoMax", "dados.destaque", "dados.pagina", "dados.por_pagina"] },
+      "upload_foto": { "campos_obrigatorios": ["dados.documentoId", "dados.imagemUrl"], "campos_opcionais": ["dados.campo (fotoCapa|fotoAerea|fotos)", "dados.legenda"] },
+      "gerar_descricao": { "campos_obrigatorios": ["dados._id"], "campos_opcionais": ["dados.tom (sofisticado|direto|emocional)", "dados.focusSEO"] }
+    },
+    "variaveis_n8n": {
+      "SANITY_TOKEN": "Settings > Variables > SANITY_TOKEN",
+      "OPENAI_API_KEY": "Settings > Variables > OPENAI_API_KEY (apenas para gerar_descricao)"
+    },
+    "integracao_fluxo_atendimento": {
+      "instrucao": "No workflow Fluxo de Atendimento, adicione um nó 'Execute Workflow', selecione este workflow pelo ID e passe o JSON: { acao: string, dados: object }",
+      "nota": "Após importar este workflow, copie o ID gerado e cole no nó Execute Workflow do Fluxo de Atendimento"
+    },
+    "payload_exemplos": {
+      "whatsapp_criar_imovel": "{ \"acao\": \"criar_imovel\", \"dados\": { \"titulo\": \"Apt 3Q Barra\", \"bairroId\": \"bairro-barra-da-tijuca\", \"preco\": 980000, \"quartos\": 3, \"areaUtil\": 85 } }",
+      "whatsapp_buscar": "{ \"acao\": \"buscar_imoveis\", \"dados\": { \"bairro\": \"barra-da-tijuca\", \"quartos\": 3 } }",
+      "whatsapp_gerar_descricao": "{ \"acao\": \"gerar_descricao\", \"dados\": { \"_id\": \"imovel-xxx\", \"tom\": \"sofisticado\" } }"
+    }
+  }
+}

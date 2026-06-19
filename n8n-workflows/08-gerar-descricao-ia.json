@@ -1,0 +1,142 @@
+{
+  "name": "Admirata | 08 — Gerar Descrição com IA",
+  "nodes": [
+    {
+      "id": "webhook-descricao",
+      "name": "Webhook — Receber ID do imóvel",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gerar-descricao",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "notes": "Payload: { _id, tom?, focusSEO? }. tom: 'sofisticado'|'direto'|'emocional'. focusSEO: palavra-chave principal."
+    },
+    {
+      "id": "http-buscar-imovel",
+      "name": "Sanity — Buscar dados do imóvel",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [500, 300],
+      "parameters": {
+        "method": "GET",
+        "url": "=https://gvf51tpc.apicdn.sanity.io/v2024-06-01/data/query/production?query={{ encodeURIComponent(`*[_id == '${$json.body._id}'][0]{ _id, titulo, tipo, finalidade, status, preco, precoCondominio, quartos, suites, banheiros, vagas, areaUtil, areaTotal, andar, endereco, descricao, 'bairro': bairro->{ nome }, 'condominio': condominio->{ nome } }`) }}"
+      }
+    },
+    {
+      "id": "code-montar-prompt",
+      "name": "Montar prompt para IA",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [740, 300],
+      "parameters": {
+        "jsCode": "const imovel = $('Sanity — Buscar dados do imóvel').item.json.result;\nconst webhookBody = $('Webhook — Receber ID do imóvel').item.json.body;\n\nif (!imovel) throw new Error('Imóvel não encontrado: ' + webhookBody._id);\n\nconst tom = webhookBody.tom || 'sofisticado';\nconst focusSEO = webhookBody.focusSEO || `${imovel.tipo || 'imóvel'} ${imovel.finalidade?.toLowerCase() || 'à venda'} ${imovel.bairro?.nome || ''}`;\n\nconst tomsConfig = {\n  sofisticado: 'Escreva em tom refinado e aspiracional, voltado para o público de alto padrão que valoriza exclusividade e estilo de vida.',\n  direto: 'Escreva de forma objetiva e informativa, destacando os pontos fortes sem rodeios.',\n  emocional: 'Escreva de forma envolvente, criando conexão emocional com o leitor e pintando um quadro vívido do cotidiano no imóvel.'\n};\n\nconst detalhes = [\n  imovel.tipo && `Tipo: ${imovel.tipo}`,\n  imovel.finalidade && `Finalidade: ${imovel.finalidade}`,\n  imovel.quartos && `${imovel.quartos} quartos${imovel.suites ? `, ${imovel.suites} suíte(s)` : ''}`,\n  imovel.banheiros && `${imovel.banheiros} banheiro(s)`,\n  imovel.vagas && `${imovel.vagas} vaga(s)`,\n  imovel.areaUtil && `${imovel.areaUtil}m² úteis`,\n  imovel.areaTotal && `${imovel.areaTotal}m² totais`,\n  imovel.andar && `${imovel.andar}º andar`,\n  imovel.bairro?.nome && `Bairro: ${imovel.bairro.nome}`,\n  imovel.condominio?.nome && `Condomínio: ${imovel.condominio.nome}`,\n  imovel.preco && `Preço: R$ ${imovel.preco.toLocaleString('pt-BR')}`,\n].filter(Boolean).join('\\n');\n\nconst prompt = `Você é um especialista em copywriting imobiliário de luxo para o mercado do Rio de Janeiro.\n\n${tomsConfig[tom]}\n\nCrie uma descrição completa para o anúncio imobiliário abaixo. A descrição deve:\n- Ter entre 180 e 280 palavras\n- Ser otimizada para SEO com foco na keyword: \"${focusSEO}\"\n- Mencionar os diferenciais do imóvel e da localização\n- Terminar com uma chamada para ação discreta\n- Ser escrita em português brasileiro\n- NÃO incluir preço\n- NÃO usar bullet points\n\nDados do imóvel:\n${detalhes}\n\nDescrição existente (para contexto, mas reescreva completamente):\n${imovel.descricao || '(sem descrição ainda)'}\n\nRetorne APENAS o texto da descrição, sem título, sem metadados.`;\n\nreturn [{ json: { prompt, imovelId: imovel._id, tom, focusSEO } }];"
+      }
+    },
+    {
+      "id": "http-openai",
+      "name": "OpenAI — Gerar descrição",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [980, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "Authorization", "value": "Bearer {{$vars.OPENAI_API_KEY}}" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ model: 'gpt-4o', messages: [{ role: 'user', content: $json.prompt }], temperature: 0.75, max_tokens: 600 }) }}"
+      },
+      "notes": "Substitua por Claude API se preferir: https://api.anthropic.com/v1/messages"
+    },
+    {
+      "id": "code-extrair-texto",
+      "name": "Extrair texto gerado",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1220, 300],
+      "parameters": {
+        "jsCode": "const resposta = $input.first().json;\nconst descricaoGerada = resposta.choices?.[0]?.message?.content?.trim() || '';\nconst imovelId = $('Montar prompt para IA').item.json.imovelId;\n\nif (!descricaoGerada) throw new Error('IA não retornou descrição');\n\nreturn [{ json: { descricaoGerada, imovelId } }];"
+      }
+    },
+    {
+      "id": "http-patch-descricao",
+      "name": "Sanity — Salvar descrição",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1460, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "https://gvf51tpc.api.sanity.io/v2024-06-01/data/mutate/production",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "Authorization", "value": "Bearer {{$vars.SANITY_TOKEN}}" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ mutations: [{ patch: { id: $json.imovelId, set: { descricao: $json.descricaoGerada } } }] }) }}"
+      }
+    },
+    {
+      "id": "respond-descricao",
+      "name": "Resposta",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1700, 300],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: true, descricao: $('Extrair texto gerado').item.json.descricaoGerada, imovelId: $('Extrair texto gerado').item.json.imovelId, timestamp: new Date().toISOString() }) }}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook — Receber ID do imóvel": {
+      "main": [[{ "node": "Sanity — Buscar dados do imóvel", "type": "main", "index": 0 }]]
+    },
+    "Sanity — Buscar dados do imóvel": {
+      "main": [[{ "node": "Montar prompt para IA", "type": "main", "index": 0 }]]
+    },
+    "Montar prompt para IA": {
+      "main": [[{ "node": "OpenAI — Gerar descrição", "type": "main", "index": 0 }]]
+    },
+    "OpenAI — Gerar descrição": {
+      "main": [[{ "node": "Extrair texto gerado", "type": "main", "index": 0 }]]
+    },
+    "Extrair texto gerado": {
+      "main": [[{ "node": "Sanity — Salvar descrição", "type": "main", "index": 0 }]]
+    },
+    "Sanity — Salvar descrição": {
+      "main": [[{ "node": "Resposta", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "__admirata_docs": {
+    "descricao": "Busca dados do imóvel no Sanity, gera descrição SEO com IA (OpenAI GPT-4o ou Claude) e salva de volta.",
+    "payload_exemplo": {
+      "_id": "imovel-apto-3q-barra-da-tijuca-exemplo",
+      "tom": "sofisticado",
+      "focusSEO": "apartamento 3 quartos barra da tijuca"
+    },
+    "toms_disponiveis": ["sofisticado", "direto", "emocional"],
+    "variaveis_necessarias": {
+      "SANITY_TOKEN": "Token da API Sanity com permissão de escrita",
+      "OPENAI_API_KEY": "Chave da API OpenAI (ou adapte para Claude/Anthropic API)"
+    },
+    "proximos_passos": "Para o agente de copy SEO avançado: adicionar nó de pesquisa de palavras-chave (Ahrefs/SEMrush API) antes do prompt, e um nó de revisão humana antes de salvar no Sanity."
+  }
+}

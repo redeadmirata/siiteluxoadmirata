@@ -1,0 +1,102 @@
+{
+  "name": "Admirata | 04 — Editar Imóvel",
+  "nodes": [
+    {
+      "id": "webhook-editar-imovel",
+      "name": "Webhook — Receber edição",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "editar-imovel",
+        "responseMode": "responseNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "code-montar-patch",
+      "name": "Montar patch Sanity",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [500, 300],
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body;\n\nif (!body._id) throw new Error('Campo _id é obrigatório para editar um imóvel.');\n\n// Campos editáveis — inclui apenas os que foram enviados no payload\nconst campos = ['titulo', 'status', 'preco', 'precoCondominio', 'finalidade',\n  'tipo', 'quartos', 'suites', 'banheiros', 'vagas', 'areaUtil', 'areaTotal',\n  'andar', 'descricao', 'endereco', 'destaque', 'metaTitle', 'metaDescription'];\n\nconst set = {};\nfor (const campo of campos) {\n  if (body[campo] !== undefined) {\n    // Converte números\n    const numericos = ['preco','precoCondominio','quartos','suites','banheiros','vagas','areaUtil','areaTotal','andar'];\n    set[campo] = numericos.includes(campo) ? Number(body[campo]) : body[campo];\n  }\n}\n\n// Referências\nif (body.bairroId) set['bairro'] = { _type: 'reference', _ref: body.bairroId };\nif (body.condominioId) set['condominio'] = { _type: 'reference', _ref: body.condominioId };\n\nreturn [{\n  json: {\n    mutations: [\n      {\n        patch: {\n          id: body._id,\n          set: set\n        }\n      }\n    ]\n  }\n}];"
+      }
+    },
+    {
+      "id": "http-sanity-patch",
+      "name": "Sanity — Patch imóvel",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [740, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "https://gvf51tpc.api.sanity.io/v2024-06-01/data/mutate/production",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "Authorization", "value": "Bearer {{$vars.SANITY_TOKEN}}" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify($json) }}"
+      }
+    },
+    {
+      "id": "revalidate-edit",
+      "name": "Revalidar cache",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [980, 300],
+      "parameters": {
+        "method": "GET",
+        "url": "https://admirata.com.br/api/revalidate",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [{ "name": "tag", "value": "imovel" }]
+        }
+      }
+    },
+    {
+      "id": "respond-edit",
+      "name": "Resposta",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1220, 300],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: true, patched: $('Sanity — Patch imóvel').item.json.results?.[0]?.id, timestamp: new Date().toISOString() }) }}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook — Receber edição": {
+      "main": [[{ "node": "Montar patch Sanity", "type": "main", "index": 0 }]]
+    },
+    "Montar patch Sanity": {
+      "main": [[{ "node": "Sanity — Patch imóvel", "type": "main", "index": 0 }]]
+    },
+    "Sanity — Patch imóvel": {
+      "main": [[{ "node": "Revalidar cache", "type": "main", "index": 0 }]]
+    },
+    "Revalidar cache": {
+      "main": [[{ "node": "Resposta", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "__admirata_docs": {
+    "descricao": "Edita campos de um imóvel existente via PATCH. Apenas os campos enviados são alterados.",
+    "payload_exemplo": {
+      "_id": "imovel-apto-3q-barra-da-tijuca-exemplo",
+      "status": "Reservado",
+      "preco": 950000,
+      "destaque": true
+    },
+    "nota": "Use o _id retornado pelo workflow 03 ou busque via GROQ no Studio."
+  }
+}

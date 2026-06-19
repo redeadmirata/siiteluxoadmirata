@@ -1,0 +1,88 @@
+{
+  "name": "Admirata | 02 — Criar Bairro Planejado",
+  "nodes": [
+    {
+      "id": "webhook-bairro-planejado",
+      "name": "Webhook — Receber dados",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "criar-bairro-planejado",
+        "responseMode": "responseNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "code-montar-bairro-planejado",
+      "name": "Montar mutation",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [500, 300],
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body;\n\nconst slug = body.slug || body.nome\n  .toLowerCase()\n  .normalize('NFD').replace(/[\\u0300-\\u036f]/g, '')\n  .replace(/[^a-z0-9]+/g, '-')\n  .replace(/^-|-$/g, '');\n\nconst id = `bairro-${slug}`;\n\nreturn [{\n  json: {\n    mutations: [\n      {\n        createOrReplace: {\n          _id: id,\n          _type: 'bairro',\n          nome: body.nome,\n          slug: { _type: 'slug', current: slug },\n          cidade: body.cidade || 'Rio de Janeiro',\n          estado: body.estado || 'RJ',\n          mercado: body.mercado || 'barra',\n          regiao: body.regiao || 'Zona Oeste',\n          zona: body.zona || 'Oeste',\n          ordem: body.ordem ? Number(body.ordem) : 99,\n          bairroplanejado: true,\n          incorporadora: body.incorporadora || '',\n          introTexto: body.introTexto || '',\n          anoInauguracao: body.anoInauguracao ? Number(body.anoInauguracao) : null,\n          areaTotal: body.areaTotal || '',\n          metaTitle: body.metaTitle || `${body.nome} | Bairro Planejado | Admirata`,\n          metaDescription: body.metaDescription || ''\n        }\n      }\n    ]\n  }\n}];"
+      }
+    },
+    {
+      "id": "http-sanity-bairro-planejado",
+      "name": "Sanity — Criar bairro planejado",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [740, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "https://gvf51tpc.api.sanity.io/v2024-06-01/data/mutate/production",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "Authorization", "value": "Bearer {{$vars.SANITY_TOKEN}}" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify($json) }}"
+      }
+    },
+    {
+      "id": "respond-bairro-planejado",
+      "name": "Resposta",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [980, 300],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: true, id: $json.results?.[0]?.id, timestamp: new Date().toISOString() }) }}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook — Receber dados": {
+      "main": [[{ "node": "Montar mutation", "type": "main", "index": 0 }]]
+    },
+    "Montar mutation": {
+      "main": [[{ "node": "Sanity — Criar bairro planejado", "type": "main", "index": 0 }]]
+    },
+    "Sanity — Criar bairro planejado": {
+      "main": [[{ "node": "Resposta", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "__admirata_docs": {
+    "descricao": "Cria um bairro planejado (ex: Ilha Pura, Cidade Arte) com bairroplanejado=true.",
+    "payload_exemplo": {
+      "nome": "Cidade Arte",
+      "slug": "cidade-arte-barra",
+      "mercado": "barra",
+      "regiao": "Zona Oeste",
+      "incorporadora": "Calper",
+      "introTexto": "Primeiro bairro planejado com conceito de Arte e Design na Barra Olímpica.",
+      "anoInauguracao": 2025,
+      "metaTitle": "Cidade Arte Barra | Bairro Planejado | Admirata",
+      "metaDescription": "Condomínios de alto padrão no Cidade Arte, bairro planejado da Calper na Barra Olímpica."
+    }
+  }
+}

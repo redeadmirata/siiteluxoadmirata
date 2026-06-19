@@ -1,0 +1,155 @@
+{
+  "name": "Admirata | 05 — Upload de Fotos",
+  "nodes": [
+    {
+      "id": "webhook-upload",
+      "name": "Webhook — Receber URL da foto",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "upload-foto",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "notes": "Aceita: { documentoId, documentoTipo, imagemUrl, campo, legenda }. documentoTipo: 'imovel' | 'condominio' | 'bairro'. campo: 'fotoCapa' | 'fotos' | 'fotoAerea'"
+    },
+    {
+      "id": "http-baixar-imagem",
+      "name": "Baixar imagem da URL",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [500, 300],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json.body.imagemUrl }}",
+        "options": {
+          "response": {
+            "response": { "responseFormat": "file" }
+          }
+        }
+      }
+    },
+    {
+      "id": "http-upload-sanity",
+      "name": "Sanity — Upload asset",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [740, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "https://gvf51tpc.api.sanity.io/v2024-06-01/assets/images/production",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "image/jpeg" },
+            { "name": "Authorization", "value": "Bearer {{$vars.SANITY_TOKEN}}" },
+            { "name": "X-Sanity-Label", "value": "={{ $('Webhook — Receber URL da foto').item.json.body.legenda || 'foto' }}" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data"
+      }
+    },
+    {
+      "id": "code-montar-patch-foto",
+      "name": "Montar patch com referência ao asset",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [980, 300],
+      "parameters": {
+        "jsCode": "const webhookBody = $('Webhook — Receber URL da foto').item.json.body;\nconst assetId = $input.first().json.document._id;\nconst campo = webhookBody.campo || 'fotoCapa';\nconst docId = webhookBody.documentoId;\n\nlet mutations;\n\nif (campo === 'fotos') {\n  // Append no array de fotos\n  mutations = [{\n    patch: {\n      id: docId,\n      insert: {\n        after: 'fotos[-1]',\n        items: [{\n          _type: 'foto',\n          _key: `foto_${Date.now()}`,\n          asset: { _type: 'reference', _ref: assetId },\n          legenda: webhookBody.legenda || ''\n        }]\n      }\n    }\n  }];\n} else {\n  // fotoCapa ou fotoAerea — set direto\n  mutations = [{\n    patch: {\n      id: docId,\n      set: {\n        [campo]: {\n          _type: 'image',\n          asset: { _type: 'reference', _ref: assetId }\n        }\n      }\n    }\n  }];\n}\n\nreturn [{ json: { mutations, assetId, docId, campo } }];"
+      }
+    },
+    {
+      "id": "http-patch-documento",
+      "name": "Sanity — Patch documento",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1220, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "https://gvf51tpc.api.sanity.io/v2024-06-01/data/mutate/production",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "Authorization", "value": "Bearer {{$vars.SANITY_TOKEN}}" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ mutations: $json.mutations }) }}"
+      }
+    },
+    {
+      "id": "revalidate-foto",
+      "name": "Revalidar cache",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1460, 300],
+      "parameters": {
+        "method": "GET",
+        "url": "https://admirata.com.br/api/revalidate",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [{ "name": "tag", "value": "imovel" }]
+        }
+      }
+    },
+    {
+      "id": "respond-upload",
+      "name": "Resposta",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1700, 300],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: true, assetId: $('Montar patch com referência ao asset').item.json.assetId, campo: $('Montar patch com referência ao asset').item.json.campo, timestamp: new Date().toISOString() }) }}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook — Receber URL da foto": {
+      "main": [[{ "node": "Baixar imagem da URL", "type": "main", "index": 0 }]]
+    },
+    "Baixar imagem da URL": {
+      "main": [[{ "node": "Sanity — Upload asset", "type": "main", "index": 0 }]]
+    },
+    "Sanity — Upload asset": {
+      "main": [[{ "node": "Montar patch com referência ao asset", "type": "main", "index": 0 }]]
+    },
+    "Montar patch com referência ao asset": {
+      "main": [[{ "node": "Sanity — Patch documento", "type": "main", "index": 0 }]]
+    },
+    "Sanity — Patch documento": {
+      "main": [[{ "node": "Revalidar cache", "type": "main", "index": 0 }]]
+    },
+    "Revalidar cache": {
+      "main": [[{ "node": "Resposta", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "__admirata_docs": {
+    "descricao": "Faz upload de uma foto por URL pública, salva no Sanity e vincula ao documento (imóvel, condomínio ou bairro).",
+    "payload_fotoCapa": {
+      "documentoId": "imovel-apto-3q-barra-da-tijuca-exemplo",
+      "documentoTipo": "imovel",
+      "imagemUrl": "https://exemplo.com/foto-sala.jpg",
+      "campo": "fotoCapa",
+      "legenda": "Sala de estar"
+    },
+    "payload_galeria": {
+      "documentoId": "imovel-apto-3q-barra-da-tijuca-exemplo",
+      "documentoTipo": "imovel",
+      "imagemUrl": "https://exemplo.com/foto-quarto.jpg",
+      "campo": "fotos",
+      "legenda": "Quarto principal"
+    },
+    "campos_aceitos": ["fotoCapa", "fotoAerea", "fotos"]
+  }
+}

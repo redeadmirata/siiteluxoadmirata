@@ -1,0 +1,116 @@
+{
+  "name": "Admirata | 03 — Criar Imóvel",
+  "nodes": [
+    {
+      "id": "webhook-criar-imovel",
+      "name": "Webhook — Receber dados do imóvel",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "criar-imovel",
+        "responseMode": "responseNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "code-montar-imovel",
+      "name": "Montar mutation imóvel",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [500, 300],
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body;\n\n// Slug: usa fornecido ou gera a partir do título\nconst slug = body.slug || body.titulo\n  .toLowerCase()\n  .normalize('NFD').replace(/[\\u0300-\\u036f]/g, '')\n  .replace(/[^a-z0-9]+/g, '-')\n  .replace(/^-|-$/g, '');\n\n// ID determinístico baseado no slug\nconst id = `imovel-${slug}`;\n\n// Monta o documento\nconst doc = {\n  _id: id,\n  _type: 'imovel',\n  titulo: body.titulo,\n  slug: { _type: 'slug', current: slug },\n  status: body.status || 'Disponível',\n  finalidade: body.finalidade || 'Venda',\n  tipo: body.tipo || 'Apartamento',\n  destaque: body.destaque === true || body.destaque === 'true',\n  preco: body.preco ? Number(body.preco) : null,\n  precoCondominio: body.precoCondominio ? Number(body.precoCondominio) : null,\n  quartos: body.quartos ? Number(body.quartos) : null,\n  suites: body.suites ? Number(body.suites) : null,\n  banheiros: body.banheiros ? Number(body.banheiros) : null,\n  vagas: body.vagas ? Number(body.vagas) : null,\n  areaUtil: body.areaUtil ? Number(body.areaUtil) : null,\n  areaTotal: body.areaTotal ? Number(body.areaTotal) : null,\n  andar: body.andar ? Number(body.andar) : null,\n  descricao: body.descricao || '',\n  endereco: body.endereco || ''\n};\n\n// Referência ao bairro (obrigatório)\nif (body.bairroId) {\n  doc.bairro = { _type: 'reference', _ref: body.bairroId };\n}\n\n// Referência ao condomínio (opcional)\nif (body.condominioId) {\n  doc.condominio = { _type: 'reference', _ref: body.condominioId };\n}\n\n// metaTitle e metaDescription (opcional)\nif (body.metaTitle) doc.metaTitle = body.metaTitle;\nif (body.metaDescription) doc.metaDescription = body.metaDescription;\n\nreturn [{ json: { mutations: [{ createOrReplace: doc }] } }];"
+      }
+    },
+    {
+      "id": "http-sanity-criar-imovel",
+      "name": "Sanity — Criar imóvel",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [740, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "https://gvf51tpc.api.sanity.io/v2024-06-01/data/mutate/production",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "Authorization", "value": "Bearer {{$vars.SANITY_TOKEN}}" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify($json) }}"
+      }
+    },
+    {
+      "id": "revalidate-cache",
+      "name": "Revalidar cache Next.js",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [980, 300],
+      "parameters": {
+        "method": "GET",
+        "url": "https://admirata.com.br/api/revalidate",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [{ "name": "tag", "value": "imovel" }]
+        }
+      }
+    },
+    {
+      "id": "respond-imovel",
+      "name": "Resposta",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1220, 300],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: true, id: $('Sanity — Criar imóvel').item.json.results?.[0]?.id, timestamp: new Date().toISOString() }) }}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook — Receber dados do imóvel": {
+      "main": [[{ "node": "Montar mutation imóvel", "type": "main", "index": 0 }]]
+    },
+    "Montar mutation imóvel": {
+      "main": [[{ "node": "Sanity — Criar imóvel", "type": "main", "index": 0 }]]
+    },
+    "Sanity — Criar imóvel": {
+      "main": [[{ "node": "Revalidar cache Next.js", "type": "main", "index": 0 }]]
+    },
+    "Revalidar cache Next.js": {
+      "main": [[{ "node": "Resposta", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "__admirata_docs": {
+    "descricao": "Cria um imóvel no Sanity e revalida o cache do Next.js.",
+    "payload_exemplo": {
+      "titulo": "Apartamento 3 Quartos na Barra da Tijuca",
+      "slug": "apto-3q-barra-da-tijuca-exemplo",
+      "finalidade": "Venda",
+      "tipo": "Apartamento",
+      "status": "Disponível",
+      "preco": 980000,
+      "precoCondominio": 1200,
+      "quartos": 3,
+      "suites": 1,
+      "banheiros": 2,
+      "vagas": 1,
+      "areaUtil": 78,
+      "bairroId": "bairro-barra-da-tijuca",
+      "condominioId": "condominio-arte-wave",
+      "destaque": false,
+      "descricao": "Excelente apartamento com vista para a lagoa..."
+    },
+    "campos_status": ["Disponível", "Reservado", "Vendido", "Alugado"],
+    "campos_tipo": ["Apartamento", "Casa", "Cobertura", "Studio", "Loft", "Penthouse", "Sala Comercial"],
+    "campos_finalidade": ["Venda", "Locação"]
+  }
+}

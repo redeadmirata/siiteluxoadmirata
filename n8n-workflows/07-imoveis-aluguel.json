@@ -1,0 +1,101 @@
+{
+  "name": "Admirata | 07 — Imóveis para Aluguel",
+  "nodes": [
+    {
+      "id": "webhook-aluguel",
+      "name": "Webhook — Filtros de busca",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300],
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "imoveis-aluguel",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "notes": "Query params: bairro, tipo, quartos, precoMin, precoMax, destaque, pagina, por_pagina"
+    },
+    {
+      "id": "code-montar-groq-aluguel",
+      "name": "Montar query GROQ",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [500, 300],
+      "parameters": {
+        "jsCode": "const q = $input.first().json.query || {};\n\n// Filtros — finalidade Locação\nconst filtros = [`_type == 'imovel'`, `finalidade == 'Locação'`, `status == 'Disponível'`];\nif (q.bairro) filtros.push(`bairro->slug.current == '${q.bairro}'`);\nif (q.tipo) filtros.push(`tipo == '${q.tipo}'`);\nif (q.quartos) filtros.push(`quartos >= ${Number(q.quartos)}`);\nif (q.precoMin) filtros.push(`preco >= ${Number(q.precoMin)}`);\nif (q.precoMax) filtros.push(`preco <= ${Number(q.precoMax)}`);\nif (q.destaque === 'true') filtros.push(`destaque == true`);\n\nconst por_pagina = Number(q.por_pagina) || 20;\nconst pagina = Number(q.pagina) || 1;\nconst offset = (pagina - 1) * por_pagina;\n\nconst groq = `*[${filtros.join(' && ')}] | order(destaque desc, _createdAt desc) [${offset}...${offset + por_pagina}] {\n  _id, titulo, slug, status, tipo, preco, precoCondominio,\n  quartos, suites, banheiros, vagas, areaUtil, areaTotal, destaque,\n  'bairro': bairro->{ nome, slug },\n  'condominio': condominio->{ nome, slug },\n  'fotoCapa': fotoCapa { asset->{ url, metadata { lqip } }, hotspot, crop }\n}`;\n\nconst groqContagem = `count(*[${filtros.join(' && ')}])`;\n\nreturn [{ json: { groq: encodeURIComponent(groq), groqContagem: encodeURIComponent(groqContagem), por_pagina, pagina } }];"
+      }
+    },
+    {
+      "id": "http-query-aluguel",
+      "name": "Sanity — Buscar imóveis",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [740, 300],
+      "parameters": {
+        "method": "GET",
+        "url": "=https://gvf51tpc.apicdn.sanity.io/v2024-06-01/data/query/production?query={{ $json.groq }}"
+      }
+    },
+    {
+      "id": "http-count-aluguel",
+      "name": "Sanity — Contar total",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [740, 480],
+      "parameters": {
+        "method": "GET",
+        "url": "=https://gvf51tpc.apicdn.sanity.io/v2024-06-01/data/query/production?query={{ $('Montar query GROQ').item.json.groqContagem }}"
+      }
+    },
+    {
+      "id": "merge-aluguel",
+      "name": "Mesclar resultados",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [980, 390],
+      "parameters": {
+        "jsCode": "const imoveis = $('Sanity — Buscar imóveis').item.json.result || [];\nconst total = $('Sanity — Contar total').item.json.result || 0;\nconst por_pagina = $('Montar query GROQ').item.json.por_pagina;\nconst pagina = $('Montar query GROQ').item.json.pagina;\n\nreturn [{\n  json: {\n    imoveis,\n    paginacao: {\n      total,\n      pagina,\n      por_pagina,\n      total_paginas: Math.ceil(total / por_pagina)\n    }\n  }\n}];"
+      }
+    },
+    {
+      "id": "respond-aluguel",
+      "name": "Resposta",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1220, 390],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook — Filtros de busca": {
+      "main": [[{ "node": "Montar query GROQ", "type": "main", "index": 0 }]]
+    },
+    "Montar query GROQ": {
+      "main": [
+        [{ "node": "Sanity — Buscar imóveis", "type": "main", "index": 0 }],
+        [{ "node": "Sanity — Contar total", "type": "main", "index": 0 }]
+      ]
+    },
+    "Sanity — Buscar imóveis": {
+      "main": [[{ "node": "Mesclar resultados", "type": "main", "index": 0 }]]
+    },
+    "Sanity — Contar total": {
+      "main": [[{ "node": "Mesclar resultados", "type": "main", "index": 1 }]]
+    },
+    "Mesclar resultados": {
+      "main": [[{ "node": "Resposta", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "__admirata_docs": {
+    "descricao": "Busca imóveis para aluguel com filtros e paginação.",
+    "exemplos_url": [
+      "GET /webhook/imoveis-aluguel",
+      "GET /webhook/imoveis-aluguel?bairro=ipanema&quartos=2"
+    ]
+  }
+}
