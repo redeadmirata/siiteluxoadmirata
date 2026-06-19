@@ -47,6 +47,17 @@
       cursor: default;
     }
 
+    /* ── AUTUMN LEAVES CANVAS ── */
+    #leaf-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 15;
+    }
+
     /* ── Scroll Progress HUD (fixo) ── */
     #hud-global {
       position: fixed;
@@ -123,7 +134,6 @@
           rgba(10,10,10,0.5) 60%,
           rgba(10,10,10,0.9) 100%),
         linear-gradient(160deg, #0A1A14 0%, #1C2B25 40%, #0A0A0A 100%);
-      /* Substituir por foto real: background-image: url('./gramado-hero.jpg') */
       background-size: cover;
       background-position: center;
     }
@@ -263,9 +273,56 @@
       letter-spacing: 0.45em;
       color: var(--color-gold);
       text-transform: uppercase;
-      margin-bottom: 24px;
+      margin-bottom: 16px;
       opacity: 0;
     }
+
+    /* ── WEATHER HERO BADGE ── */
+    #weather-hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    .weather-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--color-gold-dim);
+      background: rgba(0,0,0,0.35);
+      backdrop-filter: blur(12px);
+      padding: 6px 14px;
+    }
+    .weather-pill-temp {
+      font-family: var(--font-editorial);
+      font-size: 1.4rem;
+      font-weight: 300;
+      color: var(--color-snow);
+      line-height: 1;
+    }
+    .weather-pill-sep {
+      width: 1px;
+      height: 14px;
+      background: var(--color-gold-dim);
+    }
+    .weather-pill-cond {
+      font-family: var(--font-hud);
+      font-size: 8px;
+      letter-spacing: 0.2em;
+      color: rgba(248,246,241,0.5);
+      text-transform: uppercase;
+    }
+    .weather-pill-alt {
+      font-family: var(--font-hud);
+      font-size: 8px;
+      letter-spacing: 0.2em;
+      color: rgba(184,147,62,0.5);
+      border-left: 1px solid var(--color-gold-dim);
+      padding-left: 8px;
+    }
+
     .hero-headline {
       font-family: var(--font-editorial);
       font-weight: 200;
@@ -442,6 +499,209 @@
     }
     .stat-desc { font-size: 12px; color: rgba(248,246,241,0.4); }
 
+    /* ══════════════════════════════════════════
+       SEÇÃO CLIMA — TEMPO REAL
+    ══════════════════════════════════════════ */
+    #clima {
+      background: #0C0C0C;
+      border-top: 1px solid rgba(184,147,62,0.08);
+      border-bottom: 1px solid rgba(184,147,62,0.08);
+      position: relative;
+      overflow: hidden;
+    }
+    /* Subtle gradient glow */
+    #clima::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 100% at 30% 50%, rgba(45,74,62,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .clima-inner {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 0;
+      padding: 40px 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Left: City label */
+    .clima-city {
+      padding-right: 52px;
+      border-right: 1px solid rgba(184,147,62,0.12);
+      flex-shrink: 0;
+    }
+    .clima-city-kicker {
+      font-family: var(--font-hud);
+      font-size: 7px;
+      letter-spacing: 0.45em;
+      color: var(--color-gold);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      opacity: 0.7;
+    }
+    .clima-city-name {
+      font-family: var(--font-editorial);
+      font-weight: 200;
+      font-size: 2.4rem;
+      color: var(--color-snow);
+      line-height: 1.05;
+    }
+    .clima-city-sub {
+      font-family: var(--font-hud);
+      font-size: 8px;
+      letter-spacing: 0.2em;
+      color: rgba(184,147,62,0.4);
+      margin-top: 6px;
+      text-transform: uppercase;
+    }
+
+    /* Center: Main data */
+    .clima-data-center {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 52px;
+      padding: 0 52px;
+    }
+    .clima-main-temp {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      flex-shrink: 0;
+    }
+    .clima-temp-value {
+      font-family: var(--font-editorial);
+      font-weight: 200;
+      font-size: 5.5rem;
+      color: var(--color-snow);
+      line-height: 1;
+      letter-spacing: -0.02em;
+      transition: opacity 0.4s;
+    }
+    .clima-temp-unit {
+      font-family: var(--font-editorial);
+      font-weight: 200;
+      font-size: 1.8rem;
+      color: rgba(248,246,241,0.3);
+      margin-top: 8px;
+    }
+    .clima-condition-block {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding-left: 32px;
+      border-left: 1px solid rgba(184,147,62,0.12);
+    }
+    .clima-cond-text {
+      font-family: var(--font-hud);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      color: rgba(248,246,241,0.6);
+      text-transform: uppercase;
+      max-width: 120px;
+      line-height: 1.5;
+      transition: opacity 0.4s;
+    }
+    .clima-feels {
+      font-family: var(--font-hud);
+      font-size: 9px;
+      letter-spacing: 0.15em;
+      color: var(--color-gold);
+      opacity: 0.8;
+    }
+
+    /* Metrics grid */
+    .clima-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      padding-left: 52px;
+      border-left: 1px solid rgba(184,147,62,0.12);
+    }
+    .clima-metric {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .clima-metric-lbl {
+      font-family: var(--font-hud);
+      font-size: 7px;
+      letter-spacing: 0.3em;
+      color: rgba(248,246,241,0.25);
+      text-transform: uppercase;
+    }
+    .clima-metric-val {
+      font-family: var(--font-hud);
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      color: var(--color-snow);
+      transition: opacity 0.4s;
+    }
+    .clima-metric-val.accent { color: var(--color-gold); }
+
+    /* Right: Live badge */
+    .clima-live-badge {
+      padding-left: 52px;
+      border-left: 1px solid rgba(184,147,62,0.12);
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+    }
+    .clima-live-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .clima-live-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: #4CAF50;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    .clima-live-txt {
+      font-family: var(--font-hud);
+      font-size: 7px;
+      letter-spacing: 0.3em;
+      color: rgba(248,246,241,0.2);
+      text-transform: uppercase;
+    }
+    .clima-update-lbl {
+      font-family: var(--font-hud);
+      font-size: 7px;
+      letter-spacing: 0.25em;
+      color: rgba(248,246,241,0.15);
+      text-transform: uppercase;
+    }
+    .clima-update-val {
+      font-family: var(--font-hud);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: rgba(184,147,62,0.5);
+    }
+    .clima-source {
+      font-family: var(--font-hud);
+      font-size: 7px;
+      letter-spacing: 0.2em;
+      color: rgba(248,246,241,0.1);
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    /* Loading state */
+    .clima-loading {
+      opacity: 0.2;
+      animation: loading-pulse 1.4s ease-in-out infinite;
+    }
+    @keyframes loading-pulse {
+      0%, 100% { opacity: 0.15; }
+      50% { opacity: 0.35; }
+    }
+
     /* ── SEÇÃO 3 — BAIRROS ── */
     #bairros {
       padding: 100px 0 140px;
@@ -503,7 +763,7 @@
       transition: transform 0.8s var(--ease-expo);
       will-change: transform;
     }
-    /* Placeholder gradients por bairro (substituir por fotos reais) */
+    /* Placeholder gradients por bairro */
     .bairro-card:nth-child(1) .bairro-photo {
       background: linear-gradient(135deg, #0D1F19 0%, #1A3D2B 50%, #0D2520 100%);
     }
@@ -795,40 +1055,248 @@
     }
     .cta-hud-contact a:hover { opacity: 0.7; }
 
-    /* ── Footer minimal ── */
-    footer {
-      padding: 40px 0;
+    /* ── Newsletter strip ── */
+    .newsletter-strip {
+      background: var(--color-carbon);
       border-top: 1px solid rgba(184,147,62,0.1);
-      background: var(--color-void);
+      border-bottom: 1px solid rgba(184,147,62,0.08);
+      padding: 48px 0;
     }
-    .footer-inner {
-      display: flex;
+    .newsletter-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       align-items: center;
-      justify-content: space-between;
+      gap: 48px;
     }
-    .footer-brand {
-      font-family: var(--font-hud);
-      font-size: 9px;
-      letter-spacing: 0.3em;
-      color: rgba(248,246,241,0.3);
-      text-transform: uppercase;
-    }
-    .footer-creci {
+    .newsletter-copy .nl-kicker {
       font-family: var(--font-hud);
       font-size: 8px;
-      letter-spacing: 0.15em;
-      color: rgba(248,246,241,0.2);
+      letter-spacing: 0.4em;
+      color: var(--color-gold);
+      text-transform: uppercase;
+      margin-bottom: 10px;
     }
-    .footer-back {
+    .newsletter-copy .nl-title {
+      font-family: var(--font-editorial);
+      font-weight: 200;
+      font-size: 1.8rem;
+      color: var(--color-snow);
+      line-height: 1.2;
+    }
+    .newsletter-form {
+      display: flex;
+      gap: 0;
+    }
+    .newsletter-input {
+      flex: 1;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(184,147,62,0.2);
+      border-right: none;
+      color: var(--color-snow);
+      font-family: var(--font-body);
+      font-size: 13px;
+      padding: 14px 20px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .newsletter-input::placeholder { color: rgba(248,246,241,0.25); }
+    .newsletter-input:focus { border-color: rgba(184,147,62,0.5); }
+    .newsletter-btn {
       font-family: var(--font-hud);
       font-size: 9px;
       letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 14px 28px;
+      background: var(--color-gold);
+      color: #0A0A0A;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .newsletter-btn:hover { background: #d4ac55; }
+    .newsletter-disclaimer {
+      font-family: var(--font-hud);
+      font-size: 8px;
+      letter-spacing: 0.1em;
+      color: rgba(248,246,241,0.2);
+      margin-top: 10px;
+    }
+
+    /* ── Mega Footer ── */
+    .footer-mega {
+      background: #080808;
+      border-top: 1px solid rgba(184,147,62,0.1);
+    }
+    .footer-mega-top {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 80px;
+      padding: 64px 0 48px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .footer-brand-block .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .footer-logo-mark {
+      width: 36px; height: 36px;
+      border: 1px solid var(--color-gold-dim);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-editorial);
+      font-size: 1.1rem;
+      color: var(--color-gold);
+      flex-shrink: 0;
+    }
+    .footer-logo-text {
+      font-family: var(--font-hud);
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      color: rgba(248,246,241,0.6);
+      text-transform: uppercase;
+    }
+    .footer-brand-desc {
+      font-size: 12px;
+      line-height: 1.7;
+      color: rgba(248,246,241,0.3);
+      margin-bottom: 24px;
+      max-width: 240px;
+    }
+    .footer-contacts { display: flex; flex-direction: column; gap: 8px; }
+    .footer-contact-link {
+      display: flex; align-items: center; gap: 8px;
+      font-family: var(--font-hud);
+      font-size: 9px;
+      letter-spacing: 0.1em;
       color: var(--color-gold);
       text-decoration: none;
-      opacity: 0.6;
+      opacity: 0.75;
       transition: opacity 0.2s;
     }
-    .footer-back:hover { opacity: 1; }
+    .footer-contact-link:hover { opacity: 1; }
+    .footer-contact-link .fc-icon {
+      font-size: 10px; opacity: 0.6;
+    }
+    .footer-contact-email {
+      display: flex; align-items: center; gap: 8px;
+      font-family: var(--font-hud);
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      color: rgba(248,246,241,0.35);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-contact-email:hover { color: rgba(248,246,241,0.7); }
+
+    /* Nav columns */
+    .footer-nav-cols {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 40px;
+    }
+    .footer-col-title {
+      font-family: var(--font-hud);
+      font-size: 8px;
+      letter-spacing: 0.35em;
+      color: var(--color-gold);
+      text-transform: uppercase;
+      margin-bottom: 18px;
+      opacity: 0.7;
+    }
+    .footer-col-links { display: flex; flex-direction: column; gap: 10px; }
+    .footer-col-link {
+      font-size: 12px;
+      color: rgba(248,246,241,0.35);
+      text-decoration: none;
+      transition: color 0.2s;
+      line-height: 1;
+    }
+    .footer-col-link:hover { color: rgba(248,246,241,0.75); }
+
+    /* SEO bottom section */
+    .footer-mega-bottom {
+      padding: 40px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .footer-seo-label {
+      font-family: var(--font-hud);
+      font-size: 7px;
+      letter-spacing: 0.45em;
+      color: rgba(248,246,241,0.15);
+      text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+    .footer-seo-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 32px;
+    }
+    .footer-seo-col-title {
+      font-family: var(--font-hud);
+      font-size: 7px;
+      letter-spacing: 0.3em;
+      color: rgba(248,246,241,0.2);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .footer-seo-links { display: flex; flex-direction: column; gap: 7px; }
+    .footer-seo-link {
+      font-size: 11px;
+      color: rgba(248,246,241,0.2);
+      text-decoration: none;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+    .footer-seo-link:hover { color: rgba(248,246,241,0.5); }
+    .footer-caracteristicas {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.04);
+    }
+    .footer-car-title {
+      font-family: var(--font-hud);
+      font-size: 7px;
+      letter-spacing: 0.3em;
+      color: rgba(248,246,241,0.2);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .footer-car-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px 32px;
+    }
+
+    /* Copyright bar */
+    .footer-copyright {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 0;
+    }
+    .footer-cr-text {
+      font-family: var(--font-hud);
+      font-size: 8px;
+      letter-spacing: 0.15em;
+      color: rgba(248,246,241,0.15);
+    }
+    .footer-cr-creci {
+      font-family: var(--font-hud);
+      font-size: 8px;
+      letter-spacing: 0.15em;
+      color: rgba(184,147,62,0.3);
+    }
+    .footer-cr-back {
+      font-family: var(--font-hud);
+      font-size: 8px;
+      letter-spacing: 0.2em;
+      color: rgba(184,147,62,0.45);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-cr-back:hover { color: var(--color-gold); }
 
     /* ── Mobile ── */
     @media (max-width: 768px) {
@@ -842,6 +1310,58 @@
       .imovel-card:first-child { min-height: 380px; }
       .mercado-grid { grid-template-columns: repeat(2, 1fr); }
       .hero-cta-row { flex-direction: column; align-items: center; }
+      /* Clima mobile */
+      .clima-inner {
+        grid-template-columns: 1fr;
+        gap: 32px;
+        padding: 32px 0;
+      }
+      .clima-city {
+        padding-right: 0;
+        border-right: none;
+        border-bottom: 1px solid rgba(184,147,62,0.12);
+        padding-bottom: 24px;
+      }
+      .clima-data-center {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 24px;
+        padding: 0;
+      }
+      .clima-metrics {
+        grid-template-columns: repeat(3, 1fr);
+        padding-left: 0;
+        border-left: none;
+        border-top: 1px solid rgba(184,147,62,0.12);
+        padding-top: 24px;
+        width: 100%;
+      }
+      .clima-condition-block { padding-left: 20px; }
+      .clima-live-badge {
+        padding-left: 0;
+        border-left: none;
+        align-items: flex-start;
+      }
+      #weather-hero-badge {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      /* Newsletter mobile */
+      .newsletter-inner {
+        grid-template-columns: 1fr;
+        gap: 28px;
+      }
+      .newsletter-form { flex-direction: column; }
+      .newsletter-input { border-right: 1px solid rgba(184,147,62,0.2); border-bottom: none; }
+      /* Mega footer mobile */
+      .footer-mega-top {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        padding: 48px 0 32px;
+      }
+      .footer-nav-cols { grid-template-columns: 1fr 1fr; gap: 28px; }
+      .footer-seo-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+      .footer-copyright { flex-direction: column; gap: 10px; text-align: center; }
     }
 
     /* ── Reduced motion ── */
@@ -850,11 +1370,15 @@
         animation-duration: 0.001ms !important;
         transition-duration: 0.001ms !important;
       }
+      #leaf-canvas { display: none; }
     }
   </style>
 </head>
 
 <body>
+
+  <!-- Autumn Leaves Canvas -->
+  <canvas id="leaf-canvas" aria-hidden="true"></canvas>
 
   <!-- ══════════════════════════════════════════
        SCROLL PROGRESS HUD GLOBAL (canto dir.)
@@ -870,8 +1394,8 @@
       <span id="hud-scroll-pct">000%</span>
     </div>
     <div class="hud-row">
-      <span>ALT</span>
-      <span>825m</span>
+      <span>TEMP.</span>
+      <span id="hud-global-temp">--°C</span>
     </div>
     <div class="hud-progress-track">
       <div class="hud-progress-fill" id="hud-progress-fill"></div>
@@ -898,6 +1422,17 @@
       <!-- Texto central -->
       <div id="hero-center-text">
         <p class="hero-kicker">Admirata — Serra Gaúcha</p>
+
+        <!-- Weather badge ao vivo -->
+        <div id="weather-hero-badge" aria-live="polite" aria-label="Clima atual em Gramado">
+          <div class="weather-pill">
+            <span class="weather-pill-temp" id="weather-hero-temp">--°</span>
+            <span class="weather-pill-sep"></span>
+            <span class="weather-pill-cond" id="weather-hero-cond">Carregando</span>
+            <span class="weather-pill-alt">825m · RS</span>
+          </div>
+        </div>
+
         <h1 class="hero-headline" aria-label="Gramado, onde a natureza encontra o luxo">
           Gramado,<br><em>onde a natureza</em><br>encontra o luxo
         </h1>
@@ -914,7 +1449,7 @@
       </div>
 
       <!-- HUD de telemetria Gramado -->
-      <div id="hero-hud" aria-label="Dados de mercado Gramado">
+      <div id="hero-hud" aria-label="Dados de mercado e clima Gramado">
         <div class="hud-corner-tl"></div>
         <div class="hud-corner-tr"></div>
         <div class="hud-corner-bl"></div>
@@ -926,15 +1461,18 @@
         </div>
 
         <div class="hud-section">
-          <div class="hud-label">Dados climáticos</div>
+          <div class="hud-label">Clima atual · Open-Meteo</div>
           <div class="hud-data-row"><span>ALTITUDE</span><span class="val">825m</span></div>
-          <div class="hud-data-row"><span>TEMP. MÉD.</span><span class="val">18°C</span></div>
-          <div class="hud-data-row"><span>CONDIÇÃO</span><span class="val">Névoa leve</span></div>
+          <div class="hud-data-row"><span>TEMP. ATUAL</span><span class="val" id="hud-temp">--°C</span></div>
+          <div class="hud-data-row"><span>SENSAÇÃO</span><span class="val" id="hud-feels">--°C</span></div>
+          <div class="hud-data-row"><span>CONDIÇÃO</span><span class="val" id="hud-cond">--</span></div>
+          <div class="hud-data-row"><span>UMIDADE</span><span class="val" id="hud-humidity">--%</span></div>
+          <div class="hud-data-row"><span>VENTO</span><span class="val" id="hud-wind">-- km/h</span></div>
         </div>
 
         <div class="hud-section">
           <div class="hud-label">Mercado imobiliário 2025</div>
-          <div class="hud-data-row"><span>VALORIZAÇÃO YOY</span><span class="val accent" data-counter="+14.2%">+14.2%</span></div>
+          <div class="hud-data-row"><span>VALORIZAÇÃO YOY</span><span class="val accent">+14.2%</span></div>
           <div class="hud-data-row"><span>IMÓVEIS PRIME</span><span class="val" id="counter-imoveis">47</span></div>
           <div class="hud-data-row"><span>TICKET MÉDIO</span><span class="val">R$ 2.1M</span></div>
         </div>
@@ -961,7 +1499,7 @@
         <div>
           <p class="sobre-kicker">Por que Gramado</p>
           <h2 class="sobre-headline">
-            A Europa<br>que a Serra<br><em>guardasecretamente</em>
+            A Europa<br>que a Serra<br><em>guarda secretamente</em>
           </h2>
           <div class="sobre-body">
             <p>Gramado é a única cidade brasileira que reuniu arquitetura européia, clima de montanha, gastronomia de excelência e um mercado imobiliário que valoriza consistentemente acima da média nacional.</p>
@@ -992,6 +1530,62 @@
             <div class="stat-desc">Por 12 anos consecutivos — Gramado supera destinos internacionais</div>
           </div>
         </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════
+       SEÇÃO CLIMA — TEMPO REAL GRAMADO
+  ══════════════════════════════════════════ -->
+  <section id="clima" aria-live="polite" aria-label="Clima em tempo real em Gramado">
+    <div class="section-inner">
+      <div class="clima-inner">
+
+        <!-- Cidade -->
+        <div class="clima-city">
+          <p class="clima-city-kicker">Tempo ao vivo</p>
+          <h3 class="clima-city-name">Gramado<br>agora</h3>
+          <p class="clima-city-sub">825m · RS · Brasil</p>
+        </div>
+
+        <!-- Dados centrais -->
+        <div class="clima-data-center">
+          <div class="clima-main-temp">
+            <span class="clima-temp-value clima-loading" id="clima-temp">--</span>
+            <span class="clima-temp-unit">°C</span>
+          </div>
+          <div class="clima-condition-block">
+            <span class="clima-cond-text clima-loading" id="clima-cond">Carregando dados</span>
+            <span class="clima-feels clima-loading" id="clima-feels-txt">Sensação --°C</span>
+          </div>
+          <div class="clima-metrics">
+            <div class="clima-metric">
+              <span class="clima-metric-lbl">Umidade</span>
+              <span class="clima-metric-val clima-loading" id="clima-humidity">--%</span>
+            </div>
+            <div class="clima-metric">
+              <span class="clima-metric-lbl">Vento</span>
+              <span class="clima-metric-val clima-loading" id="clima-wind">-- km/h</span>
+            </div>
+            <div class="clima-metric">
+              <span class="clima-metric-lbl">Precipitação</span>
+              <span class="clima-metric-val accent clima-loading" id="clima-precip">-- mm</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live badge -->
+        <div class="clima-live-badge">
+          <div class="clima-live-row">
+            <div class="clima-live-dot"></div>
+            <span class="clima-live-txt">Ao vivo</span>
+          </div>
+          <span class="clima-update-lbl">Atualizado em</span>
+          <span class="clima-update-val" id="clima-time">--:--</span>
+          <span class="clima-source">Open-Meteo · WMO</span>
+        </div>
+
       </div>
     </div>
   </section>
@@ -1249,15 +1843,184 @@
 
 
   <!-- ══════════════════════════════════════════
-       FOOTER
+       NEWSLETTER STRIP
   ══════════════════════════════════════════ -->
-  <footer>
+  <div class="newsletter-strip">
     <div class="section-inner">
-      <div class="footer-inner">
-        <span class="footer-brand">Admirata Negócios Imobiliários</span>
-        <span class="footer-creci">CRECI-RS 00000 · CRECI-RJ 00000-J</span>
-        <a href="https://admirata.com.br" class="footer-back">← Admirata.com.br</a>
+      <div class="newsletter-inner">
+        <div class="newsletter-copy">
+          <p class="nl-kicker">Curadoria exclusiva</p>
+          <h3 class="nl-title">Receba imóveis selecionados<br>antes de todo mundo</h3>
+        </div>
+        <div>
+          <form class="newsletter-form" onsubmit="return false">
+            <input type="email" class="newsletter-input" placeholder="Seu melhor e-mail" aria-label="E-mail para receber curadoria" />
+            <button type="submit" class="newsletter-btn">Assinar</button>
+          </form>
+          <p class="newsletter-disclaimer">Sem spam. Apenas imóveis exclusivos e novidades do mercado de alto padrão.</p>
+        </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       FOOTER — MEGA (espelho admirata.com.br)
+  ══════════════════════════════════════════ -->
+  <footer class="footer-mega">
+    <div class="section-inner">
+
+      <!-- Top: brand + nav columns -->
+      <div class="footer-mega-top">
+
+        <!-- Brand block -->
+        <div class="footer-brand-block">
+          <div class="footer-logo">
+            <div class="footer-logo-mark">A</div>
+            <span class="footer-logo-text">Admirata Imóveis</span>
+          </div>
+          <p class="footer-brand-desc">Especialistas em imóveis de alto padrão no Rio de Janeiro e Serra Gaúcha. Curadoria exclusiva para compradores e investidores exigentes.</p>
+          <div class="footer-contacts">
+            <a href="https://wa.me/5521999999999?text=Olá, tenho interesse em imóveis no Rio de Janeiro." target="_blank" rel="noopener" class="footer-contact-link">
+              <span class="fc-icon">+</span> WhatsApp Rio de Janeiro
+            </a>
+            <a href="https://wa.me/5554992643070?text=Olá, tenho interesse em imóveis em Gramado." target="_blank" rel="noopener" class="footer-contact-link">
+              <span class="fc-icon">+</span> WhatsApp Serra Gaúcha
+            </a>
+            <a href="mailto:atendimento@admirataimoveis.com.br" class="footer-contact-email">
+              <span class="fc-icon">@</span> atendimento@admirataimoveis.com.br
+            </a>
+          </div>
+        </div>
+
+        <!-- Nav columns -->
+        <div class="footer-nav-cols">
+
+          <div>
+            <p class="footer-col-title">Imóveis</p>
+            <div class="footer-col-links">
+              <a href="https://admirata.com.br/imoveis" class="footer-col-link">Todos os Imóveis</a>
+              <a href="https://admirata.com.br/imoveis?tipo=lancamento" class="footer-col-link">Lançamentos</a>
+              <a href="https://admirata.com.br/imoveis?tipo=cobertura" class="footer-col-link">Coberturas e Penthouses</a>
+              <a href="https://admirata.com.br/imoveis?caracteristica=frente-ao-mar" class="footer-col-link">Frente ao mar</a>
+              <a href="https://admirata.com.br/imoveis?caracteristica=vista-mar" class="footer-col-link">Vista mar</a>
+              <a href="https://admirata.com.br/imoveis?situacao=na-planta" class="footer-col-link">Na planta</a>
+              <a href="https://admirata.com.br/condominios" class="footer-col-link">Condomínios</a>
+            </div>
+          </div>
+
+          <div>
+            <p class="footer-col-title">Empresa</p>
+            <div class="footer-col-links">
+              <a href="https://admirata.com.br/sobre" class="footer-col-link">Quem Somos</a>
+              <a href="https://admirata.com.br/contato" class="footer-col-link">Contato</a>
+              <a href="https://admirata.com.br/favoritos" class="footer-col-link">Favoritos</a>
+              <a href="https://admirata.com.br/blog" class="footer-col-link">Blog</a>
+              <a href="https://admirata.com.br/privacidade" class="footer-col-link">Privacidade</a>
+            </div>
+          </div>
+
+          <div>
+            <p class="footer-col-title">Localizações</p>
+            <div class="footer-col-links">
+              <a href="https://admirata.com.br/bairros/barra-da-tijuca" class="footer-col-link">Barra da Tijuca</a>
+              <a href="https://admirata.com.br/bairros/recreio-dos-bandeirantes" class="footer-col-link">Recreio dos Bandeirantes</a>
+              <a href="https://admirata.com.br/bairros/leblon-ipanema" class="footer-col-link">Leblon / Ipanema</a>
+              <a href="https://admirata.com.br/bairros/jacarepagua" class="footer-col-link">Jacarepaguá</a>
+              <a href="https://admirata.com.br/imoveis?mercado=Serra+Gaucha" class="footer-col-link">Gramado / Canela</a>
+            </div>
+          </div>
+
+        </div>
+      </div><!-- /footer-mega-top -->
+
+      <!-- Bottom: SEO links "Mais Buscados" -->
+      <div class="footer-mega-bottom">
+        <p class="footer-seo-label">Mais Buscados</p>
+        <div class="footer-seo-grid">
+
+          <div>
+            <p class="footer-seo-col-title">Apartamentos</p>
+            <div class="footer-seo-links">
+              <a href="https://admirata.com.br/imoveis?tipo=apartamento&bairro=barra-da-tijuca" class="footer-seo-link">Apartamento Barra da Tijuca</a>
+              <a href="https://admirata.com.br/imoveis?tipo=apartamento&bairro=recreio" class="footer-seo-link">Apartamento Recreio</a>
+              <a href="https://admirata.com.br/imoveis?tipo=apartamento&bairro=leblon" class="footer-seo-link">Apartamento Leblon</a>
+              <a href="https://admirata.com.br/imoveis?tipo=apartamento&bairro=ipanema" class="footer-seo-link">Apartamento Ipanema</a>
+              <a href="https://admirata.com.br/imoveis?tipo=apartamento&mercado=Serra+Gaucha" class="footer-seo-link">Apartamento Gramado</a>
+              <a href="https://admirata.com.br/imoveis?tipo=apartamento&mercado=Rio+de+Janeiro" class="footer-seo-link">Apartamento alto padrão RJ</a>
+            </div>
+          </div>
+
+          <div>
+            <p class="footer-seo-col-title">Coberturas</p>
+            <div class="footer-seo-links">
+              <a href="https://admirata.com.br/imoveis?tipo=cobertura&bairro=barra-da-tijuca" class="footer-seo-link">Cobertura Barra da Tijuca</a>
+              <a href="https://admirata.com.br/imoveis?tipo=cobertura&bairro=recreio" class="footer-seo-link">Cobertura duplex Recreio</a>
+              <a href="https://admirata.com.br/imoveis?tipo=cobertura&bairro=leblon" class="footer-seo-link">Cobertura Leblon</a>
+              <a href="https://admirata.com.br/imoveis?tipo=penthouse&bairro=barra-da-tijuca" class="footer-seo-link">Penthouse Barra da Tijuca</a>
+              <a href="https://admirata.com.br/imoveis?tipo=penthouse&bairro=recreio" class="footer-seo-link">Penthouse Recreio</a>
+              <a href="https://admirata.com.br/imoveis?tipo=cobertura&mercado=Rio+de+Janeiro" class="footer-seo-link">Cobertura de luxo RJ</a>
+            </div>
+          </div>
+
+          <div>
+            <p class="footer-seo-col-title">Casas</p>
+            <div class="footer-seo-links">
+              <a href="https://admirata.com.br/imoveis?tipo=casa&bairro=barra-da-tijuca" class="footer-seo-link">Casa Barra da Tijuca</a>
+              <a href="https://admirata.com.br/imoveis?tipo=casa&bairro=recreio" class="footer-seo-link">Casa em condomínio Recreio</a>
+              <a href="https://admirata.com.br/imoveis?tipo=casa&mercado=Serra+Gaucha" class="footer-seo-link">Casa Gramado RS</a>
+              <a href="https://admirata.com.br/imoveis?tipo=casa&mercado=Rio+de+Janeiro" class="footer-seo-link">Casa de luxo Rio de Janeiro</a>
+              <a href="https://admirata.com.br/imoveis?tipo=casa&cidade=canela" class="footer-seo-link">Casa Canela RS</a>
+              <a href="https://admirata.com.br/imoveis?tipo=casa&bairro=jacarepagua" class="footer-seo-link">Casa Jacarepaguá</a>
+            </div>
+          </div>
+
+          <div>
+            <p class="footer-seo-col-title">Condomínios</p>
+            <div class="footer-seo-links">
+              <a href="https://admirata.com.br/condominios?tipo=fechado&bairro=barra-da-tijuca" class="footer-seo-link">Condomínio fechado Barra da Tijuca</a>
+              <a href="https://admirata.com.br/condominios?tipo=bairro-planejado" class="footer-seo-link">Bairro planejado Rio de Janeiro</a>
+              <a href="https://admirata.com.br/condominios?tipo=fechado&bairro=recreio" class="footer-seo-link">Condomínio fechado Recreio</a>
+              <a href="https://admirata.com.br/condominios/ilha-pura" class="footer-seo-link">Ilha Pura Barra da Tijuca</a>
+              <a href="https://admirata.com.br/condominios?padrao=alto" class="footer-seo-link">Empreendimento alto padrão RJ</a>
+              <a href="https://admirata.com.br/condominios/ilha-pura#lancamentos" class="footer-seo-link">Lançamentos Ilha Pura</a>
+            </div>
+          </div>
+
+          <div>
+            <p class="footer-seo-col-title">Bairros</p>
+            <div class="footer-seo-links">
+              <a href="https://admirata.com.br/bairros/barra-da-tijuca" class="footer-seo-link">Imóveis Barra da Tijuca</a>
+              <a href="https://admirata.com.br/bairros/recreio-dos-bandeirantes" class="footer-seo-link">Imóveis Recreio dos Bandeirantes</a>
+              <a href="https://admirata.com.br/bairros/leblon-ipanema" class="footer-seo-link">Imóveis Leblon</a>
+              <a href="https://admirata.com.br/bairros/ipanema" class="footer-seo-link">Imóveis Ipanema</a>
+              <a href="https://admirata.com.br/imoveis?mercado=Serra+Gaucha&cidade=gramado" class="footer-seo-link">Imóveis Gramado RS</a>
+              <a href="https://admirata.com.br/bairros/jacarepagua" class="footer-seo-link">Imóveis Jacarepaguá</a>
+            </div>
+          </div>
+
+        </div><!-- /footer-seo-grid -->
+
+        <!-- Características -->
+        <div class="footer-caracteristicas">
+          <p class="footer-car-title">Características</p>
+          <div class="footer-car-links">
+            <a href="https://admirata.com.br/imoveis?caracteristica=frente-ao-mar" class="footer-seo-link">Imóveis frente ao mar</a>
+            <a href="https://admirata.com.br/imoveis?caracteristica=vista-mar" class="footer-seo-link">Imóveis com vista mar</a>
+            <a href="https://admirata.com.br/imoveis?tipo=cobertura&padrao=luxo" class="footer-seo-link">Coberturas de luxo RJ</a>
+            <a href="https://admirata.com.br/imoveis?caracteristica=piscina" class="footer-seo-link">Imóveis com piscina</a>
+            <a href="https://admirata.com.br/imoveis?caracteristica=garden" class="footer-seo-link">Apartamento garden</a>
+            <a href="https://admirata.com.br/imoveis?caracteristica=varanda-gourmet" class="footer-seo-link">Varanda gourmet</a>
+          </div>
+        </div>
+      </div><!-- /footer-mega-bottom -->
+
+      <!-- Copyright -->
+      <div class="footer-copyright">
+        <span class="footer-cr-text">© 2025 Admirata Negócios Imobiliários. Todos os direitos reservados.</span>
+        <span class="footer-cr-creci">CRECI-RS 00000 · CRECI-RJ 00000-J</span>
+        <a href="https://admirata.com.br" class="footer-cr-back">← Admirata.com.br</a>
+      </div>
+
     </div>
   </footer>
 
@@ -1278,53 +2041,285 @@
 
     // ─── Lenis Smooth Scroll ────────────────────
     const lenis = new Lenis({
-      duration: 1.4,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      duration: 1.8,
+      easing: (t) => {
+        // Exponential ease-out — inicia rápido, desacelera suavemente
+        return t === 1 ? 1 : 1 - Math.pow(2, -10 * t)
+      },
       orientation: 'vertical',
       smoothWheel: true,
-      wheelMultiplier: 0.8,
-      touchMultiplier: 1.5,
+      wheelMultiplier: 0.9,
+      touchMultiplier: 1.8,
+      infinite: false,
     })
     lenis.on('scroll', ScrollTrigger.update)
     gsap.ticker.add((time) => lenis.raf(time * 1000))
     gsap.ticker.lagSmoothing(0)
 
 
+    // ════════════════════════════════════════════
+    //  AUTUMN LEAVES ANIMATION
+    // ════════════════════════════════════════════
+    const leafCanvas = document.getElementById('leaf-canvas')
+    const leafCtx = leafCanvas.getContext('2d')
+
+    function resizeLeafCanvas() {
+      leafCanvas.width = window.innerWidth
+      leafCanvas.height = window.innerHeight
+    }
+    resizeLeafCanvas()
+    window.addEventListener('resize', resizeLeafCanvas, { passive: true })
+
+    // Autumn palette — Gramado outubro/maio
+    const LEAF_COLORS = [
+      '#C8501A', // burnt orange
+      '#9B2915', // deep red
+      '#C4861C', // amber
+      '#7A3010', // russet brown
+      '#D9A030', // golden yellow
+      '#B54D10', // dark orange
+      '#A03A1A', // brick red
+      '#E8B840', // pale gold
+      '#8C3A08', // dark brown
+      '#D06020', // vivid orange
+    ]
+
+    // ── Leaf drawing — 3 types ──────────────────
+    function drawLeafShape(ctx, type) {
+      ctx.beginPath()
+      if (type === 0) {
+        // 3-lobe maple leaf (normalized ±1)
+        ctx.moveTo(0, -1)
+        ctx.bezierCurveTo(0.14, -0.86, 0.40, -0.90, 0.34, -0.60)
+        ctx.bezierCurveTo(0.54, -0.76, 0.82, -0.60, 0.70, -0.36)
+        ctx.bezierCurveTo(0.56, -0.18, 0.44, -0.28, 0.38, -0.16)
+        ctx.bezierCurveTo(0.62, 0.08, 0.38, 0.46, 0, 0.52)
+        ctx.bezierCurveTo(-0.38, 0.46, -0.62, 0.08, -0.38, -0.16)
+        ctx.bezierCurveTo(-0.44, -0.28, -0.56, -0.18, -0.70, -0.36)
+        ctx.bezierCurveTo(-0.82, -0.60, -0.54, -0.76, -0.34, -0.60)
+        ctx.bezierCurveTo(-0.40, -0.90, -0.14, -0.86, 0, -1)
+        ctx.closePath()
+      } else if (type === 1) {
+        // Elongated elliptical leaf
+        ctx.moveTo(0, -1)
+        ctx.bezierCurveTo(0.36, -0.88, 0.50, -0.38, 0.46, 0.12)
+        ctx.bezierCurveTo(0.40, 0.60, 0.20, 0.92, 0, 1)
+        ctx.bezierCurveTo(-0.20, 0.92, -0.40, 0.60, -0.46, 0.12)
+        ctx.bezierCurveTo(-0.50, -0.38, -0.36, -0.88, 0, -1)
+        ctx.closePath()
+      } else {
+        // Fan / ginkgo leaf
+        ctx.moveTo(0, 0.65)
+        ctx.bezierCurveTo(-0.22, 0.52, -0.78, 0.20, -0.84, -0.22)
+        ctx.bezierCurveTo(-0.90, -0.62, -0.52, -0.94, -0.28, -0.96)
+        ctx.bezierCurveTo(-0.08, -0.98, 0, -0.58, 0, -0.38)
+        ctx.bezierCurveTo(0, -0.58, 0.08, -0.98, 0.28, -0.96)
+        ctx.bezierCurveTo(0.52, -0.94, 0.90, -0.62, 0.84, -0.22)
+        ctx.bezierCurveTo(0.78, 0.20, 0.22, 0.52, 0, 0.65)
+        ctx.closePath()
+      }
+    }
+
+    class Leaf {
+      constructor(initY) {
+        this.reset(initY)
+      }
+
+      reset(initY) {
+        this.x = Math.random() * leafCanvas.width
+        this.y = initY !== undefined ? initY : -(20 + Math.random() * 80)
+        this.size = 8 + Math.random() * 16
+        this.rotation = Math.random() * Math.PI * 2
+        this.rotSpeed = (Math.random() - 0.5) * 0.022
+        this.fallSpeed = 0.4 + Math.random() * 1.1
+        this.swayAmp = 28 + Math.random() * 46
+        this.swayFreq = 0.007 + Math.random() * 0.011
+        this.swayPhase = Math.random() * Math.PI * 2
+        this.color = LEAF_COLORS[Math.floor(Math.random() * LEAF_COLORS.length)]
+        this.alpha = 0.45 + Math.random() * 0.45
+        this.type = Math.floor(Math.random() * 3)
+        this.t = Math.random() * 1000
+      }
+
+      update() {
+        this.t++
+        this.y += this.fallSpeed
+        this.x += Math.sin(this.t * this.swayFreq + this.swayPhase) * 0.45
+        this.rotation += this.rotSpeed
+        if (this.y > leafCanvas.height + 50 || this.x < -60 || this.x > leafCanvas.width + 60) {
+          this.reset()
+        }
+      }
+
+      draw(ctx) {
+        ctx.save()
+        ctx.globalAlpha = this.alpha
+        ctx.translate(this.x, this.y)
+        ctx.rotate(this.rotation)
+        ctx.scale(this.size, this.size)
+
+        // Soft shadow
+        ctx.shadowColor = 'rgba(0,0,0,0.18)'
+        ctx.shadowBlur = 3 / this.size
+        ctx.shadowOffsetY = 1.5 / this.size
+
+        ctx.fillStyle = this.color
+        drawLeafShape(ctx, this.type)
+        ctx.fill()
+
+        // Midrib vein
+        ctx.shadowColor = 'transparent'
+        ctx.globalAlpha = 0.12
+        ctx.strokeStyle = 'rgba(0,0,0,0.6)'
+        ctx.lineWidth = 0.7 / this.size
+        ctx.beginPath()
+        if (this.type === 0) {
+          ctx.moveTo(0, -0.9); ctx.lineTo(0, 0.4)
+        } else if (this.type === 1) {
+          ctx.moveTo(0, -0.9); ctx.lineTo(0, 0.9)
+        } else {
+          ctx.moveTo(0, 0.5); ctx.lineTo(0, -0.5)
+        }
+        ctx.stroke()
+
+        ctx.restore()
+      }
+    }
+
+    // Spawn leaves — spread across initial viewport
+    const LEAF_COUNT = isMobile ? 18 : 35
+    const leaves = Array.from({ length: LEAF_COUNT }, (_, i) =>
+      new Leaf(i < LEAF_COUNT * 0.6 ? Math.random() * leafCanvas.height : undefined)
+    )
+
+    let leafAnimId = null
+    function animateLeaves() {
+      leafCtx.clearRect(0, 0, leafCanvas.width, leafCanvas.height)
+      for (const leaf of leaves) {
+        leaf.update()
+        leaf.draw(leafCtx)
+      }
+      leafAnimId = requestAnimationFrame(animateLeaves)
+    }
+
+    if (!prefersReducedMotion) {
+      animateLeaves()
+    }
+
+
+    // ════════════════════════════════════════════
+    //  WEATHER API — Open-Meteo (free, no key)
+    // ════════════════════════════════════════════
+    const WEATHER_URL =
+      'https://api.open-meteo.com/v1/forecast' +
+      '?latitude=-29.3781&longitude=-50.8756' +
+      '&current=temperature_2m,relative_humidity_2m,weather_code,' +
+      'wind_speed_10m,apparent_temperature,precipitation' +
+      '&timezone=America%2FSao_Paulo&wind_speed_unit=kmh'
+
+    const WMO = {
+      0: 'Céu limpo', 1: 'Céu claro', 2: 'Parcialmente nublado', 3: 'Nublado',
+      45: 'Névoa', 48: 'Névoa com geada',
+      51: 'Garoa leve', 53: 'Garoa moderada', 55: 'Garoa densa',
+      61: 'Chuva leve', 63: 'Chuva moderada', 65: 'Chuva forte',
+      71: 'Neve leve', 73: 'Neve moderada', 75: 'Neve forte',
+      77: 'Grãos de neve',
+      80: 'Aguaceiro leve', 81: 'Aguaceiro moderado', 82: 'Aguaceiro forte',
+      85: 'Aguaceiro de neve', 86: 'Aguaceiro forte de neve',
+      95: 'Trovoada', 96: 'Trovoada c/ granizo', 99: 'Trovoada forte',
+    }
+
+    function setEl(id, text) {
+      const el = document.getElementById(id)
+      if (!el) return
+      el.textContent = text
+      el.classList.remove('clima-loading')
+    }
+
+    async function fetchWeather() {
+      try {
+        const res = await fetch(WEATHER_URL, { signal: AbortSignal.timeout(8000) })
+        if (!res.ok) throw new Error('HTTP ' + res.status)
+        const data = await res.json()
+        const c = data.current
+
+        const temp     = Math.round(c.temperature_2m)
+        const feels    = Math.round(c.apparent_temperature)
+        const humidity = Math.round(c.relative_humidity_2m)
+        const wind     = Math.round(c.wind_speed_10m)
+        const precip   = parseFloat(c.precipitation).toFixed(1)
+        const cond     = WMO[c.weather_code] ?? 'Condição desconhecida'
+        const now      = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+
+        // ── Seção #clima ──────────────────────────
+        setEl('clima-temp',      temp)
+        setEl('clima-cond',      cond)
+        setEl('clima-feels-txt', `Sensação ${feels}°C`)
+        setEl('clima-humidity',  `${humidity}%`)
+        setEl('clima-wind',      `${wind} km/h`)
+        setEl('clima-precip',    `${precip} mm`)
+        setEl('clima-time',      now)
+
+        // ── Hero HUD ─────────────────────────────
+        setEl('hud-temp',     `${temp}°C`)
+        setEl('hud-feels',    `${feels}°C`)
+        setEl('hud-cond',     cond)
+        setEl('hud-humidity', `${humidity}%`)
+        setEl('hud-wind',     `${wind} km/h`)
+
+        // ── HUD global (canto dir.) ──────────────
+        setEl('hud-global-temp', `${temp}°C`)
+
+        // ── Hero weather badge ───────────────────
+        const heroTempEl = document.getElementById('weather-hero-temp')
+        const heroCondEl = document.getElementById('weather-hero-cond')
+        if (heroTempEl) heroTempEl.textContent = `${temp}°`
+        if (heroCondEl) heroCondEl.textContent = cond
+
+        // Animate badge in if first load
+        gsap.to('#weather-hero-badge', {
+          opacity: 1, y: 0, duration: 0.9, ease: 'expo.out'
+        })
+
+      } catch (err) {
+        console.warn('[Admirata] Weather fetch failed:', err.message)
+        // Graceful fallback — badge stays hidden, HUD shows placeholder dashes
+      }
+    }
+
+    fetchWeather()
+    setInterval(fetchWeather, 30 * 60 * 1000) // refresh a cada 30min
+
+
     // ─── FRAME SEQUENCE HERO ──────────────────────
-    // Coloque os frames em ./frames/gramado_0000.jpg … gramado_0089.jpg
     const canvas = document.getElementById('hero-canvas')
     const ctx = canvas.getContext('2d')
     const fallback = document.getElementById('hero-fallback')
     const frameCount = 90
     const images = []
     let framesLoaded = 0
-    let useCanvas = !isMobile  // mobile usa fallback estático
+    let useCanvas = !isMobile
 
     if (useCanvas) {
       canvas.width = window.innerWidth
       canvas.height = window.innerHeight
 
-      // Tenta carregar o primeiro frame para verificar se existem
       const testImg = new Image()
       testImg.onload = function () {
         fallback.style.display = 'none'
         canvas.style.display = 'block'
-        // Pré-carrega todos
         for (let i = 0; i < frameCount; i++) {
           const img = new Image()
           img.src = `./frames/gramado_${String(i).padStart(4, '0')}.jpg`
           img.onload = () => {
             framesLoaded++
-            if (i === 0) {
-              ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-            }
+            if (i === 0) ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
           }
           images.push(img)
         }
         initFrameSequence()
       }
       testImg.onerror = function () {
-        // Frames não encontrados — usar fallback
         canvas.style.display = 'none'
         fallback.style.display = 'block'
       }
@@ -1344,8 +2339,9 @@
           trigger: '#hero-sequence',
           start: 'top top',
           end: '+=300%',
-          scrub: 0.5,
+          scrub: 1,
           pin: true,
+          anticipatePin: 1,
         },
         onUpdate() {
           const idx = Math.round(obj.frame)
@@ -1357,7 +2353,6 @@
       })
     }
 
-    // Se não há frame sequence, pin o hero igualmente
     if (!useCanvas || isMobile) {
       ScrollTrigger.create({
         trigger: '#hero-sequence',
@@ -1372,22 +2367,15 @@
     // ─── HERO ENTRANCE ANIMATIONS ───────────────
     const heroTl = gsap.timeline({ delay: 0.3 })
 
-    // Kicker fade
     heroTl.to('.hero-kicker', { opacity: 1, y: 0, duration: 1, ease: 'expo.out' }, 0)
 
-    // Headline palavra por palavra
     const headline = document.querySelector('.hero-headline')
     if (headline) {
       const html = headline.innerHTML
       const withWords = html.replace(/(\S+)/g, '<span class="word"><span class="word-inner">$1</span></span>')
       headline.innerHTML = withWords
-
       heroTl.from('.word-inner', {
-        yPercent: 110,
-        opacity: 0,
-        duration: 1.2,
-        stagger: 0.07,
-        ease: 'expo.out',
+        yPercent: 110, opacity: 0, duration: 1.2, stagger: 0.07, ease: 'expo.out',
       }, 0.2)
     }
 
@@ -1396,47 +2384,36 @@
       .to('.hero-subtitle', { opacity: 1, duration: 0.8 }, 1.0)
       .to('.hero-cta-row', { opacity: 1, y: 0, duration: 0.8 }, 1.2)
 
-    // HUD overlay aparece
     gsap.to('#hero-hud', {
-      opacity: 1,
-      x: 0,
-      duration: 1.2,
-      ease: 'expo.out',
-      delay: 1.4,
+      opacity: 1, x: 0, duration: 1.2, ease: 'expo.out', delay: 1.4,
     })
-
-    // HUD Global
     gsap.to('#hud-global', {
-      opacity: 1,
-      x: 0,
-      duration: 0.8,
-      ease: 'expo.out',
-      delay: 1.6,
+      opacity: 1, x: 0, duration: 0.8, ease: 'expo.out', delay: 1.6,
     })
 
 
     // ─── SCROLL PROGRESS HUD ──────────────────────
     const hudProgressFill = document.getElementById('hud-progress-fill')
-    const hudScrollPct = document.getElementById('hud-scroll-pct')
-    const hudSectionName = document.getElementById('hud-section-name')
+    const hudScrollPct    = document.getElementById('hud-scroll-pct')
+    const hudSectionName  = document.getElementById('hud-section-name')
 
     function updateScrollHUD() {
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight
-      const pct = Math.round((scrollTop / docHeight) * 100)
-      if (hudScrollPct) hudScrollPct.textContent = String(pct).padStart(3, '0') + '%'
+      const scrollTop  = window.pageYOffset || document.documentElement.scrollTop
+      const docHeight  = document.documentElement.scrollHeight - window.innerHeight
+      const pct        = Math.round((scrollTop / docHeight) * 100)
+      if (hudScrollPct)    hudScrollPct.textContent    = String(pct).padStart(3, '0') + '%'
       if (hudProgressFill) hudProgressFill.style.width = pct + '%'
     }
     window.addEventListener('scroll', updateScrollHUD, { passive: true })
 
-    // Seção atual no HUD
     const sectionMap = [
       { id: 'hero-sequence', label: 'HERO' },
-      { id: 'sobre', label: 'SOBRE GRAMADO' },
-      { id: 'bairros', label: 'EXPLORANDO BAIRROS' },
-      { id: 'imoveis', label: 'IMÓVEIS' },
-      { id: 'mercado', label: 'MERCADO' },
-      { id: 'cta', label: 'CONTATO' },
+      { id: 'sobre',         label: 'SOBRE GRAMADO' },
+      { id: 'clima',         label: 'CLIMA' },
+      { id: 'bairros',       label: 'EXPLORANDO BAIRROS' },
+      { id: 'imoveis',       label: 'IMÓVEIS' },
+      { id: 'mercado',       label: 'MERCADO' },
+      { id: 'cta',           label: 'CONTATO' },
     ]
     sectionMap.forEach(({ id, label }) => {
       ScrollTrigger.create({
@@ -1445,9 +2422,7 @@
         onEnter: () => { if (hudSectionName) hudSectionName.textContent = label },
         onLeaveBack: () => {
           const idx = sectionMap.findIndex(s => s.id === id)
-          if (idx > 0 && hudSectionName) {
-            hudSectionName.textContent = sectionMap[idx - 1].label
-          }
+          if (idx > 0 && hudSectionName) hudSectionName.textContent = sectionMap[idx - 1].label
         },
       })
     })
@@ -1472,13 +2447,34 @@
     })
 
 
+    // ─── CLIMA — reveal ───────────────────────────
+    gsap.from('#clima .clima-city', {
+      opacity: 0, x: -30, duration: 1, ease: 'expo.out',
+      scrollTrigger: { trigger: '#clima', start: 'top 85%' }
+    })
+    gsap.from('#clima .clima-main-temp', {
+      opacity: 0, y: 20, duration: 1, delay: 0.1, ease: 'expo.out',
+      scrollTrigger: { trigger: '#clima', start: 'top 85%' }
+    })
+    gsap.from('#clima .clima-condition-block', {
+      opacity: 0, y: 20, duration: 0.9, delay: 0.2,
+      scrollTrigger: { trigger: '#clima', start: 'top 85%' }
+    })
+    gsap.from('#clima .clima-metric', {
+      opacity: 0, y: 16, duration: 0.8, stagger: 0.08, delay: 0.25,
+      scrollTrigger: { trigger: '#clima', start: 'top 85%' }
+    })
+    gsap.from('#clima .clima-live-badge', {
+      opacity: 0, x: 20, duration: 0.9, delay: 0.3,
+      scrollTrigger: { trigger: '#clima', start: 'top 85%' }
+    })
+
+
     // ─── COUNTER ANIMATION ────────────────────────
     document.querySelectorAll('[data-counter-target]').forEach(el => {
-      const target = parseFloat(el.getAttribute('data-counter-target'))
-      const suffix = el.getAttribute('data-suffix') || ''
+      const target    = parseFloat(el.getAttribute('data-counter-target'))
+      const suffix    = el.getAttribute('data-suffix') || ''
       const isDecimal = String(target).includes('.')
-      const decimals = isDecimal ? 1 : 0
-
       ScrollTrigger.create({
         trigger: el,
         start: 'top 85%',
@@ -1500,69 +2496,35 @@
 
     // ─── BAIRROS — stagger reveal ────────────────
     gsap.from('.bairro-card', {
-      opacity: 0,
-      y: 40,
-      scale: 0.97,
-      duration: 0.9,
-      stagger: 0.1,
-      ease: 'expo.out',
-      scrollTrigger: {
-        trigger: '.bairros-grid',
-        start: 'top 80%',
-      }
+      opacity: 0, y: 40, scale: 0.97, duration: 0.9, stagger: 0.1, ease: 'expo.out',
+      scrollTrigger: { trigger: '.bairros-grid', start: 'top 80%' }
     })
 
 
     // ─── IMÓVEIS — stagger reveal ────────────────
     gsap.from('.imovel-card', {
-      opacity: 0,
-      y: 60,
-      scale: 0.96,
-      duration: 0.9,
-      stagger: 0.12,
-      ease: 'expo.out',
-      scrollTrigger: {
-        trigger: '.imoveis-grid',
-        start: 'top 75%',
-      }
+      opacity: 0, y: 60, scale: 0.96, duration: 0.9, stagger: 0.12, ease: 'expo.out',
+      scrollTrigger: { trigger: '.imoveis-grid', start: 'top 75%' }
     })
 
 
     // ─── MERCADO — stagger reveal ────────────────
     gsap.from('.mercado-item', {
-      opacity: 0,
-      y: 30,
-      duration: 0.8,
-      stagger: 0.1,
-      ease: 'expo.out',
-      scrollTrigger: {
-        trigger: '.mercado-grid',
-        start: 'top 80%',
-      }
+      opacity: 0, y: 30, duration: 0.8, stagger: 0.1, ease: 'expo.out',
+      scrollTrigger: { trigger: '.mercado-grid', start: 'top 80%' }
     })
 
 
     // ─── CTA — parallax background ───────────────
     gsap.to('.cta-bg', {
-      yPercent: -30,
-      ease: 'none',
+      yPercent: -30, ease: 'none',
       scrollTrigger: {
-        trigger: '#cta',
-        start: 'top bottom',
-        end: 'bottom top',
-        scrub: true,
+        trigger: '#cta', start: 'top bottom', end: 'bottom top', scrub: true,
       }
     })
     gsap.from('.cta-inner > *', {
-      opacity: 0,
-      y: 40,
-      duration: 1,
-      stagger: 0.1,
-      ease: 'expo.out',
-      scrollTrigger: {
-        trigger: '#cta',
-        start: 'top 75%',
-      }
+      opacity: 0, y: 40, duration: 1, stagger: 0.1, ease: 'expo.out',
+      scrollTrigger: { trigger: '#cta', start: 'top 75%' }
     })
 
 
@@ -1572,13 +2534,15 @@
         canvas.width = window.innerWidth
         canvas.height = window.innerHeight
       }
-    })
+      resizeLeafCanvas()
+    }, { passive: true })
 
 
     // ─── Reduced motion: desativar tudo ──────────
     if (prefersReducedMotion) {
       gsap.globalTimeline.timeScale(0)
       lenis.destroy()
+      if (leafAnimId) cancelAnimationFrame(leafAnimId)
     }
 
   })()
