@@ -17,6 +17,7 @@ import {
 import type { ImovelCard } from '@/types/sanity'
 import ImovelCardComponent from '@/components/cards/ImovelCard'
 import BreadcrumbNav from '@/components/ui/BreadcrumbNav'
+import ShimmerText from '@/components/ui/ShimmerText'
 import { routing } from '@/i18n/routing'
 
 export const revalidate = 60
@@ -339,7 +340,11 @@ export default async function BairroPlanejadiSlugPage({ params, searchParams }: 
               marginBottom: '1.25rem',
             }}
           >
-            {bairro.nome}
+            {params.slug === 'ilha-pura' ? (
+              <ShimmerText variant="gold">{bairro.nome}</ShimmerText>
+            ) : (
+              bairro.nome
+            )}
           </h1>
 
           {bairro.introTexto && (

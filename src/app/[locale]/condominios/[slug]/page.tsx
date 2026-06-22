@@ -44,7 +44,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://admirata.com.br'
   const localePrefix = params.locale === 'pt-BR' ? '' : `/${params.locale}`
-  const canonicalUrl = `${siteUrl}${localePrefix}/condominios/${params.slug}`
+  // Condomínios da Ilha Pura usam a URL de marca /ilhapura como canônica
+  const isIlhaPura = cond.bairro?.slug?.current === 'ilha-pura'
+  const condPath = isIlhaPura
+    ? `/ilhapura/condominios/${params.slug}`
+    : `/condominios/${params.slug}`
+  const canonicalUrl = `${siteUrl}${localePrefix}${condPath}`
 
   const titulo = cond.seo?.titulo ?? `${cond.nome} — Condomínio de Alto Padrão`
   const descricao =

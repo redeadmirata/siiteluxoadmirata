@@ -8,6 +8,7 @@ import {
   CONDOMINIOS_SLUGS_HIERARQUIA_QUERY,
   TIPOLOGIAS_SLUGS_QUERY,
   LANCAMENTOS_SLUGS_QUERY,
+  ILHAPURA_CONDOMINIOS_SLUGS_QUERY,
 } from '@/sanity/queries'
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://admirata.com.br'
@@ -22,6 +23,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     condominioHierarquia,
     tipologiaHierarquia,
     lancamentoSlugs,
+    ilhapuraCondominioSlugs,
   ] = await Promise.all([
     client.fetch<Array<{ slug: string }>>(IMOVEIS_SLUGS_QUERY),
     client.fetch<Array<{ slug: string }>>(BAIRROS_SLUGS_QUERY),
@@ -30,6 +32,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     client.fetch<Array<{ bairroSlug: string; condSlug: string }>>(CONDOMINIOS_SLUGS_HIERARQUIA_QUERY),
     client.fetch<Array<{ bairroSlug: string; condSlug: string; tipologias: string[] }>>(TIPOLOGIAS_SLUGS_QUERY),
     client.fetch<Array<{ slug: string }>>(LANCAMENTOS_SLUGS_QUERY),
+    client.fetch<Array<{ slug: string }>>(ILHAPURA_CONDOMINIOS_SLUGS_QUERY),
   ])
 
   // ── Páginas estáticas ────────────────────────────────────────────
@@ -63,6 +66,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.8,
+    },
+    // Landing de marca do empreendimento Ilha Pura
+    {
+      url: `${BASE_URL}/ilhapura`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.85,
     },
     // Páginas de característica SEO
     {
@@ -98,6 +108,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: 'weekly' as const,
     priority: 0.8,
   }))
+
+  // ── Condomínios Ilha Pura — /ilhapura/condominios/[slug] ────────
+  const ilhapuraCondominioRoutes: MetadataRoute.Sitemap = ilhapuraCondominioSlugs.map(
+    ({ slug }) => ({
+      url: `${BASE_URL}/ilhapura/condominios/${slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.82,
+    })
+  )
 
   // ── PDI de imóveis (NÍVEL 0) — /imovel/[slug] ───────────────────
   const imovelRoutes: MetadataRoute.Sitemap = imovelSlugs.map(({ slug }) => ({
@@ -157,6 +177,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...imovelRoutes,
     ...bairroRoutes,
     ...condominioDetailRoutes,
+    ...ilhapuraCondominioRoutes,
     ...condominioRoutes,
     ...tipologiaRoutes,
     ...lancamentoRoutes,

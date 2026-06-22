@@ -420,3 +420,10 @@ export const BAIRRO_PLANEJADO_QUERY = groq`
 export const BAIRROS_PLANEJADOS_SLUGS_QUERY = groq`
   *[_type == "bairro" && bairroplanejado == true && defined(slug.current)] { "slug": slug.current }
 `
+
+/** Slugs dos condomínios do empreendimento Ilha Pura — para URLs /ilhapura/condominios/[slug] no sitemap */
+export const ILHAPURA_CONDOMINIOS_SLUGS_QUERY = groq`
+  *[_type == "condominio" && bairro->slug.current == "ilha-pura" && defined(slug.current)] {
+    "slug": slug.current
+  }
+`

@@ -48,8 +48,46 @@ const nextConfig = {
     ]
   },
 
+  // Rewrites de URL de marca — servem páginas existentes sob /ilhapura
+  // O middleware next-intl roda ANTES dos beforeFiles rewrites e prefixa o
+  // locale internamente (ex: /ilhapura → /pt-BR/ilhapura), por isso o :locale.
+  async rewrites() {
+    return {
+      beforeFiles: [
+        // Landing do empreendimento: /ilhapura → /bairros-planejados/ilha-pura
+        {
+          source: '/:locale(pt-BR|en|es)/ilhapura',
+          destination: '/:locale/bairros-planejados/ilha-pura',
+        },
+        // Condomínio: /ilhapura/condominios/[slug] → /condominios/[slug]
+        {
+          source: '/:locale(pt-BR|en|es)/ilhapura/condominios/:slug',
+          destination: '/:locale/condominios/:slug',
+        },
+      ],
+    }
+  },
+
   // Redirects canônicos
   async redirects() {
+    // Condomínios da Ilha Pura — 301 da URL antiga para a URL de marca /ilhapura
+    const ILHAPURA_CONDOS = [
+      'pura-por-artefacto',
+      'oro-by-ornare',
+      'astra',
+      'viure',
+      'elos',
+      'saint-michel',
+    ]
+    const ILHAPURA_LOCALE_PREFIXES = ['', '/en', '/es']
+    const ilhapuraCondoRedirects = ILHAPURA_CONDOS.flatMap((slug) =>
+      ILHAPURA_LOCALE_PREFIXES.map((prefix) => ({
+        source: `${prefix}/condominios/${slug}`,
+        destination: `${prefix}/ilhapura/condominios/${slug}`,
+        permanent: true,
+      }))
+    )
+
     return [
       // www → apex
       {
@@ -58,6 +96,8 @@ const nextConfig = {
         destination: 'https://admirata.com.br/:path*',
         permanent: true,
       },
+      // Ilha Pura: /condominios/[slug] → /ilhapura/condominios/[slug]
+      ...ilhapuraCondoRedirects,
       // /bairros/[slug] → /imoveis/[slug]  (301 — hierarquia SEO consolidada)
       {
         source: '/bairros/:slug',
