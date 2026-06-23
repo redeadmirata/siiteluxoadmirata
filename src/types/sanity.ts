@@ -57,7 +57,7 @@ export type ImovelTipo =
   | 'Casa em condomínio'
   | 'Terreno'
 
-export type ImovelFinalidade = 'Residencial' | 'Comercial'
+export type ImovelFinalidade = 'Venda' | 'Locação' | 'Temporada'
 export type ImovelMercado = 'Rio de Janeiro' | 'Serra Gaúcha'
 export type ImovelStatus = 'Disponível' | 'Vendido' | 'Locado' | 'Em negociação'
 
@@ -129,6 +129,7 @@ export interface ImovelCard {
 
 /** PDI completa */
 export interface ImovelPDI extends ImovelCard {
+  condominioRef?: { slug?: string; bairroSlug?: string }
   condominio?: number
   iptu?: number
   areaTotal?: number

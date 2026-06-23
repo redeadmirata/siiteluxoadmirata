@@ -26,6 +26,25 @@ interface PageProps {
   params: { locale: string; slug: string }
 }
 
+/**
+ * Caminho (sem domínio/locale) da PDI do imóvel.
+ * Unidades de condomínios do Ilha Pura usam a URL de marca como canônica:
+ *   /ilhapura/condominios/[condominio]/[venda|aluguel|temporada]/[unidade]
+ * Demais imóveis seguem em /imovel/[slug].
+ */
+function buildImovelPath(imovel: ImovelPDI, slug: string): string {
+  const condSlug = imovel.condominioRef?.slug
+  const isIlhaPura = imovel.condominioRef?.bairroSlug === 'ilha-pura' && !!condSlug
+  if (!isIlhaPura) return `/imovel/${slug}`
+  const finalidadeSeg =
+    imovel.finalidade === 'Locação'
+      ? 'aluguel'
+      : imovel.finalidade === 'Temporada'
+        ? 'temporada'
+        : 'venda'
+  return `/ilhapura/condominios/${condSlug}/${finalidadeSeg}/${slug}`
+}
+
 export async function generateStaticParams() {
   const slugs = await client.fetch<{ slug: string }[]>(IMOVEIS_SLUGS_QUERY)
   return routing.locales.flatMap((locale) =>
@@ -54,6 +73,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://admirata.com.br'
   const localePrefix = params.locale === 'pt-BR' ? '' : `/${params.locale}`
+  const imovelPath = buildImovelPath(imovel, params.slug)
 
   return {
     title: titulo,
@@ -73,11 +93,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description: descricao,
     },
     alternates: {
-      canonical: `${siteUrl}${localePrefix}/imovel/${params.slug}`,
+      canonical: `${siteUrl}${localePrefix}${imovelPath}`,
       languages: {
-        'pt-BR': `${siteUrl}/imovel/${params.slug}`,
-        'en-US': `${siteUrl}/en/imovel/${params.slug}`,
-        'fr-FR': `${siteUrl}/fr/imovel/${params.slug}`,
+        'pt-BR': `${siteUrl}${imovelPath}`,
+        'en-US': `${siteUrl}/en${imovelPath}`,
+        'fr-FR': `${siteUrl}/fr${imovelPath}`,
       },
     },
   }
@@ -96,7 +116,7 @@ export default async function ImovelPDIPage({ params }: PageProps) {
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://admirata.com.br'
   const localePrefix = params.locale === 'pt-BR' ? '' : `/${params.locale}`
-  const url = `${siteUrl}${localePrefix}/imovel/${params.slug}`
+  const url = `${siteUrl}${localePrefix}${buildImovelPath(imovel, params.slug)}`
 
   const imagens = imovel.imagens ?? []
   const bairroSlug = imovel.bairro?.slug?.current

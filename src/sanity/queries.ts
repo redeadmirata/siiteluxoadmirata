@@ -63,6 +63,7 @@ export const IMOVEL_PDI_QUERY = groq`
     preco, condominio, iptu, areaUtil, areaTotal,
     quartos, suites, banheiros, vagas, andar,
     ${bairroFragment},
+    "condominioRef": condominioRef->{ "slug": slug.current, "bairroSlug": bairro->slug.current },
     endereco,
     imagens[] { ${imagemFragment} },
     plantas[] {
@@ -425,5 +426,14 @@ export const BAIRROS_PLANEJADOS_SLUGS_QUERY = groq`
 export const ILHAPURA_CONDOMINIOS_SLUGS_QUERY = groq`
   *[_type == "condominio" && bairro->slug.current == "ilha-pura" && defined(slug.current)] {
     "slug": slug.current
+  }
+`
+
+/** Unidades (imóveis) do Ilha Pura — para URLs de marca /ilhapura/condominios/[cond]/[finalidade]/[unidade] no sitemap */
+export const ILHAPURA_IMOVEIS_QUERY = groq`
+  *[_type == "imovel" && condominioRef->bairro->slug.current == "ilha-pura" && defined(slug.current) && defined(condominioRef->slug.current)] {
+    "slug": slug.current,
+    "condSlug": condominioRef->slug.current,
+    finalidade
   }
 `

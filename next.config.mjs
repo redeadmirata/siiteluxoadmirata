@@ -64,6 +64,12 @@ const nextConfig = {
           source: '/:locale(pt-BR|en|es)/ilhapura/condominios/:slug',
           destination: '/:locale/condominios/:slug',
         },
+        // Unidade: /ilhapura/condominios/[cond]/[venda|aluguel|temporada]/[unidade] → /imovel/[unidade]
+        {
+          source:
+            '/:locale(pt-BR|en|es)/ilhapura/condominios/:cond/:finalidade(venda|aluguel|temporada)/:unidade',
+          destination: '/:locale/imovel/:unidade',
+        },
       ],
     }
   },
@@ -88,6 +94,23 @@ const nextConfig = {
       }))
     )
 
+    // Unidades Ilha Pura — 301 da PDI antiga /imovel/[slug] para a URL de marca
+    // /ilhapura/condominios/[cond]/[finalidade]/[unidade]. Todas em venda.
+    const ILHAPURA_UNIDADES = [
+      { unidade: 'elos-iris-1408', cond: 'elos', finalidade: 'venda' },
+      { unidade: 'saint-michel-bordeaux-101', cond: 'saint-michel', finalidade: 'venda' },
+      { unidade: 'millenio-chicago-1307', cond: 'millenio', finalidade: 'venda' },
+      { unidade: 'viure-gaudi-1501', cond: 'viure', finalidade: 'venda' },
+      { unidade: 'astra-selene-404', cond: 'astra', finalidade: 'venda' },
+    ]
+    const ilhapuraImovelRedirects = ILHAPURA_UNIDADES.flatMap(({ unidade, cond, finalidade }) =>
+      ILHAPURA_LOCALE_PREFIXES.map((prefix) => ({
+        source: `${prefix}/imovel/${unidade}`,
+        destination: `${prefix}/ilhapura/condominios/${cond}/${finalidade}/${unidade}`,
+        permanent: true,
+      }))
+    )
+
     return [
       // www → apex
       {
@@ -98,6 +121,8 @@ const nextConfig = {
       },
       // Ilha Pura: /condominios/[slug] → /ilhapura/condominios/[slug]
       ...ilhapuraCondoRedirects,
+      // Ilha Pura: /imovel/[unidade] → /ilhapura/condominios/[cond]/[finalidade]/[unidade]
+      ...ilhapuraImovelRedirects,
       // /bairros/[slug] → /imoveis/[slug]  (301 — hierarquia SEO consolidada)
       {
         source: '/bairros/:slug',
