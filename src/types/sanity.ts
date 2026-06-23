@@ -17,6 +17,13 @@ export interface SanityImageFile {
   alt?: string
 }
 
+/** Item de galeria retornado pela GROQ — {asset: {...}, alt, legenda} */
+export interface GaleriaItem {
+  asset: SanityImageAsset
+  alt?: string
+  legenda?: string
+}
+
 // ─── Bairro ───────────────────────────────────────────────────────
 
 export type BairroRegiao = 'Centro' | 'Zona Sul' | 'Sudoeste' | 'Gramado' | 'Canela'
@@ -57,7 +64,7 @@ export type ImovelTipo =
   | 'Casa em condomínio'
   | 'Terreno'
 
-export type ImovelFinalidade = 'Venda' | 'Locação' | 'Temporada'
+export type ImovelFinalidade = 'Residencial' | 'Comercial'
 export type ImovelMercado = 'Rio de Janeiro' | 'Serra Gaúcha'
 export type ImovelStatus = 'Disponível' | 'Vendido' | 'Locado' | 'Em negociação'
 
@@ -129,7 +136,6 @@ export interface ImovelCard {
 
 /** PDI completa */
 export interface ImovelPDI extends ImovelCard {
-  condominioRef?: { slug?: string; bairroSlug?: string }
   condominio?: number
   iptu?: number
   areaTotal?: number
@@ -184,7 +190,7 @@ export interface CondominioDetalhe extends Omit<CondominioCard, 'fotoCapa'> {
     proximidades?: string[]
   }
   fotoCapa?: SanityImageFile    // Override com hotspot/crop
-  galeria?: SanityImageAsset[]
+  galeria?: GaleriaItem[]
   condominiosProximos?: Array<{ nome: string; slug: { current: string } }>
   seo?: { titulo?: string; descricao?: string }
 }

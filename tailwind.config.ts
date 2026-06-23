@@ -43,12 +43,17 @@ const config: Config = {
           '0%': { backgroundPosition: '-200% 0' },
           '100%': { backgroundPosition: '200% 0' },
         },
+        'scroll-x': {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
+        },
       },
       animation: {
         'fade-in': 'fade-in 0.6s ease-out forwards',
         'slide-in-right': 'slide-in-right 0.5s ease-out forwards',
         'scale-in': 'scale-in 0.4s ease-out forwards',
         shimmer: 'shimmer 2s linear infinite',
+        'scroll-x': 'scroll-x 40s linear infinite',
       },
 
       // ─── Spacing / Sizing ─────────────────────────────────────────

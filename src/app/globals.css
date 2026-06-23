@@ -238,6 +238,12 @@ body {
   50%       { opacity: 1;   transform: scaleY(1.18); }
 }
 
+/* ─── ImageAutoSlider ──────────────────────────────────────────────────────── */
+@keyframes scroll-x {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
 /* ─── MarketGate + MarketSwitcher ───────────────────────────────────────────── */
 .adm-gate-card:hover {
   transform: translateY(-4px);

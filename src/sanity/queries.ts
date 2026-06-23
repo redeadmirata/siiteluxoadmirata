@@ -63,7 +63,6 @@ export const IMOVEL_PDI_QUERY = groq`
     preco, condominio, iptu, areaUtil, areaTotal,
     quartos, suites, banheiros, vagas, andar,
     ${bairroFragment},
-    "condominioRef": condominioRef->{ "slug": slug.current, "bairroSlug": bairro->slug.current },
     endereco,
     imagens[] { ${imagemFragment} },
     plantas[] {
@@ -192,6 +191,20 @@ export const CONDOMINIO_QUERY = groq`
 
 export const CONDOMINIOS_SLUGS_QUERY = groq`
   *[_type == "condominio" && defined(slug.current)] { "slug": slug.current }
+`
+
+/**
+ * Fotos dos imóveis para o slider da PDI de condomínio.
+ * Usa o primeiro imóvel com imagens cadastradas como fonte da galeria.
+ */
+export const FOTOS_CONDOMINIO_QUERY = groq`
+  *[_type == "imovel" && condominioRef->slug.current == $slug && defined(imagens) && count(imagens) > 0][0] {
+    "fotos": imagens[]{
+      "url": arquivo.asset->url,
+      "lqip": arquivo.asset->metadata.lqip,
+      "alt": alt
+    }
+  }
 `
 
 /** Condomínios de um bairro — para NÍVEL 1 (cards linkando para NÍVEL 2) */
@@ -426,14 +439,5 @@ export const BAIRROS_PLANEJADOS_SLUGS_QUERY = groq`
 export const ILHAPURA_CONDOMINIOS_SLUGS_QUERY = groq`
   *[_type == "condominio" && bairro->slug.current == "ilha-pura" && defined(slug.current)] {
     "slug": slug.current
-  }
-`
-
-/** Unidades (imóveis) do Ilha Pura — para URLs de marca /ilhapura/condominios/[cond]/[finalidade]/[unidade] no sitemap */
-export const ILHAPURA_IMOVEIS_QUERY = groq`
-  *[_type == "imovel" && condominioRef->bairro->slug.current == "ilha-pura" && defined(slug.current) && defined(condominioRef->slug.current)] {
-    "slug": slug.current,
-    "condSlug": condominioRef->slug.current,
-    finalidade
   }
 `

@@ -12,10 +12,13 @@ import {
   CONDOMINIO_QUERY,
   IMOVEIS_POR_CONDOMINIO_QUERY,
   CONDOMINIOS_SLUGS_QUERY,
+  FOTOS_CONDOMINIO_QUERY,
 } from '@/sanity/queries'
 import type { CondominioDetalhe, ImovelCard } from '@/types/sanity'
 import { routing } from '@/i18n/routing'
 import BreadcrumbNav from '@/components/ui/BreadcrumbNav'
+import { ImageAutoSlider } from '@/components/ui/ImageAutoSlider'
+import type { SliderImage } from '@/components/ui/ImageAutoSlider'
 
 export const revalidate = 3600
 export const dynamicParams = true
@@ -92,12 +95,25 @@ const TIPO_LABELS: Record<string, string> = {
 export default async function CondominioPage({ params }: PageProps) {
   setRequestLocale(params.locale)
 
-  const [cond, imoveis] = await Promise.all([
+  const [cond, imoveis, fotosData] = await Promise.all([
     client.fetch<CondominioDetalhe | null>(CONDOMINIO_QUERY, { slug: params.slug }),
     client.fetch<ImovelCard[]>(IMOVEIS_POR_CONDOMINIO_QUERY, { condSlug: params.slug }),
+    client.fetch<{ fotos: SliderImage[] } | null>(FOTOS_CONDOMINIO_QUERY, { slug: params.slug }),
   ])
 
   if (!cond) notFound()
+
+  // Monta a galeria para o slider: prefere galeria do condomínio, senão usa imagens dos imóveis
+  const sliderImages: SliderImage[] =
+    cond.galeria && cond.galeria.length > 0
+      ? cond.galeria
+          .filter((img) => img.asset?.url)
+          .map((img) => ({
+            url: img.asset.url,
+            alt: img.alt ?? null,
+            lqip: img.asset.metadata?.lqip ?? null,
+          }))
+      : (fotosData?.fotos ?? []).filter((f) => f.url)
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://admirata.com.br'
   const localePrefix = params.locale === 'pt-BR' ? '' : `/${params.locale}`
@@ -204,6 +220,16 @@ export default async function CondominioPage({ params }: PageProps) {
         </div>
       )}
 
+      {/* ── Slider de fotos full-width ───────────────────────────────────────── */}
+      {sliderImages.length > 0 && (
+        <div className="mb-12">
+          <div className="container-site mb-5">
+            <h2 className="text-display-sm text-ink">Galeria</h2>
+          </div>
+          <ImageAutoSlider images={sliderImages} height={300} duracao={50} />
+        </div>
+      )}
+
       {/* ── Layout principal ─────────────────────────────────────────────────── */}
       <div className="container-site pb-20">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-16 items-start">
@@ -287,31 +313,6 @@ export default async function CondominioPage({ params }: PageProps) {
                     </li>
                   ))}
                 </ul>
-              </div>
-            )}
-
-            {/* ── Galeria ───────────────────────────────────────────────── */}
-            {cond.galeria && cond.galeria.length > 0 && (
-              <div className="mb-12">
-                <h2 className="text-display-sm text-ink mb-4">Galeria</h2>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {cond.galeria.filter((img) => img.url).slice(0, 6).map((img, i) => (
-                    <div
-                      key={img._id ?? i}
-                      className="relative aspect-[4/3] overflow-hidden rounded-xl"
-                    >
-                      <Image
-                        src={img.url}
-                        alt={`${cond.nome} — foto ${i + 1}`}
-                        fill
-                        className="object-cover hover:scale-105 transition-transform duration-500"
-                        placeholder={img.metadata?.lqip ? 'blur' : 'empty'}
-                        blurDataURL={img.metadata?.lqip}
-                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 280px"
-                      />
-                    </div>
-                  ))}
-                </div>
               </div>
             )}
 
