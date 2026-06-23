@@ -64,7 +64,7 @@ export type ImovelTipo =
   | 'Casa em condomínio'
   | 'Terreno'
 
-export type ImovelFinalidade = 'Residencial' | 'Comercial'
+export type ImovelFinalidade = 'Venda' | 'Locação' | 'Temporada'
 export type ImovelMercado = 'Rio de Janeiro' | 'Serra Gaúcha'
 export type ImovelStatus = 'Disponível' | 'Vendido' | 'Locado' | 'Em negociação'
 
