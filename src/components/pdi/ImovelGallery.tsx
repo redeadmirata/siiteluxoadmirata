@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { useState, useEffect, useCallback } from 'react'
 import { urlForImovelImage } from '@/sanity/client'
 import type { ImovelImagem } from '@/types/sanity'
+import { CardStack, type CardStackItem } from '@/components/ui/card-stack'
 
 interface ImovelGalleryProps {
   imagens: ImovelImagem[]
@@ -59,38 +60,51 @@ export default function ImovelGallery({
     }
   }
 
+  // ── Monta items para o CardStack ─────────────────────────────────
+  const stackItems: CardStackItem[] = imagens.map((img, i) => ({
+    id: i,
+    title: img.arquivo.alt ?? `Foto ${i + 1} de ${titulo}`,
+    imageSrc: getUrl(img, 900),
+    lqip: img.arquivo.asset?.metadata?.lqip,
+  }))
+
   if (!visivel) {
-    // Grade compacta (inline, não-modal)
     return (
       <section aria-label="Galeria de fotos" className="section-padding">
-        <h2 className="text-xs tracking-widest uppercase text-gold mb-6">
+        <h2 className="text-xs tracking-widest uppercase text-gold mb-8">
           Galeria ({imagens.length} fotos)
         </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-1">
-          {imagens.map((img, i) => (
-            <button
-              key={i}
-              className="relative aspect-[4/3] overflow-hidden bg-stone group"
-              onClick={() => { setIndice(i); setVisivel(true) }}
-              aria-label={`Abrir foto ${i + 1} — ${img.arquivo.alt ?? titulo}`}
-            >
-              <Image
-                src={getUrl(img, 600)}
-                alt={img.arquivo.alt ?? `Foto ${i + 1} de ${titulo}`}
-                fill
-                sizes="33vw"
-                className="object-cover group-hover:scale-105 transition-transform duration-500"
-                placeholder={img.arquivo.asset?.metadata?.lqip ? 'blur' : 'empty'}
-                blurDataURL={img.arquivo.asset?.metadata?.lqip}
-              />
-            </button>
-          ))}
+
+        {/* CardStack — 3D fan carousel */}
+        <CardStack
+          items={stackItems}
+          cardWidth={480}
+          cardHeight={290}
+          autoAdvance
+          intervalMs={3500}
+          pauseOnHover
+          loop
+          onClickCard={(_item, idx) => {
+            setIndice(idx)
+            setVisivel(true)
+          }}
+        />
+
+        {/* Ver todas no lightbox */}
+        <div className="mt-6 flex justify-center">
+          <button
+            onClick={() => { setIndice(0); setVisivel(true) }}
+            className="btn-outline text-xs px-6 py-2"
+            aria-label={`Ver todas as ${imagens.length} fotos`}
+          >
+            Ver todas as fotos ({imagens.length})
+          </button>
         </div>
       </section>
     )
   }
 
-  // Lightbox
+  // ── Lightbox ─────────────────────────────────────────────────────
   const imgAtual = imagens[indice]
 
   return (
@@ -115,7 +129,7 @@ export default function ImovelGallery({
       </div>
 
       {/* Imagem principal */}
-      <div className="flex-1 relative flex items-center justify-center px-16">
+      <div className="flex-1 relative flex items-center justify-center px-16 min-h-0">
         <div className="relative w-full h-full max-w-5xl mx-auto">
           <Image
             key={indice}
