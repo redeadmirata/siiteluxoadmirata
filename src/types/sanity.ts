@@ -136,6 +136,7 @@ export interface ImovelCard {
 
 /** PDI completa */
 export interface ImovelPDI extends ImovelCard {
+  condominioRef?: { slug?: string; bairroSlug?: string }
   condominio?: number
   iptu?: number
   areaTotal?: number
