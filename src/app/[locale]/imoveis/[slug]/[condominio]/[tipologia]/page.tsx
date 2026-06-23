@@ -64,7 +64,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const [cond, imoveis] = await Promise.all([
     client.fetch<CondNomeBairro | null>(
       CONDOMINIO_NOME_BAIRRO_QUERY,
-      { condSlug: params.condominio }
+      { bairroSlug: params.slug, condSlug: params.condominio }
     ),
     client.fetch<ImovelCard[]>(
       IMOVEIS_POR_TIPOLOGIA_QUERY,
@@ -100,7 +100,7 @@ export default async function TipologiaPage({ params }: PageProps) {
   const [cond, imoveis] = await Promise.all([
     client.fetch<CondNomeBairro | null>(
       CONDOMINIO_NOME_BAIRRO_QUERY,
-      { condSlug: params.condominio },
+      { bairroSlug: params.slug, condSlug: params.condominio },
       { next: { revalidate: 3600 } }
     ),
     client.fetch<ImovelCard[]>(
