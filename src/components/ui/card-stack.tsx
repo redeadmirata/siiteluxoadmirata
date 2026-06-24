@@ -253,8 +253,8 @@ export function CardStack<T extends CardStackItem>({
 
       {/* Contador + dots */}
       <div className="mt-4 flex items-center justify-center gap-4">
-        <span className="text-xs font-mono text-muted tracking-widest">
-          {String(active + 1).padStart(2, '0')} / {String(len).padStart(2, '0')}
+        <span className="text-sm text-muted tabular-nums">
+          {active + 1} <span className="mx-1 opacity-30">/</span> {len}
         </span>
         {showDots && (
           <div className="flex gap-1.5">

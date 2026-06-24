@@ -78,8 +78,11 @@ export default function ImovelGallery({
         {/* CardStack — 3D fan carousel */}
         <CardStack
           items={stackItems}
-          cardWidth={480}
-          cardHeight={290}
+          cardWidth={360}
+          cardHeight={240}
+          maxVisible={5}
+          spreadDeg={36}
+          overlap={0.5}
           autoAdvance
           intervalMs={3500}
           pauseOnHover
