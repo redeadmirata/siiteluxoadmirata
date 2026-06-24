@@ -22,34 +22,33 @@ interface FichaTecnicaProps {
 interface EspecItem {
   label: string
   valor: string
-  icon: string
 }
 
 function buildEspecs(imovel: FichaTecnicaProps['imovel']): EspecItem[] {
   const items: EspecItem[] = []
 
   if (imovel.areaUtil)
-    items.push({ label: 'Área útil', valor: formatArea(imovel.areaUtil), icon: '⬜' })
+    items.push({ label: 'Área útil', valor: formatArea(imovel.areaUtil) })
   if (imovel.areaTotal)
-    items.push({ label: 'Área total', valor: formatArea(imovel.areaTotal), icon: '⬛' })
+    items.push({ label: 'Área total', valor: formatArea(imovel.areaTotal) })
   if (imovel.quartos)
-    items.push({ label: 'Quartos', valor: String(imovel.quartos), icon: '🛏' })
+    items.push({ label: 'Quartos', valor: String(imovel.quartos) })
   if (imovel.suites)
-    items.push({ label: 'Suítes', valor: String(imovel.suites), icon: '🚿' })
+    items.push({ label: 'Suítes', valor: String(imovel.suites) })
   if (imovel.banheiros)
-    items.push({ label: 'Banheiros', valor: String(imovel.banheiros), icon: '🚽' })
+    items.push({ label: 'Banheiros', valor: String(imovel.banheiros) })
   if (imovel.vagas)
-    items.push({ label: 'Vagas', valor: String(imovel.vagas), icon: '🚗' })
+    items.push({ label: 'Vagas', valor: String(imovel.vagas) })
   if (imovel.andar)
-    items.push({ label: 'Andar', valor: `${imovel.andar}º`, icon: '🏢' })
+    items.push({ label: 'Andar', valor: `${imovel.andar}º` })
   if (imovel.tipo)
-    items.push({ label: 'Tipo', valor: imovel.tipo, icon: '🏠' })
+    items.push({ label: 'Tipo', valor: imovel.tipo })
   if (imovel.finalidade)
-    items.push({ label: 'Finalidade', valor: imovel.finalidade, icon: '📋' })
+    items.push({ label: 'Finalidade', valor: imovel.finalidade })
   if (imovel.condominio)
-    items.push({ label: 'Condomínio', valor: formatPreco(imovel.condominio), icon: '🏗' })
+    items.push({ label: 'Condomínio', valor: formatPreco(imovel.condominio) })
   if (imovel.iptu)
-    items.push({ label: 'IPTU/mês', valor: formatPreco(imovel.iptu / 12), icon: '📄' })
+    items.push({ label: 'IPTU/mês', valor: formatPreco(imovel.iptu / 12) })
 
   return items
 }
@@ -97,17 +96,26 @@ export default function FichaTecnica({ imovel }: FichaTecnicaProps) {
 
       {/* Características por grupo */}
       {Object.keys(grupos).length > 0 && (
-        <div className="mt-10 space-y-6">
+        <div className="mt-12 space-y-10">
           {Object.entries(grupos).map(([grupo, nomes]) => (
             <div key={grupo}>
-              <h3 className="text-xs uppercase tracking-widest text-muted mb-3">
-                {grupo}
-              </h3>
-              <ul className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-2">
+              {/* Separador + label do grupo */}
+              <div className="flex items-center gap-3 mb-5">
+                <span className="w-4 h-px bg-gold flex-shrink-0" />
+                <h3 className="text-xs uppercase tracking-widest text-muted">
+                  {grupo}
+                </h3>
+              </div>
+
+              {/* Cards das características */}
+              <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                 {nomes.map((nome) => (
-                  <li key={nome} className="flex items-center gap-2 text-sm text-ink">
+                  <li
+                    key={nome}
+                    className="flex items-start gap-3 bg-stone/60 border border-stone rounded-lg px-4 py-3 text-sm text-ink leading-snug"
+                  >
                     <span
-                      className="w-1 h-1 rounded-full bg-gold flex-shrink-0"
+                      className="mt-1.5 w-1.5 h-1.5 rounded-full bg-gold flex-shrink-0"
                       aria-hidden="true"
                     />
                     {nome}
