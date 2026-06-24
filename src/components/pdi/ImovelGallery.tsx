@@ -22,6 +22,14 @@ export default function ImovelGallery({
 }: ImovelGalleryProps) {
   const [indice, setIndice] = useState(0)
   const [visivel, setVisivel] = useState(aberto)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
 
   useEffect(() => setVisivel(aberto), [aberto])
 
@@ -78,10 +86,10 @@ export default function ImovelGallery({
         {/* CardStack — 3D fan carousel */}
         <CardStack
           items={stackItems}
-          cardWidth={360}
-          cardHeight={240}
-          maxVisible={5}
-          spreadDeg={36}
+          cardWidth={isMobile ? 220 : 360}
+          cardHeight={isMobile ? 150 : 240}
+          maxVisible={isMobile ? 3 : 5}
+          spreadDeg={isMobile ? 28 : 36}
           overlap={0.5}
           autoAdvance
           intervalMs={3500}

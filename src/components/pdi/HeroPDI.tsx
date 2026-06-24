@@ -92,7 +92,8 @@ export default function HeroPDI({
   return (
     <>
       <section ref={heroRef} className="relative w-full" aria-label="Fotos do imóvel">
-        {/* ── Grid de fotos ─────────────────────────────────────────── */}
+        {/* ── Grid de fotos + botão (div relativo próprio) ─────────── */}
+        <div className="relative">
         <div
           className="grid gap-1"
           style={{
@@ -158,7 +159,7 @@ export default function HeroPDI({
           ))}
         </div>
 
-        {/* ── Ver todas ─────────────────────────────────────────────── */}
+        {/* ── Ver todas (dentro do div relativo da grid) ───────────── */}
         {imagens.length > 5 && (
           <button
             onClick={() => abrirLightbox(0)}
@@ -168,6 +169,7 @@ export default function HeroPDI({
             Ver todas as fotos ({imagens.length})
           </button>
         )}
+        </div>{/* fecha div relativo da grid */}
 
         {/* ── Info overlay (mobile) ──────────────────────────────────── */}
         <div className="md:hidden px-5 pt-5 pb-2">
