@@ -1,3 +1,5 @@
+'use client'
+
 /**
  * ImovelCardMobile
  * Card compacto otimizado para o carrossel de scroll snap mobile.
