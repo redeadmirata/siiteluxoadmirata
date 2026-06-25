@@ -7,7 +7,6 @@
  *   noindex se: forcarNoindex === true
  */
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { setRequestLocale } from 'next-intl/server'
