@@ -74,7 +74,7 @@ export default function Navbar() {
           right: 0,
           zIndex: 100,
           height: transparente ? 88 : 72,
-          background: transparente ? 'transparent' : 'rgba(26,26,46,0.92)',
+          background: transparente ? 'transparent' : 'rgba(13,27,62,0.92)',
           backdropFilter: transparente ? 'none' : 'blur(14px)',
           WebkitBackdropFilter: transparente ? 'none' : 'blur(14px)',
           borderBottom: transparente ? 'none' : '1px solid rgba(184,150,12,0.18)',
@@ -245,7 +245,7 @@ export default function Navbar() {
         style={{
           position: 'fixed',
           inset: 0,
-          background: '#1a1a2e',
+          background: '#0d1b3e',
           zIndex: 99,
           padding: '80px 40px 40px',
           transform: menuAberto ? 'translateX(0)' : 'translateX(100%)',

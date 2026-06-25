@@ -214,6 +214,7 @@ export interface BairroFull extends Bairro {
   }
   faqs?: Array<{ pergunta: string; resposta: string }>
   bairrosProximos?: Array<{ _id: string; nome: string; slug: { current: string } }>
+  destaque?: string
   metaTitle?: string
   metaDescription?: string
   ogImage?: { asset?: { url: string } }
@@ -257,17 +258,3 @@ export interface LancamentoCard {
   bairro?: BairroRef
   construtora?: string
   imagemCapa?: LancamentoImagem
-}
-
-export interface LancamentoDetalhe extends LancamentoCard {
-  precoAte?: number
-  dataEntregaPrevista?: string   // ISO date string — GROQ field name
-  descricao?: string             // plain text
-  diferenciais?: string[]
-  galeria?: LancamentoImagem[]
-  plantas?: Array<LancamentoImagem & { titulo?: string }>
-  faqs?: Array<{ pergunta: string; resposta: string }>
-  metaTitle?: string
-  metaDescription?: string
-  ogImage?: { asset?: { url: string } }
-}

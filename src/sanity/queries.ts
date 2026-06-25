@@ -121,7 +121,7 @@ export const IMOVEIS_POR_TIPOLOGIA_QUERY = groq`
 
 /** Imóveis por bairro (Landing de bairro) */
 export const IMOVEIS_POR_BAIRRO_QUERY = groq`
-  *[_type == "imovel" && bairro->slug.current == $bairroSlug && status == "Disponível"] | order(publicadoEm desc)[0...$limit] {
+  *[_type == "imovel" && bairro->slug.current == $bairroSlug && status == "Disponível" && !(_id in path("drafts.**"))] | order(publicadoEm desc)[0...$limit] {
     _id, titulo, slug, tipo, preco, areaUtil, quartos, vagas,
     ${bairroFragment},
     "imagemCapa": coalesce(imagens[arquivo.principal == true][0], imagens[0]).arquivo {
@@ -152,7 +152,7 @@ export const BAIRRO_QUERY = groq`
     faixaPreco { min, max, tipoPredominante },
     faqs[] { pergunta, resposta },
     bairrosProximos[]->{ _id, nome, slug },
-    metaTitle, metaDescription,
+    destaque, metaTitle, metaDescription,
     ogImage { asset->{ _id, url } },
     "totalImoveis": count(*[_type == "imovel" && bairro._ref == ^._id && status == "Disponível"])
   }
@@ -341,12 +341,18 @@ export const LANCAMENTOS_SLUGS_QUERY = groq`
 
 /** Slugs de imóveis — generateStaticParams + sitemap */
 export const IMOVEIS_SLUGS_QUERY = groq`
-  *[_type == "imovel" && defined(slug.current)] { "slug": slug.current }
+  *[_type == "imovel" && defined(slug.current) && !(_id in path("drafts.**"))] {
+    "slug": slug.current,
+    _updatedAt
+  }
 `
 
 /** Slugs de bairros — generateStaticParams + sitemap */
 export const BAIRROS_SLUGS_QUERY = groq`
-  *[_type == "bairro" && defined(slug.current)] { "slug": slug.current }
+  *[_type == "bairro" && defined(slug.current)] {
+    "slug": slug.current,
+    _updatedAt
+  }
 `
 
 /** Listagem do blog */
@@ -424,35 +430,3 @@ export const BAIRRO_PLANEJADO_QUERY = groq`
         nome, quartos, area,
         "imagem": imagem { asset->{ url, metadata { lqip } } }
       },
-      "tabelaPreco": tabelaPreco { asset->{ url } },
-      "materialMarketing": materialMarketing[] {
-        titulo, tipo, url,
-        "arquivo": arquivo { asset->{ url } }
-      }
-    },
-    "totalImoveis": count(*[_type == "imovel" && bairro._ref == ^._id && status == "Disponível"]),
-    geo, pontosDeInteresse,
-    metaTitle, metaDescription
-  }
-`
-
-/** Slugs de bairros planejados — generateStaticParams */
-export const BAIRROS_PLANEJADOS_SLUGS_QUERY = groq`
-  *[_type == "bairro" && bairroplanejado == true && defined(slug.current)] { "slug": slug.current }
-`
-
-/** Slugs dos condomínios do empreendimento Ilha Pura — para URLs /ilhapura/condominios/[slug] no sitemap */
-export const ILHAPURA_CONDOMINIOS_SLUGS_QUERY = groq`
-  *[_type == "condominio" && bairro->slug.current == "ilha-pura" && defined(slug.current)] {
-    "slug": slug.current
-  }
-`
-
-/** Unidades (imóveis) do Ilha Pura — para URLs de marca /ilhapura/condominios/[cond]/[finalidade]/[unidade] no sitemap */
-export const ILHAPURA_IMOVEIS_QUERY = groq`
-  *[_type == "imovel" && condominioRef->bairro->slug.current == "ilha-pura" && defined(slug.current) && defined(condominioRef->slug.current)] {
-    "slug": slug.current,
-    "condSlug": condominioRef->slug.current,
-    finalidade
-  }
-`

@@ -109,6 +109,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: titulo,
       description: descricao,
     },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+        'max-video-preview': -1,
+      },
+    },
     alternates: {
       canonical: `${siteUrl}${localePrefix}${imovelPath}`,
       languages: {
@@ -179,99 +190,4 @@ export default async function ImovelPDIPage({ params }: PageProps) {
           preco={imovel.preco}
           bairroNome={imovel.bairro?.nome}
           cidade={imovel.bairro?.cidade}
-          imagens={imagens}
-          condominioNome={imovel.condominioNome}
-          novidade={imovel.novidade}
-          condominioAnoEntrega={imovel.condominioAnoEntrega}
-          tourUrl={tourUrl}
-        />
-      )}
-
-      {/* ── Seção 2: Faixa de fotos em movimento (square marquee) ──── */}
-      {imagens.length >= 3 && (
-        <PhotoStrip
-          imagens={imagens}
-          size={180}
-          label="Galeria de fotos do imóvel"
-        />
-      )}
-
-      {/* Layout 2 colunas */}
-      <div className="container-site">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-12 py-10">
-          <main>
-            {/* Título desktop — mobile usa overlay no hero */}
-            <div className="hidden md:block mb-8">
-              {imovel.bairro && (
-                <p className="text-xs tracking-widest uppercase text-gold mb-2">
-                  {imovel.bairro.nome} · {imovel.bairro.cidade}
-                </p>
-              )}
-              {imovel.condominioNome && (
-                <p className="text-base font-light text-muted mb-1 tracking-wide">
-                  {imovel.condominioNome}
-                </p>
-              )}
-              <h1 className="text-display-lg text-ink leading-tight mb-3">
-                {imovel.titulo}
-              </h1>
-              {imovel.preco && (
-                <p className="text-price text-3xl text-ink">
-                  {formatPreco(imovel.preco)}
-                </p>
-              )}
-            </div>
-
-            <FichaTecnica imovel={imovel} />
-
-            {imovel.descricaoPtBr && (
-              <StorytellingBlock
-                descricao={imovel.descricaoPtBr}
-                titulo={t('about')}
-              />
-            )}
-
-            {/* ── Obra por Administração ────────────────────────────── */}
-            {isObraAdmin && <ObraAdminBanner />}
-
-            {/* Tour virtual embutido — só desktop (mobile: card no hero) */}
-            {tourUrl && (
-              <div className="hidden md:block">
-                <TourVirtual url={tourUrl} titulo={imovel.titulo} />
-              </div>
-            )}
-
-            {imovel.videoUrl && (
-              <VideoPlayer url={imovel.videoUrl} titulo={imovel.titulo} />
-            )}
-
-            {imagens.length > 0 && (
-              <ImovelGallery imagens={imagens} titulo={imovel.titulo} />
-            )}
-
-            {/* ── Seção 3: Plantas ─────────────────────────────────── */}
-            {imovel.plantas && imovel.plantas.length > 0 && (
-              <PlantaViewer plantas={imovel.plantas} />
-            )}
-          </main>
-
-          <aside className="hidden lg:block">
-            <CTACard
-              preco={imovel.preco}
-              titulo={imovel.titulo}
-              bairroNome={imovel.bairro?.nome}
-            />
-          </aside>
-        </div>
-      </div>
-
-      <CTAFixo
-        preco={imovel.preco}
-        titulo={imovel.titulo}
-        bairroNome={imovel.bairro?.nome}
-      />
-
-      <div className="md:hidden h-20" aria-hidden="true" />
-    </>
-  )
-}
+          imagens={ima

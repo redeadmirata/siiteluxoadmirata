@@ -9,8 +9,9 @@ import {
   BAIRROS_SLUGS_QUERY,
   IMOVEIS_POR_BAIRRO_QUERY,
 } from '@/sanity/queries'
-import type { Bairro, ImovelCard } from '@/types/sanity'
+import type { BairroFull, ImovelCard } from '@/types/sanity'
 import ImovelCardComponent from '@/components/cards/ImovelCard'
+import SchemaJSONLDBairro from '@/components/SchemaJSONLDBairro'
 import { routing } from '@/i18n/routing'
 
 export const revalidate = 60
@@ -27,7 +28,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const bairro = await client.fetch<Bairro | null>(
+  const bairro = await client.fetch<BairroFull | null>(
     BAIRRO_QUERY,
     { slug: params.slug },
     { next: { revalidate: 3600 } }
@@ -37,31 +38,64 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://admirata.com.br'
   const localePrefix = params.locale === 'pt-BR' ? '' : `/${params.locale}`
-  const capaUrl = bairro.fotoCapa?.asset?.url
-    ? `${bairro.fotoCapa.asset.url}?w=1200&h=630&fit=crop&q=80`
-    : undefined
+  const canonicalUrl = `${siteUrl}${localePrefix}/bairros/${params.slug}/`
+
+  // Título: prioriza campo SEO do Sanity, depois padrão editorial
+  const title =
+    bairro.metaTitle ??
+    `Imóveis ${bairro.nome} — Admirata`
+
+  // Descrição: prioriza campo SEO do Sanity, depois fallback rico
+  const description =
+    bairro.metaDescription ??
+    bairro.descricao ??
+    `Conheça os lançamentos e imóveis disponíveis em ${bairro.nome}, ${bairro.cidade}. ${bairro.totalImoveis > 0 ? `${bairro.totalImoveis} ${bairro.totalImoveis === 1 ? 'imóvel disponível' : 'imóveis disponíveis'}.` : ''} Curadoria exclusiva Admirata Imóveis.`.trim()
+
+  // OG image: prioriza ogImage dedicado, depois fotoCapa recortada
+  const ogImageUrl =
+    bairro.ogImage?.asset?.url ??
+    (bairro.fotoCapa?.asset?.url
+      ? `${bairro.fotoCapa.asset.url}?w=1200&h=630&fit=crop&q=80`
+      : undefined)
 
   return {
-    title: `${bairro.nome}, ${bairro.cidade}`,
-    description:
-      bairro.descricao ??
-      `Imóveis de alto padrão em ${bairro.nome}, ${bairro.cidade}. ${bairro.totalImoveis} ${bairro.totalImoveis === 1 ? 'imóvel disponível' : 'imóveis disponíveis'} com curadoria exclusiva da Admirata.`,
+    title,
+    description,
+    alternates: {
+      canonical: canonicalUrl,
+      languages: {
+        'pt-BR': `${siteUrl}/bairros/${params.slug}/`,
+        'en-US': `${siteUrl}/en/bairros/${params.slug}/`,
+        'fr-FR': `${siteUrl}/fr/bairros/${params.slug}/`,
+      },
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+        'max-video-preview': -1,
+      },
+    },
     openGraph: {
-      title: `${bairro.nome}, ${bairro.cidade} | Admirata Imóveis`,
-      description:
-        bairro.descricao ??
-        `Imóveis de luxo em ${bairro.nome} — curadoria exclusiva Admirata.`,
-      ...(capaUrl && {
-        images: [{ url: capaUrl, width: 1200, height: 630, alt: bairro.nome }],
+      title,
+      description,
+      url: canonicalUrl,
+      type: 'website',
+      locale: 'pt_BR',
+      siteName: 'Admirata Negócios Imobiliários',
+      ...(ogImageUrl && {
+        images: [{ url: ogImageUrl, width: 1200, height: 630, alt: bairro.nome }],
       }),
     },
-    alternates: {
-      canonical: `${siteUrl}${localePrefix}/bairros/${params.slug}`,
-      languages: {
-        'pt-BR': `${siteUrl}/bairros/${params.slug}`,
-        'en-US': `${siteUrl}/en/bairros/${params.slug}`,
-        'fr-FR': `${siteUrl}/fr/bairros/${params.slug}`,
-      },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      ...(ogImageUrl && { images: [ogImageUrl] }),
     },
   }
 }
@@ -72,7 +106,7 @@ export default async function BairroPage({ params }: PageProps) {
   const t = await getTranslations({ locale: params.locale, namespace: 'bairros' })
 
   const [bairro, imoveis] = await Promise.all([
-    client.fetch<Bairro | null>(
+    client.fetch<BairroFull | null>(
       BAIRRO_QUERY,
       { slug: params.slug },
       { next: { revalidate: 3600 } }
@@ -108,6 +142,7 @@ export default async function BairroPage({ params }: PageProps) {
 
   return (
     <main className="min-h-screen bg-white" id="main-content">
+      <SchemaJSONLDBairro bairro={bairro} imoveis={imoveis} localePrefix={localePrefix} />
       {/* ── Hero ── */}
       <div className="relative h-[65vh] min-h-[420px] bg-ink overflow-hidden">
         {capaUrl ? (
@@ -309,27 +344,4 @@ export default async function BairroPage({ params }: PageProps) {
           )}
         </section>
 
-        {/* ── CTA strip ── */}
-        <section className="border-t border-stone/40 py-16 mb-8">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-            <div>
-              <p className="font-display text-2xl text-ink font-light">
-                {t('interested', { neighborhood: bairro.nome })}
-              </p>
-              <p className="text-sm text-muted mt-1">{t('teamKnows')}</p>
-            </div>
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-shrink-0 inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] bg-gold text-white px-8 py-4 hover:bg-[#a07a0a] transition-colors duration-300"
-            >
-              <span aria-hidden="true" className="text-sm">↗</span>
-              {t('whatsapp')}
-            </a>
-          </div>
-        </section>
-      </div>
-    </main>
-  )
-}
+        {/* ─�

@@ -192,6 +192,14 @@ export const bairro = defineType({
       description: 'Campo legado. Para novos bairros, prefira porQueMorar.',
     }),
     defineField({
+      name: 'destaque',
+      title: 'Frase de destaque (SEO / meta fallback)',
+      type: 'string',
+      group: 'conteudo',
+      description: 'Frase curta usada no fallback da meta description. Ex: "vistas para o maciço da Tijuca e acesso direto à praia"',
+      validation: (r) => r.max(80),
+    }),
+    defineField({
       name: 'faixaPreco',
       title: 'Faixa de preço dos imóveis',
       type: 'object',
@@ -309,19 +317,4 @@ export const bairro = defineType({
       title: 'Meta title (max 60 chars)',
       type: 'string',
       group: 'seo',
-      description: 'Ex: Imóveis à venda na Barra da Tijuca | Admirata RJ',
-      validation: (r) => r.max(60),
-    }),
-    defineField({
-      name: 'metaDescription',
-      title: 'Meta description (150-160 chars)',
-      type: 'text',
-      group: 'seo',
-      rows: 3,
-      validation: (r) => r.max(160),
-    }),
-  ],
-  preview: {
-    select: { title: 'nome', subtitle: 'cidade' },
-  },
-})
+      description: 'Ex: Imóveis à venda na Barra da Tijuca | Admirata

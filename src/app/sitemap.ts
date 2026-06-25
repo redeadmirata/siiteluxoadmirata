@@ -9,7 +9,6 @@ import {
   TIPOLOGIAS_SLUGS_QUERY,
   LANCAMENTOS_SLUGS_QUERY,
   ILHAPURA_CONDOMINIOS_SLUGS_QUERY,
-  ILHAPURA_IMOVEIS_QUERY,
 } from '@/sanity/queries'
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://admirata.com.br'
@@ -25,23 +24,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     tipologiaHierarquia,
     lancamentoSlugs,
     ilhapuraCondominioSlugs,
-    ilhapuraImoveis,
   ] = await Promise.all([
-    client.fetch<Array<{ slug: string }>>(IMOVEIS_SLUGS_QUERY),
-    client.fetch<Array<{ slug: string }>>(BAIRROS_SLUGS_QUERY),
+    client.fetch<Array<{ slug: string; _updatedAt: string }>>(IMOVEIS_SLUGS_QUERY),
+    client.fetch<Array<{ slug: string; _updatedAt: string }>>(BAIRROS_SLUGS_QUERY),
     client.fetch<Array<{ slug: string }>>(BLOG_SLUGS_QUERY),
     client.fetch<Array<{ slug: string }>>(CONDOMINIOS_SLUGS_QUERY),
     client.fetch<Array<{ bairroSlug: string; condSlug: string }>>(CONDOMINIOS_SLUGS_HIERARQUIA_QUERY),
     client.fetch<Array<{ bairroSlug: string; condSlug: string; tipologias: string[] }>>(TIPOLOGIAS_SLUGS_QUERY),
     client.fetch<Array<{ slug: string }>>(LANCAMENTOS_SLUGS_QUERY),
     client.fetch<Array<{ slug: string }>>(ILHAPURA_CONDOMINIOS_SLUGS_QUERY),
-    client.fetch<Array<{ slug: string; condSlug: string; finalidade: string }>>(ILHAPURA_IMOVEIS_QUERY),
   ])
-
-  // Mapa finalidade → segmento de URL e set de slugs de unidades Ilha Pura
-  const finalidadeSeg = (f: string) =>
-    f === 'Locação' ? 'aluguel' : f === 'Temporada' ? 'temporada' : 'venda'
-  const ilhapuraImovelSlugs = new Set(ilhapuraImoveis.map((i) => i.slug))
 
   // ── Páginas estáticas ────────────────────────────────────────────
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -128,30 +120,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   )
 
   // ── PDI de imóveis (NÍVEL 0) — /imovel/[slug] ───────────────────
-  // Exclui unidades Ilha Pura (têm URL de marca canônica, abaixo)
-  const imovelRoutes: MetadataRoute.Sitemap = imovelSlugs
-    .filter(({ slug }) => !ilhapuraImovelSlugs.has(slug))
-    .map(({ slug }) => ({
-      url: `${BASE_URL}/imovel/${slug}`,
-      lastModified: new Date(),
-      changeFrequency: 'daily' as const,
-      priority: 0.85,
-    }))
-
-  // ── Unidades Ilha Pura — /ilhapura/condominios/[cond]/[finalidade]/[unidade] ──
-  const ilhapuraImovelRoutes: MetadataRoute.Sitemap = ilhapuraImoveis.map(
-    ({ slug, condSlug, finalidade }) => ({
-      url: `${BASE_URL}/ilhapura/condominios/${condSlug}/${finalidadeSeg(finalidade)}/${slug}`,
-      lastModified: new Date(),
-      changeFrequency: 'daily' as const,
-      priority: 0.85,
-    })
-  )
+  const imovelRoutes: MetadataRoute.Sitemap = imovelSlugs.map(({ slug, _updatedAt }) => ({
+    url: `${BASE_URL}/imovel/${slug}`,
+    lastModified: new Date(_updatedAt),
+    changeFrequency: 'daily' as const,
+    priority: 0.85,
+  }))
 
   // ── Bairros (NÍVEL 1) — /imoveis/[bairro] ───────────────────────
-  const bairroRoutes: MetadataRoute.Sitemap = bairroSlugs.map(({ slug }) => ({
+  const bairroRoutes: MetadataRoute.Sitemap = bairroSlugs.map(({ slug, _updatedAt }) => ({
     url: `${BASE_URL}/imoveis/${slug}`,
-    lastModified: new Date(),
+    lastModified: new Date(_updatedAt),
     changeFrequency: 'weekly' as const,
     priority: 0.8,
   }))
@@ -196,13 +175,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...staticRoutes,
     ...imovelRoutes,
-    ...ilhapuraImovelRoutes,
     ...bairroRoutes,
     ...condominioDetailRoutes,
     ...ilhapuraCondominioRoutes,
-    ...condominioRoutes,
-    ...tipologiaRoutes,
-    ...lancamentoRoutes,
-    ...blogRoutes,
-  ]
-}
+    ...condomin
