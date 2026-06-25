@@ -137,6 +137,10 @@ export interface ImovelCard {
 /** PDI completa */
 export interface ImovelPDI extends ImovelCard {
   condominioRef?: { slug?: string; bairroSlug?: string }
+  /** Nome do condomínio — campo calculado pelo GROQ (condominioRef->nome) */
+  condominioNome?: string
+  /** Ano de entrega do condomínio — para badge "Pronto para morar" */
+  condominioAnoEntrega?: number
   condominio?: number
   iptu?: number
   areaTotal?: number

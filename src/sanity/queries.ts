@@ -43,6 +43,8 @@ export const IMOVEIS_FILTRADOS_QUERY = groq`
     && ($precoMin == 0 || preco >= $precoMin)
     && ($precoMax == 0 || preco <= $precoMax)
     && ($quartos == 0 || quartos >= $quartos)
+    && ($novidade != "true" || novidade == true)
+    && ($exclusivo != "true" || exclusivo == true)
   ] | order(publicadoEm desc) [$offset...$end] {
     _id, titulo, slug, tipo, finalidade, mercado, status,
     exclusivo, permuta, novidade, precoSobConsulta,
@@ -60,10 +62,13 @@ export const IMOVEIS_FILTRADOS_QUERY = groq`
 export const IMOVEL_PDI_QUERY = groq`
   *[_type == "imovel" && slug.current == $slug][0] {
     _id, titulo, slug, tipo, finalidade, mercado, status, destaque,
+    novidade, exclusivo,
     preco, condominio, iptu, areaUtil, areaTotal,
     quartos, suites, banheiros, vagas, andar,
     ${bairroFragment},
     "condominioRef": condominioRef->{ "slug": slug.current, "bairroSlug": bairro->slug.current },
+    "condominioNome": condominioRef->nome,
+    "condominioAnoEntrega": condominioRef->anoEntrega,
     endereco,
     imagens[] { ${imagemFragment} },
     plantas[] {

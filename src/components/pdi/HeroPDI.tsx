@@ -12,7 +12,10 @@ interface HeroPDIProps {
   bairroNome?: string
   cidade?: string
   imagens: ImovelImagem[]
-  onVerTodas?: () => void
+  condominioNome?: string
+  novidade?: boolean
+  condominioAnoEntrega?: number
+  tourUrl?: string
 }
 
 export default function HeroPDI({
@@ -21,21 +24,31 @@ export default function HeroPDI({
   bairroNome,
   cidade,
   imagens,
+  condominioNome,
+  novidade,
+  condominioAnoEntrega,
+  tourUrl,
 }: HeroPDIProps) {
-  const [imgErro, setImgErro] = useState<Record<number, boolean>>({})
   const [lightboxIndice, setLightboxIndice] = useState<number | null>(null)
   const [mobileIdx, setMobileIdx] = useState(0)
-  const heroRef = useRef<HTMLElement>(null)
   const touchStartX = useRef(0)
+  const heroRef = useRef<HTMLElement>(null)
 
   const capa = imagens.find((i) => i.arquivo.principal) ?? imagens[0]
   const galeria = imagens.filter((i) => i !== capa).slice(0, 4)
 
-  // ── GSAP parallax (desktop only, respects prefers-reduced-motion) ──
+  // Badge: Lançamento ou Pronto para morar
+  const currentYear = new Date().getFullYear()
+  const isLancamento = novidade === true
+  const isPronto =
+    !isLancamento &&
+    !!condominioAnoEntrega &&
+    condominioAnoEntrega <= currentYear
+
+  // ── GSAP parallax (desktop only) ──────────────────────────────────
   useEffect(() => {
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (prefersReduced || !heroRef.current || window.innerWidth < 768) return
-
     let kill: (() => void) | null = null
     ;(async () => {
       const { default: gsap } = await import('gsap')
@@ -56,7 +69,7 @@ export default function HeroPDI({
     return () => kill?.()
   }, [])
 
-  // ── Lightbox teclado ─────────────────────────────────────────────
+  // ── Lightbox teclado ──────────────────────────────────────────────
   useEffect(() => {
     if (lightboxIndice === null) return
     const handler = (e: KeyboardEvent) => {
@@ -79,7 +92,7 @@ export default function HeroPDI({
     }
   }
 
-  // ── Swipe mobile ─────────────────────────────────────────────────
+  // ── Swipe mobile ──────────────────────────────────────────────────
   const onTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX
   }
@@ -93,7 +106,7 @@ export default function HeroPDI({
     <>
       <section ref={heroRef} className="relative w-full" aria-label="Fotos do imóvel">
 
-        {/* ── MOBILE: foto única fullbleed com swipe ─────────────── */}
+        {/* ── MOBILE: hero fullbleed com overlay de texto ──────────── */}
         <div
           className="md:hidden relative w-full overflow-hidden"
           style={{ aspectRatio: '4/3' }}
@@ -102,8 +115,9 @@ export default function HeroPDI({
           onClick={() => setLightboxIndice(mobileIdx)}
           role="button"
           tabIndex={0}
-          aria-label="Abrir galeria"
+          aria-label="Abrir galeria de fotos"
         >
+          {/* Foto */}
           {imagens[mobileIdx] && (
             <Image
               src={getUrl(imagens[mobileIdx], 900)}
@@ -116,37 +130,96 @@ export default function HeroPDI({
               blurDataURL={imagens[mobileIdx].arquivo.asset?.metadata?.lqip}
             />
           )}
-          {/* Overlay gradiente base */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
 
-          {/* Contador */}
-          <div className="absolute bottom-3 right-3 flex items-center gap-2 pointer-events-none">
-            <span className="text-white/80 text-xs font-mono bg-black/50 backdrop-blur-sm px-2.5 py-1 rounded-full">
+          {/* Gradiente topo (para badges) */}
+          <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-black/60 to-transparent pointer-events-none" />
+
+          {/* Gradiente base (para texto) */}
+          <div className="absolute bottom-0 left-0 right-0 h-2/3 bg-gradient-to-t from-black/90 via-black/50 to-transparent pointer-events-none" />
+
+          {/* Badge status — topo esquerdo */}
+          <div className="absolute top-4 left-4 z-10 flex items-center gap-2 pointer-events-none">
+            {isLancamento && (
+              <span className="bg-gold text-white text-[10px] font-semibold tracking-[0.15em] uppercase px-3 py-1">
+                Lançamento
+              </span>
+            )}
+            {isPronto && (
+              <span className="bg-white text-ink text-[10px] font-semibold tracking-[0.15em] uppercase px-3 py-1">
+                Pronto para morar
+              </span>
+            )}
+          </div>
+
+          {/* Contador — topo direito */}
+          <div className="absolute top-4 right-4 z-10 pointer-events-none">
+            <span className="text-white/80 text-[11px] font-mono bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded-full">
               {mobileIdx + 1} / {imagens.length}
             </span>
           </div>
 
-          {/* Indicadores de swipe (pontos) */}
+          {/* Texto overlay — base */}
+          <div className="absolute bottom-0 left-0 right-0 z-10 px-5 pb-8 pt-16 pointer-events-none">
+            {(bairroNome || cidade) && (
+              <p className="text-white/60 text-[10px] tracking-[0.2em] uppercase mb-1">
+                {bairroNome}{cidade ? ` · ${cidade}` : ''}
+              </p>
+            )}
+            {condominioNome && (
+              <p className="text-white/80 text-sm font-light tracking-wide mb-0.5">
+                {condominioNome}
+              </p>
+            )}
+            <h1 className="text-white text-xl font-light leading-tight">
+              {titulo}
+            </h1>
+            {preco && (
+              <p className="text-gold text-xl font-light mt-2">
+                {formatPreco(preco)}
+              </p>
+            )}
+          </div>
+
+          {/* Pontos de swipe */}
           {imagens.length > 1 && (
-            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1 pointer-events-none">
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex gap-1 pointer-events-none">
               {imagens.slice(0, Math.min(imagens.length, 8)).map((_, i) => (
                 <span
                   key={i}
                   className={`rounded-full transition-all duration-300 ${
-                    i === mobileIdx
-                      ? 'w-4 h-1.5 bg-white'
-                      : 'w-1.5 h-1.5 bg-white/40'
+                    i === mobileIdx ? 'w-4 h-1.5 bg-white' : 'w-1.5 h-1.5 bg-white/40'
                   }`}
                 />
               ))}
-              {imagens.length > 8 && (
-                <span className="text-white/40 text-xs leading-none self-center">…</span>
-              )}
             </div>
           )}
         </div>
 
-        {/* ── DESKTOP: grid de 5 fotos ───────────────────────────── */}
+        {/* Tour virtual — card abaixo da foto no mobile */}
+        {tourUrl && (
+          <div className="md:hidden px-5 pt-4">
+            <a
+              href={tourUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 border border-gold/40 bg-gold/5 px-4 py-3 rounded-lg group"
+            >
+              {/* Ícone 360° */}
+              <span className="w-9 h-9 rounded-full border border-gold/50 flex items-center justify-center flex-shrink-0 text-gold text-xs font-mono group-hover:bg-gold group-hover:text-white transition-colors">
+                360°
+              </span>
+              <div className="min-w-0">
+                <p className="text-xs tracking-widest uppercase text-gold">Tour Virtual</p>
+                <p className="text-sm text-ink font-light truncate">Ver decorado completo</p>
+              </div>
+              <svg className="w-4 h-4 text-muted ml-auto flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+          </div>
+        )}
+
+        {/* ── DESKTOP: grid 5 fotos ─────────────────────────────────── */}
         <div className="relative hidden md:block">
           <div
             className="grid gap-1"
@@ -164,7 +237,7 @@ export default function HeroPDI({
               tabIndex={0}
               onKeyDown={(e) => e.key === 'Enter' && setLightboxIndice(imagens.indexOf(capa))}
             >
-              {capa && !imgErro[0] ? (
+              {capa && (
                 <Image
                   src={getUrl(capa, 1200)}
                   alt={capa.arquivo.alt ?? titulo}
@@ -174,12 +247,37 @@ export default function HeroPDI({
                   className="object-cover hover:scale-[1.025] transition-transform duration-700 ease-out"
                   placeholder={capa.arquivo.asset?.metadata?.lqip ? 'blur' : 'empty'}
                   blurDataURL={capa.arquivo.asset?.metadata?.lqip}
-                  onError={() => setImgErro((p) => ({ ...p, 0: true }))}
                 />
-              ) : (
-                <div className="w-full h-full bg-stone flex items-center justify-center">
-                  <span className="text-muted text-sm">Sem foto</span>
+              )}
+
+              {/* Badge status desktop — topo esquerdo da foto principal */}
+              {(isLancamento || isPronto) && (
+                <div className="absolute top-4 left-4 z-10">
+                  {isLancamento && (
+                    <span className="bg-gold text-white text-[10px] font-semibold tracking-[0.15em] uppercase px-3 py-1.5">
+                      Lançamento
+                    </span>
+                  )}
+                  {isPronto && (
+                    <span className="bg-white text-ink text-[10px] font-semibold tracking-[0.15em] uppercase px-3 py-1.5">
+                      Pronto para morar
+                    </span>
+                  )}
                 </div>
+              )}
+
+              {/* Tour button desktop */}
+              {tourUrl && (
+                <a
+                  href={tourUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="absolute bottom-4 left-4 z-10 flex items-center gap-2 bg-black/60 backdrop-blur-sm text-white text-xs tracking-wider uppercase px-3 py-2 rounded-full hover:bg-black/80 transition-colors"
+                >
+                  <span className="font-mono">360°</span>
+                  <span>Tour virtual</span>
+                </a>
               )}
             </div>
 
@@ -193,25 +291,20 @@ export default function HeroPDI({
                 tabIndex={0}
                 onKeyDown={(e) => e.key === 'Enter' && setLightboxIndice(imagens.indexOf(img))}
               >
-                {!imgErro[i + 1] ? (
-                  <Image
-                    src={getUrl(img, 600)}
-                    alt={img.arquivo.alt ?? `Foto ${i + 2}`}
-                    fill
-                    sizes="25vw"
-                    className="object-cover hover:scale-[1.03] transition-transform duration-500 ease-out"
-                    placeholder={img.arquivo.asset?.metadata?.lqip ? 'blur' : 'empty'}
-                    blurDataURL={img.arquivo.asset?.metadata?.lqip}
-                    onError={() => setImgErro((p) => ({ ...p, [i + 1]: true }))}
-                  />
-                ) : (
-                  <div className="w-full h-full bg-stone" />
-                )}
+                <Image
+                  src={getUrl(img, 600)}
+                  alt={img.arquivo.alt ?? `Foto ${i + 2}`}
+                  fill
+                  sizes="25vw"
+                  className="object-cover hover:scale-[1.03] transition-transform duration-500 ease-out"
+                  placeholder={img.arquivo.asset?.metadata?.lqip ? 'blur' : 'empty'}
+                  blurDataURL={img.arquivo.asset?.metadata?.lqip}
+                />
               </div>
             ))}
           </div>
 
-          {/* Botão Ver todas (desktop) */}
+          {/* Botão ver todas */}
           {imagens.length > 5 && (
             <button
               onClick={() => setLightboxIndice(0)}
@@ -221,22 +314,9 @@ export default function HeroPDI({
             </button>
           )}
         </div>
-
-        {/* ── Info overlay mobile ────────────────────────────────── */}
-        <div className="md:hidden px-5 pt-5 pb-2">
-          {bairroNome && (
-            <p className="text-xs tracking-widest uppercase text-gold mb-1">
-              {bairroNome}{cidade ? ` · ${cidade}` : ''}
-            </p>
-          )}
-          <h1 className="text-display-lg text-ink leading-tight">{titulo}</h1>
-          {preco && (
-            <p className="text-price text-2xl text-ink mt-2">{formatPreco(preco)}</p>
-          )}
-        </div>
       </section>
 
-      {/* ── Lightbox ──────────────────────────────────────────────── */}
+      {/* ── Lightbox ────────────────────────────────────────────────── */}
       {lightboxIndice !== null && (
         <div
           className="fixed inset-0 z-[100] bg-black/96 flex flex-col"

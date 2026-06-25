@@ -9,6 +9,8 @@ import { routing } from '@/i18n/routing'
 
 import BreadcrumbNav from '@/components/ui/BreadcrumbNav'
 import HeroPDI from '@/components/pdi/HeroPDI'
+import PhotoStrip from '@/components/pdi/PhotoStrip'
+import ObraAdminBanner from '@/components/pdi/ObraAdminBanner'
 import FichaTecnica from '@/components/pdi/FichaTecnica'
 import StorytellingBlock from '@/components/pdi/StorytellingBlock'
 import ImovelGallery from '@/components/pdi/ImovelGallery'
@@ -45,6 +47,24 @@ function buildImovelPath(imovel: ImovelPDI, slug: string): string {
   return `/ilhapura/condominios/${condSlug}/${finalidadeSeg}/${slug}`
 }
 
+/** Meta description rica para SEO: inclui preço, quartos, área, bairro e condomínio */
+function buildMetaDescription(imovel: ImovelPDI): string {
+  if (imovel.seo?.descricao) return imovel.seo.descricao
+  if (imovel.descricaoPtBr) return imovel.descricaoPtBr.slice(0, 160)
+
+  const partes: string[] = []
+  if (imovel.tipo) partes.push(imovel.tipo)
+  if (imovel.quartos) partes.push(`${imovel.quartos} quartos`)
+  if (imovel.areaUtil) partes.push(`${formatArea(imovel.areaUtil)}`)
+  if (imovel.bairro) partes.push(`em ${imovel.bairro.nome}, ${imovel.bairro.cidade}`)
+  if (imovel.condominioNome) partes.push(`· ${imovel.condominioNome}`)
+
+  const base = partes.join(' ')
+  if (imovel.precoSobConsulta) return `${base}. Valor sob consulta — Admirata Imóveis.`
+  if (imovel.preco) return `${base}. ${formatPreco(imovel.preco)}.`
+  return `${base}. Admirata Imóveis.`
+}
+
 export async function generateStaticParams() {
   const slugs = await client.fetch<{ slug: string }[]>(IMOVEIS_SLUGS_QUERY)
   return routing.locales.flatMap((locale) =>
@@ -62,10 +82,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!imovel) return { title: t('notFound') }
 
   const titulo = imovel.seo?.titulo ?? `${imovel.titulo} | Admirata Imóveis`
-  const descricao =
-    imovel.seo?.descricao ??
-    imovel.descricaoPtBr?.slice(0, 160) ??
-    `${imovel.tipo ?? ''} ${imovel.areaUtil ? `de ${formatArea(imovel.areaUtil)}` : ''} ${imovel.bairro ? `em ${imovel.bairro.nome}, ${imovel.bairro.cidade}` : ''}`.trim()
+  const descricao = buildMetaDescription(imovel)
 
   const imagemCapa =
     imovel.imagens?.find((i) => i.arquivo.principal)?.arquivo.asset?.url ??
@@ -120,8 +137,14 @@ export default async function ImovelPDIPage({ params }: PageProps) {
 
   const imagens = imovel.imagens ?? []
   const bairroSlug = imovel.bairro?.slug?.current
+
   // Tour: prefere campo top-level, fallback para urlMatterport em imagens (legado)
-  const tourUrl = imovel.tourVirtual ?? imagens.find((i) => i.arquivo.urlMatterport)?.arquivo.urlMatterport
+  const tourUrl =
+    imovel.tourVirtual ??
+    imagens.find((i) => i.arquivo.urlMatterport)?.arquivo.urlMatterport
+
+  // Badge Obra por Administração: lançamento em construção direta
+  const isObraAdmin = imovel.novidade === true
 
   return (
     <>
@@ -149,7 +172,7 @@ export default async function ImovelPDIPage({ params }: PageProps) {
         />
       </div>
 
-      {/* Hero */}
+      {/* ── Seção 1: Hero com overlay de texto + badges + tour ─────── */}
       {imagens.length > 0 && (
         <HeroPDI
           titulo={imovel.titulo}
@@ -157,6 +180,19 @@ export default async function ImovelPDIPage({ params }: PageProps) {
           bairroNome={imovel.bairro?.nome}
           cidade={imovel.bairro?.cidade}
           imagens={imagens}
+          condominioNome={imovel.condominioNome}
+          novidade={imovel.novidade}
+          condominioAnoEntrega={imovel.condominioAnoEntrega}
+          tourUrl={tourUrl}
+        />
+      )}
+
+      {/* ── Seção 2: Faixa de fotos em movimento (square marquee) ──── */}
+      {imagens.length >= 3 && (
+        <PhotoStrip
+          imagens={imagens}
+          size={180}
+          label="Galeria de fotos do imóvel"
         />
       )}
 
@@ -164,10 +200,16 @@ export default async function ImovelPDIPage({ params }: PageProps) {
       <div className="container-site">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-12 py-10">
           <main>
+            {/* Título desktop — mobile usa overlay no hero */}
             <div className="hidden md:block mb-8">
               {imovel.bairro && (
                 <p className="text-xs tracking-widest uppercase text-gold mb-2">
                   {imovel.bairro.nome} · {imovel.bairro.cidade}
+                </p>
+              )}
+              {imovel.condominioNome && (
+                <p className="text-base font-light text-muted mb-1 tracking-wide">
+                  {imovel.condominioNome}
                 </p>
               )}
               <h1 className="text-display-lg text-ink leading-tight mb-3">
@@ -189,8 +231,14 @@ export default async function ImovelPDIPage({ params }: PageProps) {
               />
             )}
 
+            {/* ── Obra por Administração ────────────────────────────── */}
+            {isObraAdmin && <ObraAdminBanner />}
+
+            {/* Tour virtual embutido — só desktop (mobile: card no hero) */}
             {tourUrl && (
-              <TourVirtual url={tourUrl} titulo={imovel.titulo} />
+              <div className="hidden md:block">
+                <TourVirtual url={tourUrl} titulo={imovel.titulo} />
+              </div>
             )}
 
             {imovel.videoUrl && (
@@ -201,6 +249,7 @@ export default async function ImovelPDIPage({ params }: PageProps) {
               <ImovelGallery imagens={imagens} titulo={imovel.titulo} />
             )}
 
+            {/* ── Seção 3: Plantas ─────────────────────────────────── */}
             {imovel.plantas && imovel.plantas.length > 0 && (
               <PlantaViewer plantas={imovel.plantas} />
             )}
