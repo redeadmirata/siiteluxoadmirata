@@ -30,13 +30,6 @@ function waUrl(phone: string, text: string) {
   return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`
 }
 
-function getSub(mercado: Mercado): string {
-  if (mercado === 'Rio de Janeiro')
-    return 'Curadoria de coberturas e apartamentos no Rio de Janeiro — venda e locação.'
-  if (mercado === 'Serra Gaúcha')
-    return 'Curadoria de casas e coberturas na Serra Gaúcha — Gramado e Canela.'
-  return 'Curadoria de imóveis exclusivos no Rio de Janeiro e Serra Gaúcha.'
-}
 
 function getCTA(mercado: Mercado): { label: string; href: string } {
   if (mercado === 'Serra Gaúcha') return { label: 'Ver imóveis em Gramado', href: '/gramado' }
@@ -168,52 +161,6 @@ export default function HeroHome() {
             padding: '0 clamp(1.5rem, 4vw, 3rem) clamp(4.5rem, 10vh, 8rem)',
           }}
         >
-          {/* Eyebrow */}
-          <p
-            style={{
-              fontSize: 10,
-              textTransform: 'uppercase',
-              letterSpacing: '0.4em',
-              color: 'var(--color-gold)',
-              marginBottom: 20,
-            }}
-          >
-            Negócios imobiliários de alto padrão
-          </p>
-
-          {/* H1 */}
-          <h1
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontWeight: 300,
-              color: '#fff',
-              lineHeight: 1.02,
-              marginBottom: 20,
-              fontSize: 'clamp(2.8rem, 7.5vw, 6rem)',
-              maxWidth: 820,
-            }}
-          >
-            O imóvel certo,
-            <br />
-            <em style={{ fontStyle: 'italic', color: 'rgba(212,172,26,0.9)' }}>
-              com discrição e cuidado.
-            </em>
-          </h1>
-
-          {/* Sub */}
-          <p
-            style={{
-              fontSize: 15,
-              color: 'rgba(255,255,255,0.55)',
-              maxWidth: 460,
-              lineHeight: 1.75,
-              marginBottom: 36,
-              minHeight: '2em',
-            }}
-          >
-            {getSub(mercado)}
-          </p>
-
           {/* Mercado switcher */}
           {mounted && (
             <div
