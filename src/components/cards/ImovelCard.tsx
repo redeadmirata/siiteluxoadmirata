@@ -39,12 +39,12 @@ export default function ImovelCard({ imovel, priority = false, className = '' }:
       aria-label={`${titulo} — ${bairro?.nome ?? ''}`}
     >
       {/*
-       * Mobile: layout horizontal (foto 40% | info 60%)
+       * Mobile: layout horizontal (foto 42% | info 58%)
        * Desktop (sm+): layout vertical original (foto topo, info embaixo)
        */}
       <div className="flex flex-row sm:flex-col gap-3 sm:gap-0">
 
-        {/* ── Foto ── */}
+        {/* Foto */}
         <div className="relative w-[42%] sm:w-auto flex-shrink-0 sm:flex-shrink aspect-[4/3] sm:aspect-card overflow-hidden bg-stone rounded-md sm:rounded-none">
           {capaUrl ? (
             <Image
@@ -63,10 +63,8 @@ export default function ImovelCard({ imovel, priority = false, className = '' }:
             </div>
           )}
 
-          {/* Overlay escuro no hover */}
           <div className="absolute inset-0 bg-ink/0 group-hover:bg-ink/10 transition-colors duration-500 pointer-events-none" />
 
-          {/* Badges — topo esquerdo */}
           <div className="absolute top-2 left-2 flex flex-col gap-1 pointer-events-none">
             {exclusivo && (
               <span className="text-[8px] sm:text-[9px] uppercase tracking-[0.14em] bg-gold text-white px-2 py-0.5 sm:px-2.5 sm:py-1 font-medium">
@@ -83,7 +81,6 @@ export default function ImovelCard({ imovel, priority = false, className = '' }:
             </span>
           </div>
 
-          {/* Permuta badge — topo direito */}
           {permuta && (
             <div className="absolute top-2 right-2 pointer-events-none">
               <span className="text-[8px] uppercase tracking-[0.12em] bg-white/92 backdrop-blur-sm text-ink px-1.5 py-0.5">
@@ -92,24 +89,42 @@ export default function ImovelCard({ imovel, priority = false, className = '' }:
             </div>
           )}
 
-          {/* Favorito — canto inferior direito, aparece no hover */}
           <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
             <FavoritoButton imovelId={_id} titulo={titulo} />
           </div>
         </div>
 
-        {/* ── Info ── */}
+        {/* Info */}
         <div className="flex-1 sm:pt-4 flex flex-col justify-center sm:justify-start min-w-0">
-          {/* Bairro · Condomínio */}
           <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.22em] text-gold mb-1 sm:mb-1.5 truncate">
             {bairro?.nome ?? ''}
             {condominionome ? ` · ${condominionome}` : bairro?.cidade ? ` · ${bairro.cidade}` : ''}
           </p>
 
-          {/* Título */}
           <h2 className="font-display text-sm sm:text-lg text-ink leading-snug group-hover:text-gold transition-colors duration-200 line-clamp-2">
             {titulo}
           </h2>
 
-          {/* Métricas */}
-          <div className="flex items-center flex-wrap gap-x-2 sm:gap-x-3 gap-y-1 mt-1.5 sm:mt-2 text-[10px] sm:text-
+          <div className="flex items-center flex-wrap gap-x-2 sm:gap-x-3 gap-y-1 mt-1.5 sm:mt-2 text-[10px] sm:text-[11px] text-muted">
+            {areaUtil && (
+              <span>{formatArea(areaUtil)}</span>
+            )}
+            {quartos != null && (
+              <span>{quartos} {quartos === 1 ? 'qto' : 'qtos'}{suites ? ` · ${suites} suite${suites > 1 ? 's' : ''}` : ''}</span>
+            )}
+            {vagas != null && (
+              <span className="hidden sm:inline">{vagas} {vagas === 1 ? 'vaga' : 'vagas'}</span>
+            )}
+          </div>
+
+          <p className="mt-2 sm:mt-3 font-mono text-xs sm:text-sm text-ink tracking-tight">
+            {precoSobConsulta || !preco
+              ? 'Sob consulta'
+              : formatPreco(preco)}
+          </p>
+        </div>
+
+      </div>
+    </Link>
+  )
+}

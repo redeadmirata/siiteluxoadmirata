@@ -14,7 +14,6 @@ import {
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://admirata.com.br'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // ── Slugs dinâmicos ──────────────────────────────────────────────
   const [
     imovelSlugs,
     bairroSlugs,
@@ -35,73 +34,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     client.fetch<Array<{ slug: string }>>(ILHAPURA_CONDOMINIOS_SLUGS_QUERY),
   ])
 
-  // ── Páginas estáticas ────────────────────────────────────────────
   const staticRoutes: MetadataRoute.Sitemap = [
-    {
-      url: BASE_URL,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 1.0,
-    },
-    {
-      url: `${BASE_URL}/imoveis`,
-      lastModified: new Date(),
-      changeFrequency: 'hourly',
-      priority: 0.9,
-    },
-    {
-      url: `${BASE_URL}/blog`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.6,
-    },
-    {
-      url: `${BASE_URL}/lancamentos`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/condominios`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    // Landing de marca do empreendimento Ilha Pura
-    {
-      url: `${BASE_URL}/ilhapura`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.85,
-    },
-    // Páginas de característica SEO
-    {
-      url: `${BASE_URL}/imoveis/cobertura`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.75,
-    },
-    {
-      url: `${BASE_URL}/imoveis/frente-mar`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.75,
-    },
-    {
-      url: `${BASE_URL}/imoveis/vista-mar`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.75,
-    },
-    {
-      url: `${BASE_URL}/imoveis/na-planta`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.75,
-    },
+    { url: BASE_URL, lastModified: new Date(), changeFrequency: 'daily', priority: 1.0 },
+    { url: `${BASE_URL}/imoveis`, lastModified: new Date(), changeFrequency: 'hourly', priority: 0.9 },
+    { url: `${BASE_URL}/blog`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.6 },
+    { url: `${BASE_URL}/lancamentos`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
+    { url: `${BASE_URL}/condominios`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${BASE_URL}/ilhapura`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.85 },
+    { url: `${BASE_URL}/imoveis/cobertura`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.75 },
+    { url: `${BASE_URL}/imoveis/frente-mar`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.75 },
+    { url: `${BASE_URL}/imoveis/vista-mar`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.75 },
+    { url: `${BASE_URL}/imoveis/na-planta`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.75 },
   ]
 
-  // ── PDI de condomínio — /condominios/[slug] ─────────────────────
   const condominioDetailRoutes: MetadataRoute.Sitemap = condominioSlugs.map(({ slug }) => ({
     url: `${BASE_URL}/condominios/${slug}`,
     lastModified: new Date(),
@@ -109,17 +54,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }))
 
-  // ── Condomínios Ilha Pura — /ilhapura/condominios/[slug] ────────
-  const ilhapuraCondominioRoutes: MetadataRoute.Sitemap = ilhapuraCondominioSlugs.map(
-    ({ slug }) => ({
-      url: `${BASE_URL}/ilhapura/condominios/${slug}`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 0.82,
-    })
-  )
+  const ilhapuraCondominioRoutes: MetadataRoute.Sitemap = ilhapuraCondominioSlugs.map(({ slug }) => ({
+    url: `${BASE_URL}/ilhapura/condominios/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.82,
+  }))
 
-  // ── PDI de imóveis (NÍVEL 0) — /imovel/[slug] ───────────────────
   const imovelRoutes: MetadataRoute.Sitemap = imovelSlugs.map(({ slug, _updatedAt }) => ({
     url: `${BASE_URL}/imovel/${slug}`,
     lastModified: new Date(_updatedAt),
@@ -127,7 +68,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.85,
   }))
 
-  // ── Bairros (NÍVEL 1) — /imoveis/[bairro] ───────────────────────
   const bairroRoutes: MetadataRoute.Sitemap = bairroSlugs.map(({ slug, _updatedAt }) => ({
     url: `${BASE_URL}/imoveis/${slug}`,
     lastModified: new Date(_updatedAt),
@@ -135,28 +75,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }))
 
-  // ── Condomínios (NÍVEL 2) — /imoveis/[bairro]/[condominio] ──────
-  const condominioRoutes: MetadataRoute.Sitemap = condominioHierarquia.map(
-    ({ bairroSlug, condSlug }) => ({
-      url: `${BASE_URL}/imoveis/${bairroSlug}/${condSlug}`,
+  const condominioRoutes: MetadataRoute.Sitemap = condominioHierarquia.map(({ bairroSlug, condSlug }) => ({
+    url: `${BASE_URL}/imoveis/${bairroSlug}/${condSlug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.75,
+  }))
+
+  const tipologiaRoutes: MetadataRoute.Sitemap = tipologiaHierarquia.flatMap(({ bairroSlug, condSlug, tipologias }) =>
+    (tipologias ?? []).map((tipologia) => ({
+      url: `${BASE_URL}/imoveis/${bairroSlug}/${condSlug}/${tipologia}`,
       lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 0.75,
-    })
+      changeFrequency: 'daily' as const,
+      priority: 0.7,
+    }))
   )
 
-  // ── Tipologias (NÍVEL 3) — /imoveis/[bairro]/[cond]/[tipologia] ─
-  const tipologiaRoutes: MetadataRoute.Sitemap = tipologiaHierarquia.flatMap(
-    ({ bairroSlug, condSlug, tipologias }) =>
-      (tipologias ?? []).map((tipologia) => ({
-        url: `${BASE_URL}/imoveis/${bairroSlug}/${condSlug}/${tipologia}`,
-        lastModified: new Date(),
-        changeFrequency: 'daily' as const,
-        priority: 0.7,
-      }))
-  )
-
-  // ── Lançamentos (/lancamento/[slug]) ─────────────────────────────
   const lancamentoRoutes: MetadataRoute.Sitemap = lancamentoSlugs.map(({ slug }) => ({
     url: `${BASE_URL}/lancamento/${slug}`,
     lastModified: new Date(),
@@ -164,7 +98,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.78,
   }))
 
-  // ── Blog ─────────────────────────────────────────────────────────
   const blogRoutes: MetadataRoute.Sitemap = blogSlugs.map(({ slug }) => ({
     url: `${BASE_URL}/blog/${slug}`,
     lastModified: new Date(),
@@ -178,4 +111,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...bairroRoutes,
     ...condominioDetailRoutes,
     ...ilhapuraCondominioRoutes,
-    ...condomin
+    ...condominioRoutes,
+    ...tipologiaRoutes,
+    ...lancamentoRoutes,
+    ...blogRoutes,
+  ]
+}

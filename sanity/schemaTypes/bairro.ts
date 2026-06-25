@@ -74,7 +74,7 @@ export const bairro = defineType({
       title: 'Zona (RJ)',
       type: 'string',
       group: 'basico',
-      description: 'Zona geográfica do Rio. Ignorar para Serra Gaúcha.',
+      description: 'Zona geografica do Rio. Ignorar para Serra Gaucha.',
       options: {
         list: [
           { title: 'Zona Oeste', value: 'oeste' },
@@ -96,7 +96,7 @@ export const bairro = defineType({
       title: 'Bairro Planejado?',
       type: 'boolean',
       group: 'basico',
-      description: 'Marcar se este bairro é um empreendimento de bairro planejado (ex: Ilha Pura, Península, Rio2)',
+      description: 'Marcar se este bairro e um empreendimento de bairro planejado (ex: Ilha Pura, Peninsula, Rio2)',
       initialValue: false,
     }),
     defineField({
@@ -108,10 +108,10 @@ export const bairro = defineType({
     }),
     defineField({
       name: 'areaTotal',
-      title: 'Área total do bairro (m²)',
+      title: 'Area total do bairro (m2)',
       type: 'number',
       group: 'basico',
-      description: 'Área total do empreendimento em m²',
+      description: 'Area total do empreendimento em m2',
     }),
     defineField({
       name: 'anoInauguracao',
@@ -124,18 +124,18 @@ export const bairro = defineType({
       title: 'Amenidades do bairro planejado',
       type: 'array',
       group: 'conteudo',
-      description: 'Ex: Parque 72mil m², Escola, Shopping, Segurança 24h',
+      description: 'Ex: Parque 72mil m2, Escola, Shopping, Segurança 24h',
       of: [
         {
           type: 'object',
           fields: [
-            { name: 'titulo', title: 'Título', type: 'string' },
-            { name: 'descricao', title: 'Descrição curta', type: 'string' },
+            { name: 'titulo', title: 'Titulo', type: 'string' },
+            { name: 'descricao', title: 'Descricao curta', type: 'string' },
             {
               name: 'icone',
-              title: 'Ícone (emoji ou nome)',
+              title: 'Icone (emoji ou nome)',
               type: 'string',
-              description: 'Ex: 🌿 ou "parque"',
+              description: 'Ex: parque',
             },
           ],
           preview: { select: { title: 'titulo', subtitle: 'descricao' } },
@@ -153,14 +153,14 @@ export const bairro = defineType({
     }),
     defineField({
       name: 'fotoAerea',
-      title: 'Foto aérea (parallax no hero)',
+      title: 'Foto aerea (parallax no hero)',
       type: 'image',
       group: 'basico',
       options: { hotspot: true },
     }),
     defineField({
       name: 'ogImage',
-      title: 'Imagem Open Graph (1200×630)',
+      title: 'Imagem Open Graph (1200x630)',
       type: 'image',
       group: 'seo',
       options: { hotspot: true },
@@ -169,19 +169,17 @@ export const bairro = defineType({
     // ─── Conteúdo SEO ──────────────────────────────────────────────
     defineField({
       name: 'introTexto',
-      title: 'Intro curta (aparece no hero — 1-2 linhas)',
+      title: 'Intro curta (aparece no hero)',
       type: 'text',
       group: 'conteudo',
       rows: 2,
-      description: 'Ex: "A Barra da Tijuca reúne 18 km de praia com infraestrutura de primeiro mundo."',
     }),
     defineField({
       name: 'porQueMorar',
-      title: 'Por que morar aqui? (rich text — 400-600 palavras)',
+      title: 'Por que morar aqui? (rich text)',
       type: 'array',
       group: 'conteudo',
       of: [defineArrayMember({ type: 'block' })],
-      description: 'Conteúdo único por bairro. Estrutura: visão geral → natureza → infraestrutura → mercado imobiliário → para quem é.',
     }),
     defineField({
       name: 'descricao',
@@ -196,33 +194,32 @@ export const bairro = defineType({
       title: 'Frase de destaque (SEO / meta fallback)',
       type: 'string',
       group: 'conteudo',
-      description: 'Frase curta usada no fallback da meta description. Ex: "vistas para o maciço da Tijuca e acesso direto à praia"',
+      description: 'Frase curta usada no fallback da meta description.',
       validation: (r) => r.max(80),
     }),
     defineField({
       name: 'faixaPreco',
-      title: 'Faixa de preço dos imóveis',
+      title: 'Faixa de preco dos imoveis',
       type: 'object',
       group: 'conteudo',
       fields: [
-        defineField({ name: 'min', title: 'Preço mínimo (R$)', type: 'number' }),
-        defineField({ name: 'max', title: 'Preço máximo (R$)', type: 'number' }),
+        defineField({ name: 'min', title: 'Preco minimo (R$)', type: 'number' }),
+        defineField({ name: 'max', title: 'Preco maximo (R$)', type: 'number' }),
         defineField({
           name: 'tipoPredominante',
           title: 'Tipo predominante',
           type: 'string',
-          description: 'Ex: Apartamentos e coberturas de alto padrão',
+          description: 'Ex: Apartamentos e coberturas de alto padrao',
         }),
       ],
     }),
     defineField({
       name: 'caracteristicas',
-      title: 'Características / tags do bairro',
+      title: 'Caracteristicas / tags do bairro',
       type: 'array',
       group: 'conteudo',
       of: [defineArrayMember({ type: 'string' })],
       options: { layout: 'tags' },
-      description: 'Ex: praia, condomínio fechado, planejado, frente-mar, lazer completo',
     }),
     defineField({
       name: 'faqs',
@@ -253,11 +250,10 @@ export const bairro = defineType({
           },
         }),
       ],
-      description: 'Mínimo 5 FAQs únicas por bairro. Geram FAQPage JSON-LD e aparecem como acordeão na página.',
     }),
     defineField({
       name: 'bairrosProximos',
-      title: 'Bairros próximos (linkagem interna)',
+      title: 'Bairros proximos (linkagem interna)',
       type: 'array',
       group: 'conteudo',
       of: [defineArrayMember({ type: 'reference', to: [{ type: 'bairro' }] })],
@@ -295,7 +291,7 @@ export const bairro = defineType({
                   'Shopping',
                   'Escola',
                   'Hospital',
-                  'Metrô',
+                  'Metro',
                   'Supermercado',
                   'Academia',
                 ],
@@ -317,4 +313,19 @@ export const bairro = defineType({
       title: 'Meta title (max 60 chars)',
       type: 'string',
       group: 'seo',
-      description: 'Ex: Imóveis à venda na Barra da Tijuca | Admirata
+      description: 'Ex: Imoveis a venda na Barra da Tijuca | Admirata RJ',
+      validation: (r) => r.max(60),
+    }),
+    defineField({
+      name: 'metaDescription',
+      title: 'Meta description (150-160 chars)',
+      type: 'text',
+      group: 'seo',
+      rows: 3,
+      validation: (r) => r.max(160),
+    }),
+  ],
+  preview: {
+    select: { title: 'nome', subtitle: 'cidade' },
+  },
+})

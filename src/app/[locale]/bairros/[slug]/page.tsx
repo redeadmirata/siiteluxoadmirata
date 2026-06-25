@@ -34,24 +34,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     { next: { revalidate: 3600 } }
   )
 
-  if (!bairro) return { title: 'Bairro não encontrado' }
+  if (!bairro) return { title: 'Bairro nao encontrado' }
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://admirata.com.br'
   const localePrefix = params.locale === 'pt-BR' ? '' : `/${params.locale}`
   const canonicalUrl = `${siteUrl}${localePrefix}/bairros/${params.slug}/`
 
-  // Título: prioriza campo SEO do Sanity, depois padrão editorial
   const title =
     bairro.metaTitle ??
-    `Imóveis ${bairro.nome} — Admirata`
+    `Imoveis ${bairro.nome} — Admirata`
 
-  // Descrição: prioriza campo SEO do Sanity, depois fallback rico
   const description =
     bairro.metaDescription ??
     bairro.descricao ??
-    `Conheça os lançamentos e imóveis disponíveis em ${bairro.nome}, ${bairro.cidade}. ${bairro.totalImoveis > 0 ? `${bairro.totalImoveis} ${bairro.totalImoveis === 1 ? 'imóvel disponível' : 'imóveis disponíveis'}.` : ''} Curadoria exclusiva Admirata Imóveis.`.trim()
+    `Conheca os lancamentos e imoveis disponiveis em ${bairro.nome}, ${bairro.cidade}. ${bairro.totalImoveis > 0 ? `${bairro.totalImoveis} ${bairro.totalImoveis === 1 ? 'imovel disponivel' : 'imoveis disponiveis'}.` : ''} Curadoria exclusiva Admirata Imoveis.`.trim()
 
-  // OG image: prioriza ogImage dedicado, depois fotoCapa recortada
   const ogImageUrl =
     bairro.ogImage?.asset?.url ??
     (bairro.fotoCapa?.asset?.url
@@ -86,7 +83,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       url: canonicalUrl,
       type: 'website',
       locale: 'pt_BR',
-      siteName: 'Admirata Negócios Imobiliários',
+      siteName: 'Admirata Negocios Imobiliarios',
       ...(ogImageUrl && {
         images: [{ url: ogImageUrl, width: 1200, height: 630, alt: bairro.nome }],
       }),
@@ -135,15 +132,15 @@ export default async function BairroPage({ params }: PageProps) {
     params.locale === 'en'
       ? `Hello, I'm interested in properties in ${bairro.nome}`
       : params.locale === 'fr'
-      ? `Bonjour, je suis intéressé par des biens à ${bairro.nome}`
-      : `Olá, tenho interesse em imóveis no bairro ${bairro.nome}`
+      ? `Bonjour, je suis interesse par des biens a ${bairro.nome}`
+      : `Ola, tenho interesse em imoveis no bairro ${bairro.nome}`
 
   const whatsappUrl = `https://wa.me/5521998079459?text=${encodeURIComponent(whatsappText)}`
 
   return (
     <main className="min-h-screen bg-white" id="main-content">
       <SchemaJSONLDBairro bairro={bairro} imoveis={imoveis} localePrefix={localePrefix} />
-      {/* ── Hero ── */}
+      {/* Hero */}
       <div className="relative h-[65vh] min-h-[420px] bg-ink overflow-hidden">
         {capaUrl ? (
           <Image
@@ -161,9 +158,8 @@ export default async function BairroPage({ params }: PageProps) {
         <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-r from-ink/60 via-transparent to-ink/20" />
 
-        {/* Breadcrumb */}
         <nav
-          aria-label="Navegação estrutural"
+          aria-label="Navegacao estrutural"
           className="absolute top-[84px] left-6 lg:left-10 flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-white/50"
         >
           <Link href={`${localePrefix}/`} className="hover:text-white transition-colors">
@@ -195,7 +191,7 @@ export default async function BairroPage({ params }: PageProps) {
       </div>
 
       <div className="max-w-screen-xl mx-auto px-6 lg:px-10">
-        {/* ── Descrição + foto aérea ── */}
+        {/* Descricao + foto aerea */}
         {(bairro.descricao || aereoUrl) && (
           <section className="py-16 border-b border-stone/40" aria-labelledby="sobre-heading">
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-12 items-start">
@@ -218,8 +214,8 @@ export default async function BairroPage({ params }: PageProps) {
                     {params.locale === 'en'
                       ? 'Premium neighborhood with exclusive property curation by Admirata.'
                       : params.locale === 'fr'
-                      ? 'Quartier de standing avec une sélection exclusive de biens par Admirata.'
-                      : 'Região de alto padrão com curadoria exclusiva de imóveis selecionados pela Admirata Imóveis.'}
+                      ? 'Quartier de standing avec une selection exclusive de biens par Admirata.'
+                      : 'Regiao de alto padrao com curadoria exclusiva de imoveis selecionados pela Admirata Imoveis.'}
                   </p>
                 )}
 
@@ -236,7 +232,7 @@ export default async function BairroPage({ params }: PageProps) {
                 <div className="relative aspect-[4/3] overflow-hidden">
                   <Image
                     src={aereoUrl}
-                    alt={`Vista aérea de ${bairro.nome}`}
+                    alt={`Vista aerea de ${bairro.nome}`}
                     fill
                     sizes="(max-width: 1024px) 100vw, 50vw"
                     className="object-cover"
@@ -247,7 +243,7 @@ export default async function BairroPage({ params }: PageProps) {
           </section>
         )}
 
-        {/* ── Pontos de interesse ── */}
+        {/* Pontos de interesse */}
         {bairro.pontosDeInteresse && bairro.pontosDeInteresse.length > 0 && (
           <section className="py-16 border-b border-stone/40" aria-labelledby="poi-heading">
             <p className="text-[10px] uppercase tracking-[0.4em] text-gold mb-4">
@@ -275,7 +271,7 @@ export default async function BairroPage({ params }: PageProps) {
           </section>
         )}
 
-        {/* ── Imóveis do bairro ── */}
+        {/* Imoveis do bairro */}
         <section className="py-16" aria-labelledby="imoveis-heading">
           <div className="flex items-start justify-between gap-4 mb-10">
             <div>
@@ -344,4 +340,27 @@ export default async function BairroPage({ params }: PageProps) {
           )}
         </section>
 
-        {/* ─�
+        {/* CTA strip */}
+        <section className="border-t border-stone/40 py-16 mb-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+            <div>
+              <p className="font-display text-2xl text-ink font-light">
+                {t('interested', { neighborhood: bairro.nome })}
+              </p>
+              <p className="text-sm text-muted mt-1">{t('teamKnows')}</p>
+            </div>
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-shrink-0 inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] bg-gold text-white px-8 py-4 hover:bg-[#a07a0a] transition-colors duration-300"
+            >
+              <span aria-hidden="true" className="text-sm">↗</span>
+              {t('whatsapp')}
+            </a>
+          </div>
+        </section>
+      </div>
+    </main>
+  )
+}
