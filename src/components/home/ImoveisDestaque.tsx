@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
 import ImovelCard from '@/components/cards/ImovelCard'
+import ImovelCardMobile from '@/components/cards/ImovelCardMobile'
 import type { ImovelCard as ImovelCardType } from '@/types/sanity'
 
 interface ImoveisDestaqueProps {
@@ -69,7 +70,7 @@ export default async function ImoveisDestaque({ imoveis }: ImoveisDestaqueProps)
                 width: 'min(82vw, 320px)',
               }}
             >
-              <ImovelCard imovel={imovel} priority={i < 2} />
+              <ImovelCardMobile imovel={imovel} priority={i < 2} />
             </div>
           ))}
           {/* Spacer para o último card não colar na borda */}
