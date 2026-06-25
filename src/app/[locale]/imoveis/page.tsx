@@ -5,6 +5,7 @@ import { IMOVEIS_FILTRADOS_QUERY } from '@/sanity/queries'
 import type { ImovelCard } from '@/types/sanity'
 import ImovelCardComponent from '@/components/cards/ImovelCard'
 import FiltrosSearch from '@/components/busca/FiltrosSearch'
+import TabsFiltro from '@/components/busca/TabsFiltro'
 
 export const revalidate = 60
 
@@ -32,6 +33,8 @@ interface SearchParams {
   precoMin?: string
   precoMax?: string
   quartos?: string
+  novidade?: string   // "true" → filtra novidade == true
+  exclusivo?: string  // "true" → filtra exclusivo == true
 }
 
 interface PageProps {
@@ -45,13 +48,15 @@ export default async function ImoveisPage({ params, searchParams }: PageProps) {
   const t = await getTranslations({ locale: params.locale, namespace: 'imoveis' })
 
   const queryParams = {
-    tipo: searchParams.tipo ?? '',
-    mercado: searchParams.mercado ?? '',
+    tipo:      searchParams.tipo      ?? '',
+    mercado:   searchParams.mercado   ?? '',
     finalidade: searchParams.finalidade ?? '',
     bairroSlug: searchParams.bairroSlug ?? '',
-    precoMin: Number(searchParams.precoMin ?? 0),
-    precoMax: Number(searchParams.precoMax ?? 0),
-    quartos: Number(searchParams.quartos ?? 0),
+    precoMin:  Number(searchParams.precoMin ?? 0),
+    precoMax:  Number(searchParams.precoMax ?? 0),
+    quartos:   Number(searchParams.quartos  ?? 0),
+    novidade:  searchParams.novidade  ?? '',
+    exclusivo: searchParams.exclusivo ?? '',
     offset: 0,
     end: 24,
   }
@@ -65,7 +70,9 @@ export default async function ImoveisPage({ params, searchParams }: PageProps) {
   const temFiltros =
     queryParams.tipo !== '' ||
     queryParams.mercado !== '' ||
-    queryParams.quartos !== 0
+    queryParams.quartos !== 0 ||
+    queryParams.novidade !== '' ||
+    queryParams.exclusivo !== ''
 
   return (
     <main className="min-h-screen bg-white" id="main-content">
@@ -83,6 +90,9 @@ export default async function ImoveisPage({ params, searchParams }: PageProps) {
           </p>
         </div>
       </div>
+
+      {/* ── Tabs mobile (padrão Cyrela) — sticky top-14, sm:hidden ── */}
+      <TabsFiltro />
 
       {/* ── Conteúdo ── */}
       <div className="max-w-screen-xl mx-auto px-6 lg:px-10 py-12">

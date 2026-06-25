@@ -1,0 +1,8 @@
+feat(busca): tabs Cyrela — filtros horizontais sticky sem scrollbar
+
+- TabsFiltro: barra sticky top-14, sm:hidden, scroll-x sem scrollbar
+- Tabs: Todos / Venda / Locacao / Lancamentos / Exclusivos
+- Ativo com border-b gold (padrao Cyrela), inativo em stone-400
+- GROQ: novos filtros novidade e exclusivo via parametros
+- FiltrosSearch: finalidade hidden no mobile (TabsFiltro cuida disso)
+- Botao Limpar reseta todos os filtros incluindo novidade/exclusivo

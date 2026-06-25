@@ -28,33 +28,51 @@ export default function FiltrosSearch({ totalResultados, hideFinalidade = false 
 
   const [filters, setFilters] = useQueryStates({
     finalidade: parseAsString.withDefault(''),
-    tipo: parseAsString.withDefault(''),
-    mercado: parseAsString.withDefault(''),
-    quartos: parseAsInteger.withDefault(0),
+    tipo:       parseAsString.withDefault(''),
+    mercado:    parseAsString.withDefault(''),
+    quartos:    parseAsInteger.withDefault(0),
+    // novidade e exclusivo controlados pelo TabsFiltro (mobile)
+    // mas incluídos aqui para o botão "Limpar" funcionar corretamente
+    novidade:   parseAsString.withDefault(''),
+    exclusivo:  parseAsString.withDefault(''),
   })
 
   const temFiltros =
-    filters.finalidade !== '' || filters.tipo !== '' || filters.mercado !== '' || filters.quartos !== 0
+    filters.finalidade !== '' ||
+    filters.tipo !== '' ||
+    filters.mercado !== '' ||
+    filters.quartos !== 0 ||
+    filters.novidade !== '' ||
+    filters.exclusivo !== ''
 
   return (
     <div className="mb-12">
-      {/* ── Finalidade (Venda / Locação / Temporada) ── */}
-      {!hideFinalidade && <div className="flex gap-3 mb-6 border-b border-stone pb-5" role="group" aria-label="Finalidade">
-        {FINALIDADES.map((f) => (
-          <button
-            key={f}
-            className={`text-[11px] uppercase tracking-[0.16em] font-medium pb-1 transition-colors border-b-2 ${
-              filters.finalidade === f
-                ? 'text-gold border-gold'
-                : 'text-muted border-transparent hover:text-ink hover:border-stone'
-            }`}
-            onClick={() => setFilters({ finalidade: filters.finalidade === f ? null : f })}
-            aria-pressed={filters.finalidade === f}
-          >
-            {f}
-          </button>
-        ))}
-      </div>}
+      {/* ── Finalidade (Venda / Locação / Temporada) ──────────────────
+          No mobile fica oculta pois o TabsFiltro sticky já cobre isso.
+          No desktop (sm:) mostra normalmente.
+      ─────────────────────────────────────────────────────────────── */}
+      {!hideFinalidade && (
+        <div
+          className="hidden sm:flex gap-3 mb-6 border-b border-stone pb-5"
+          role="group"
+          aria-label="Finalidade"
+        >
+          {FINALIDADES.map((f) => (
+            <button
+              key={f}
+              className={`text-[11px] uppercase tracking-[0.16em] font-medium pb-1 transition-colors border-b-2 ${
+                filters.finalidade === f
+                  ? 'text-gold border-gold'
+                  : 'text-muted border-transparent hover:text-ink hover:border-stone'
+              }`}
+              onClick={() => setFilters({ finalidade: filters.finalidade === f ? null : f })}
+              aria-pressed={filters.finalidade === f}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* ── Filtros por tipo ── */}
       <div className="flex flex-wrap gap-2 mb-5" role="group" aria-label={t('byType')}>
@@ -127,11 +145,20 @@ export default function FiltrosSearch({ totalResultados, hideFinalidade = false 
           ))}
         </div>
 
-        {/* Limpar */}
+        {/* Limpar — reseta todos incluindo novidade/exclusivo do TabsFiltro */}
         {temFiltros && (
           <button
             className="text-[11px] text-muted hover:text-ink underline underline-offset-2 transition-colors ml-auto"
-            onClick={() => setFilters({ finalidade: null, tipo: null, mercado: null, quartos: null })}
+            onClick={() =>
+              setFilters({
+                finalidade: null,
+                tipo:       null,
+                mercado:    null,
+                quartos:    null,
+                novidade:   null,
+                exclusivo:  null,
+              })
+            }
           >
             {t('clear')}
           </button>
