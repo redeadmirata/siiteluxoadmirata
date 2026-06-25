@@ -34,7 +34,7 @@ export interface BairroRef {
   slug: { current: string }
   cidade: string
   estado: 'RJ' | 'RS'
-  mercado: 'Rio de Janeiro' | 'Serra Gaúcha'
+  mercado: 'Rio de Janeiro' | 'Serra Gaucha'
 }
 
 export interface Bairro extends BairroRef {
@@ -53,7 +53,7 @@ export interface Bairro extends BairroRef {
   totalImoveis: number
 }
 
-// ─── Imóvel ───────────────────────────────────────────────────────
+// ─── Imovel ───────────────────────────────────────────────────────
 
 export type ImovelTipo =
   | 'Apartamento'
@@ -61,12 +61,12 @@ export type ImovelTipo =
   | 'Cobertura duplex'
   | 'Penthouse'
   | 'Casa'
-  | 'Casa em condomínio'
+  | 'Casa em condominio'
   | 'Terreno'
 
-export type ImovelFinalidade = 'Venda' | 'Locação' | 'Temporada'
-export type ImovelMercado = 'Rio de Janeiro' | 'Serra Gaúcha'
-export type ImovelStatus = 'Disponível' | 'Vendido' | 'Locado' | 'Em negociação'
+export type ImovelFinalidade = 'Venda' | 'Locacao' | 'Temporada'
+export type ImovelMercado = 'Rio de Janeiro' | 'Serra Gaucha'
+export type ImovelStatus = 'Disponivel' | 'Vendido' | 'Locado' | 'Em negociacao'
 
 export interface ImovelImagem {
   arquivo: SanityImageFile & {
@@ -97,7 +97,7 @@ export interface ImovelCaracteristica {
   nome: string
 }
 
-/** Tipologia de imóvel (slug da categoria) */
+/** Tipologia de imovel (slug da categoria) */
 export type ImovelTipologia =
   | '1-quarto'
   | '2-quartos'
@@ -137,9 +137,9 @@ export interface ImovelCard {
 /** PDI completa */
 export interface ImovelPDI extends ImovelCard {
   condominioRef?: { slug?: string; bairroSlug?: string }
-  /** Nome do condomínio — campo calculado pelo GROQ (condominioRef->nome) */
+  /** Nome do condominio — campo calculado pelo GROQ (condominioRef->nome) */
   condominioNome?: string
-  /** Ano de entrega do condomínio — para badge "Pronto para morar" */
+  /** Ano de entrega do condominio — para badge "Pronto para morar" */
   condominioAnoEntrega?: number
   condominio?: number
   iptu?: number
@@ -158,7 +158,7 @@ export interface ImovelPDI extends ImovelCard {
   publicadoEm?: string
 }
 
-// ─── Condomínio ───────────────────────────────────────────────────
+// ─── Condominio ───────────────────────────────────────────────────
 
 export type CondominioTipo = 'condominio-fechado' | 'bairro-planejado' | 'vertical' | 'resort'
 
@@ -177,15 +177,13 @@ export interface CondominioCard {
   totalImoveis: number
 }
 
-/** Condomínio detalhado — PDI de condomínio (NÍVEL 2) */
-// Omit fotoCapa porque o detalhe retorna SanityImageFile (asset->), enquanto
-// CondominioCard retorna SanityImageAsset (flat). São shapes diferentes por design.
+/** Condominio detalhado — PDI de condominio (NIVEL 2) */
 export interface CondominioDetalhe extends Omit<CondominioCard, 'fotoCapa'> {
   construtora?: string
   anoEntrega?: number
   numTorres?: number
   numUnidades?: number
-  sobre?: unknown[]             // PortableText blocks
+  sobre?: unknown[]
   tipologiasDisponiveis?: ImovelTipologia[]
   forcarNoindex?: boolean
   faqs?: Array<{ pergunta: string; resposta: string }>
@@ -194,7 +192,7 @@ export interface CondominioDetalhe extends Omit<CondominioCard, 'fotoCapa'> {
     lng?: number
     proximidades?: string[]
   }
-  fotoCapa?: SanityImageFile    // Override com hotspot/crop
+  fotoCapa?: SanityImageFile
   galeria?: GaleriaItem[]
   condominiosProximos?: Array<{ nome: string; slug: { current: string } }>
   seo?: { titulo?: string; descricao?: string }
@@ -205,7 +203,7 @@ export interface CondominioDetalhe extends Omit<CondominioCard, 'fotoCapa'> {
 export interface BairroFull extends Bairro {
   zona?: 'oeste' | 'sul' | 'centro'
   introTexto?: string
-  porQueMorar?: unknown[]       // PortableText blocks
+  porQueMorar?: unknown[]
   caracteristicas?: string[]
   faixaPreco?: {
     min?: number
@@ -236,13 +234,20 @@ export interface Corretor {
   ativo?: boolean
 }
 
-// ─── Lançamento ───────────────────────────────────────────────────
+// ─── Lancamento ───────────────────────────────────────────────────
 
 export type StatusObra = 'na-planta' | 'em-obras' | 'pronto' | 'breve' | 'entregue'
 
 /** imagemCapa de lancamento vem flat (sem wrapper arquivo) */
 export interface LancamentoImagem {
-  asset?: { _id?: string; url: string; metadata?: { lqip?: string; dimensions?: { width: number; height: number } } }
+  asset?: {
+    _id?: string
+    url: string
+    metadata?: {
+      lqip?: string
+      dimensions?: { width: number; height: number }
+    }
+  }
   hotspot?: { x: number; y: number }
   crop?: { top: number; bottom: number; left: number; right: number }
   alt?: string
@@ -258,3 +263,101 @@ export interface LancamentoCard {
   bairro?: BairroRef
   construtora?: string
   imagemCapa?: LancamentoImagem
+}
+
+export interface LancamentoDetalhe extends LancamentoCard {
+  precoAte?: number
+  descricao?: string
+  diferenciais?: string[]
+  dataEntregaPrevista?: string
+  galeria?: Array<{
+    asset?: { _id?: string; url: string; metadata?: { lqip?: string } }
+    alt?: string
+  }>
+  plantas?: Array<{
+    asset?: { _id?: string; url: string; metadata?: { lqip?: string } }
+    alt?: string
+    titulo?: string
+  }>
+  faqs?: Array<{ pergunta: string; resposta: string }>
+  metaTitle?: string
+  metaDescription?: string
+}
+
+// ─── Blog ─────────────────────────────────────────────────────────
+
+export type BlogCategoria =
+  | 'mercado-imobiliario'
+  | 'decoracao'
+  | 'financiamento'
+  | 'bairros'
+  | 'lifestyle'
+  | 'dicas'
+
+export interface BlogPost {
+  _id: string
+  titulo: string
+  slug: { current: string }
+  categoria?: BlogCategoria
+  resumo?: string
+  publicadoEm?: string
+  autor?: string
+  conteudo?: unknown[]
+  imagemCapa?: {
+    asset?: { _id?: string; url: string; metadata?: { lqip?: string } }
+    alt?: string
+  }
+  bairroRelacionado?: BairroRef
+  seo?: {
+    metaTitle?: string
+    metaDescription?: string
+    ogImage?: { asset?: { url: string } }
+  }
+}
+
+// ─── Condominio de Bairro Planejado ───────────────────────────────
+
+export interface CondominioResumido {
+  _id: string
+  nome: string
+  slug: { current: string }
+  status?: string
+  construtora?: string
+  precoMinimo?: number
+  precoMaximo?: number
+  areaPrivativaMin?: number
+  areaPrivativaMax?: number
+  prazoEntrega?: string
+  tipologiasDisponiveis?: string[]
+  videoTour?: string
+  comissao?: number
+  vgv?: number
+  whatsappCorretor?: string
+  mensagemCorretorWhatsapp?: string
+  visibilidadeCorretor?: boolean
+  imagemCapa?: { url: string; metadata?: { lqip?: string } }
+  plantasBaixas?: Array<{
+    nome?: string
+    quartos?: number
+    area?: number
+    imagem?: { asset?: { url: string; metadata?: { lqip?: string } } }
+  }>
+  tabelaPreco?: { asset?: { url: string } }
+  materialMarketing?: Array<{
+    titulo?: string
+    tipo?: string
+    url?: string
+    arquivo?: { asset?: { url: string } }
+  }>
+}
+
+// ─── Bairro Planejado ─────────────────────────────────────────────
+
+export interface BairroPlaneado extends BairroFull {
+  incorporadora?: string
+  areaTotal?: number
+  anoInauguracao?: number
+  amenidades?: string[]
+  condominios?: CondominioResumido[]
+  totalCondominios?: number
+}
