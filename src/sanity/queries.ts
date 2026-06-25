@@ -199,10 +199,6 @@ export const CONDOMINIOS_SLUGS_QUERY = groq`
   *[_type == "condominio" && defined(slug.current)] { "slug": slug.current }
 `
 
-/**
- * Fotos dos imóveis para o slider da PDI de condomínio.
- * Usa o primeiro imóvel com imagens cadastradas como fonte da galeria.
- */
 export const FOTOS_CONDOMINIO_QUERY = groq`
   *[_type == "imovel" && condominioRef->slug.current == $slug && defined(imagens) && count(imagens) > 0][0] {
     "fotos": imagens[]{
@@ -430,3 +426,35 @@ export const BAIRRO_PLANEJADO_QUERY = groq`
         nome, quartos, area,
         "imagem": imagem { asset->{ url, metadata { lqip } } }
       },
+      "tabelaPreco": tabelaPreco { asset->{ url } },
+      "materialMarketing": materialMarketing[] {
+        titulo, tipo, url,
+        "arquivo": arquivo { asset->{ url } }
+      }
+    },
+    "totalImoveis": count(*[_type == "imovel" && bairro._ref == ^._id && status == "Disponível"]),
+    geo, pontosDeInteresse,
+    metaTitle, metaDescription
+  }
+`
+
+/** Slugs de bairros planejados — generateStaticParams */
+export const BAIRROS_PLANEJADOS_SLUGS_QUERY = groq`
+  *[_type == "bairro" && bairroplanejado == true && defined(slug.current)] { "slug": slug.current }
+`
+
+/** Slugs dos condomínios do empreendimento Ilha Pura */
+export const ILHAPURA_CONDOMINIOS_SLUGS_QUERY = groq`
+  *[_type == "condominio" && bairro->slug.current == "ilha-pura" && defined(slug.current)] {
+    "slug": slug.current
+  }
+`
+
+/** Unidades (imóveis) do Ilha Pura */
+export const ILHAPURA_IMOVEIS_QUERY = groq`
+  *[_type == "imovel" && condominioRef->bairro->slug.current == "ilha-pura" && defined(slug.current) && defined(condominioRef->slug.current)] {
+    "slug": slug.current,
+    "condSlug": condominioRef->slug.current,
+    finalidade
+  }
+`
