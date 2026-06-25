@@ -18,10 +18,8 @@ function getFavCount(): number {
 
 const NAV_LINKS = [
   { href: '/',                label: 'Home' },
-  { href: '/imoveis/venda',   label: 'Venda' },
   { href: '/imoveis/locacao', label: 'Locação' },
   { href: '/lancamentos',     label: 'Lançamentos' },
-  { href: '/videos',          label: 'Vídeos' },
   { href: '/condominios',     label: 'Condomínios' },
   { href: '/anuncie',         label: 'Anuncie' },
   { href: '/sobre',           label: 'Sobre' },

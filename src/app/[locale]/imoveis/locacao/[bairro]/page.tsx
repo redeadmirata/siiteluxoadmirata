@@ -98,6 +98,8 @@ export default async function ImoveisLocacaoBairroPage({ params, searchParams }:
         precoMin: 0,
         precoMax: 0,
         quartos: Number(searchParams.quartos ?? 0),
+        novidade: '',
+        exclusivo: '',
         offset: 0,
         end: 24,
       },

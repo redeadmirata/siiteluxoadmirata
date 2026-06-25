@@ -51,6 +51,8 @@ export default async function ImoveisVendaPage({ params, searchParams }: PagePro
       precoMin: 0,
       precoMax: 0,
       quartos: Number(searchParams.quartos ?? 0),
+      novidade: '',
+      exclusivo: '',
       offset: 0,
       end: 24,
     },

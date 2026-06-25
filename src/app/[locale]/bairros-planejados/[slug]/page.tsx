@@ -156,6 +156,8 @@ export default async function BairroPlanejadiSlugPage({ params, searchParams }: 
           precoMin: 0,
           precoMax: 0,
           quartos: 0,
+          novidade: '',
+          exclusivo: '',
           offset: 0,
           end: 9,
         },
