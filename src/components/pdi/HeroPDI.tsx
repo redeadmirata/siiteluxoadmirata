@@ -2,9 +2,11 @@
 
 import Image from 'next/image'
 import { useState, useEffect, useRef } from 'react'
+import { motion } from 'framer-motion'
 import { urlForImovelImage } from '@/sanity/client'
 import { formatPreco } from '@/lib/formatters'
 import type { ImovelImagem } from '@/types/sanity'
+import HeroMediaVideo from '@/components/ui/HeroMediaVideo'
 
 interface HeroPDIProps {
   titulo: string
@@ -16,6 +18,8 @@ interface HeroPDIProps {
   novidade?: boolean
   condominioAnoEntrega?: number
   tourUrl?: string
+  /** URL do vídeo hero: YouTube, Vimeo ou MP4. Quando presente, exibe hero imersivo antes do grid de fotos. */
+  videoUrl?: string
 }
 
 export default function HeroPDI({
@@ -28,6 +32,7 @@ export default function HeroPDI({
   novidade,
   condominioAnoEntrega,
   tourUrl,
+  videoUrl,
 }: HeroPDIProps) {
   const [lightboxIndice, setLightboxIndice] = useState<number | null>(null)
   const [mobileIdx, setMobileIdx] = useState(0)
@@ -102,8 +107,107 @@ export default function HeroPDI({
     if (dx > 50)  setMobileIdx((i) => Math.max(i - 1, 0))
   }
 
+  const fadeUp = {
+    hidden:  { opacity: 0, y: 24 },
+    visible: (delay: number) => ({
+      opacity: 1, y: 0,
+      transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1], delay },
+    }),
+  }
+
   return (
     <>
+      {/* ── HERO DE VÍDEO (se disponível) ─────────────────────────── */}
+      {videoUrl && (
+        <section
+          style={{
+            position: 'relative',
+            height: '82vh',
+            minHeight: 520,
+            overflow: 'hidden',
+            background: '#0a0f1e',
+          }}
+          aria-label={`Vídeo — ${titulo}`}
+        >
+          {/* Camada de vídeo */}
+          <HeroMediaVideo url={videoUrl} />
+
+          {/* Foto capa como fallback enquanto o vídeo carrega */}
+          {imagens[0] && (
+            <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+              <Image
+                src={getUrl(imagens[0], 1600)}
+                alt={titulo}
+                fill
+                priority
+                sizes="100vw"
+                style={{ objectFit: 'cover', objectPosition: 'center' }}
+                placeholder={imagens[0].arquivo.asset?.metadata?.lqip ? 'blur' : 'empty'}
+                blurDataURL={imagens[0].arquivo.asset?.metadata?.lqip}
+              />
+            </div>
+          )}
+
+          {/* Gradiente editorial */}
+          <div
+            aria-hidden="true"
+            style={{
+              position: 'absolute', inset: 0, zIndex: 2,
+              background: 'linear-gradient(to top, rgba(10,15,30,0.88) 0%, rgba(10,15,30,0.3) 50%, rgba(10,15,30,0.1) 100%)',
+            }}
+          />
+          <div
+            aria-hidden="true"
+            style={{
+              position: 'absolute', inset: 0, zIndex: 2,
+              background: 'linear-gradient(to right, rgba(10,15,30,0.5) 0%, transparent 55%)',
+            }}
+          />
+
+          {/* Texto sobreposto */}
+          <div
+            style={{
+              position: 'absolute', inset: 0, zIndex: 3,
+              display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
+              padding: '0 clamp(1.5rem, 5vw, 4rem) clamp(2.5rem, 5vh, 4rem)',
+            }}
+          >
+            {(bairroNome || cidade) && (
+              <motion.p
+                variants={fadeUp} initial="hidden" animate="visible" custom={0}
+                style={{
+                  fontSize: '0.65rem', letterSpacing: '0.38em', textTransform: 'uppercase',
+                  color: 'var(--color-gold, #b8960c)', marginBottom: '0.75rem',
+                }}
+              >
+                {[bairroNome, cidade].filter(Boolean).join(' · ')}
+              </motion.p>
+            )}
+            <motion.h2
+              variants={fadeUp} initial="hidden" animate="visible" custom={0.15}
+              style={{
+                fontFamily: 'var(--font-display)', fontWeight: 300,
+                fontSize: 'clamp(2rem, 5vw, 4.5rem)', lineHeight: 1.06,
+                color: '#fff', marginBottom: preco ? '0.75rem' : 0,
+              }}
+            >
+              {titulo}
+            </motion.h2>
+            {preco && (
+              <motion.p
+                variants={fadeUp} initial="hidden" animate="visible" custom={0.3}
+                style={{
+                  fontSize: 'clamp(0.9rem, 1.4vw, 1.1rem)', color: 'rgba(255,255,255,0.65)',
+                  fontWeight: 300, letterSpacing: '0.04em',
+                }}
+              >
+                {formatPreco(preco)}
+              </motion.p>
+            )}
+          </div>
+        </section>
+      )}
+
       <section ref={heroRef} className="relative w-full" aria-label="Fotos do imóvel">
 
         {/* ── MOBILE: hero fullbleed com overlay de texto ──────────── */}

@@ -18,6 +18,7 @@ import type { ImovelCard } from '@/types/sanity'
 import ImovelCardComponent from '@/components/cards/ImovelCard'
 import BreadcrumbNav from '@/components/ui/BreadcrumbNav'
 import ShimmerText from '@/components/ui/ShimmerText'
+import HeroMediaVideo from '@/components/ui/HeroMediaVideo'
 import { routing } from '@/i18n/routing'
 
 export const revalidate = 60
@@ -43,6 +44,7 @@ interface BairroData {
   fotoCapa?: { asset?: { url: string; metadata?: { lqip?: string } } }
   fotoAerea?: { asset?: { url: string; metadata?: { lqip?: string } } }
   ogImage?: { asset?: { url: string } }
+  heroVideoUrl?: string
   condominios?: Array<{
     _id: string
     nome: string
@@ -216,6 +218,13 @@ export default async function BairroPlanejadiSlugPage({ params, searchParams }: 
 
   return (
     <>
+      <style>{`
+        @keyframes kenBurns {
+          0%   { transform: scale(1.04) translate(0, 0); }
+          100% { transform: scale(1.12) translate(-1.5%, -1%); }
+        }
+      `}</style>
+
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify({ '@context': 'https://schema.org', '@graph': jsonLd }) }}
@@ -233,9 +242,12 @@ export default async function BairroPlanejadiSlugPage({ params, searchParams }: 
           paddingTop: 72,
         }}
       >
-        {/* Imagem aérea */}
-        {heroImage && (
-          <div style={{ position: 'absolute', inset: 0 }}>
+        {/* Vídeo imersivo (zIndex 1 — sobrepõe a foto) */}
+        <HeroMediaVideo url={bairro.heroVideoUrl} />
+
+        {/* Imagem aérea (fallback, zIndex 0) */}
+        {heroImage && !bairro.heroVideoUrl && (
+          <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
             <Image
               src={heroImage}
               alt={bairro.nome}
@@ -245,40 +257,47 @@ export default async function BairroPlanejadiSlugPage({ params, searchParams }: 
               sizes="100vw"
               placeholder={heroLqip ? 'blur' : 'empty'}
               blurDataURL={heroLqip}
-              style={{ transform: 'scale(1.04)', transformOrigin: 'center' }}
+              style={{
+                transform: 'scale(1.04)',
+                transformOrigin: 'center',
+                animation: 'kenBurns 22s ease-in-out infinite alternate',
+              }}
             />
           </div>
         )}
 
-        {/* Gradiente */}
+        {/* Gradiente (zIndex 2 — acima do vídeo) */}
         <div
           aria-hidden="true"
           style={{
             position: 'absolute',
             inset: 0,
-            background: heroImage
+            zIndex: 2,
+            background: (heroImage || bairro.heroVideoUrl)
               ? 'linear-gradient(to top, rgba(9,11,21,0.92) 0%, rgba(9,11,21,0.55) 45%, rgba(9,11,21,0.25) 100%)'
               : 'linear-gradient(160deg, #0a0f1e 0%, #1a1a2e 60%, #090b15 100%)',
           }}
         />
 
-        {/* Glow dourado (sem imagem) */}
-        {!heroImage && (
+        {/* Glow dourado (sem imagem nem vídeo) */}
+        {!heroImage && !bairro.heroVideoUrl && (
           <div
             aria-hidden="true"
             style={{
               position: 'absolute',
               inset: 0,
+              zIndex: 2,
               background: 'radial-gradient(ellipse 65% 50% at 60% 30%, rgba(184,150,12,0.1) 0%, transparent 65%)',
             }}
           />
         )}
 
-        {/* Linha dourada */}
+        {/* Linha dourada (zIndex 3) */}
         <div
           aria-hidden="true"
           style={{
             position: 'absolute',
+            zIndex: 3,
             left: 'clamp(1.5rem, 5vw, 4rem)',
             top: '15%',
             bottom: '15%',

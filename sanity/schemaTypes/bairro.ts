@@ -159,6 +159,13 @@ export const bairro = defineType({
       options: { hotspot: true },
     }),
     defineField({
+      name: 'heroVideoUrl',
+      title: 'Video do hero (URL)',
+      type: 'url',
+      group: 'basico',
+      description: 'YouTube, Vimeo ou MP4 direto. Se preenchido, substitui a foto no hero com video imersivo.',
+    }),
+    defineField({
       name: 'ogImage',
       title: 'Imagem Open Graph (1200x630)',
       type: 'image',

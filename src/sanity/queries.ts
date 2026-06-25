@@ -153,6 +153,7 @@ export const BAIRRO_QUERY = groq`
     faqs[] { pergunta, resposta },
     bairrosProximos[]->{ _id, nome, slug },
     destaque, metaTitle, metaDescription,
+    heroVideoUrl,
     ogImage { asset->{ _id, url } },
     "totalImoveis": count(*[_type == "imovel" && bairro._ref == ^._id && status == "Disponível"])
   }
@@ -222,6 +223,12 @@ export const CONDOMINIOS_POR_BAIRRO_QUERY = groq`
 export const CONDOMINIO_POR_BAIRRO_QUERY = groq`
   *[_type == "condominio" && bairro->slug.current == $bairroSlug && slug.current == $condSlug][0] {
     _id, nome, slug, tipo, descricao, infraestrutura, areaTotal, totalLotes,
+    sobre, construtora, anoEntrega, numTorres, numUnidades,
+    forcarNoindex, condominiosProximos[]->{ nome, slug },
+    faqs[] { pergunta, resposta },
+    geo { lat, lng, proximidades },
+    seo { titulo, descricao },
+    videoTour, heroVideoUrl,
     bairro->{ _id, nome, slug, cidade, estado, mercado },
     "fotoCapa": fotoCapa.asset->{ _id, url, metadata { lqip, dimensions } },
     galeria[]{ "asset": asset.asset->{ _id, url, metadata { lqip, dimensions } }, alt, legenda },
@@ -415,10 +422,11 @@ export const BAIRRO_PLANEJADO_QUERY = groq`
     "fotoCapa": fotoCapa { asset->{ url, metadata { lqip } }, hotspot, crop },
     "fotoAerea": fotoAerea { asset->{ url, metadata { lqip } }, hotspot, crop },
     "ogImage": ogImage { asset->{ url } },
+    heroVideoUrl, metaTitle, metaDescription,
     "condominios": *[_type == "condominio" && bairro._ref == ^._id] | order(ordem asc) {
       _id, nome, slug, status, construtora,
       precoMinimo, precoMaximo, areaPrivativaMin, areaPrivativaMax,
-      prazoEntrega, tipologiasDisponiveis, videoTour,
+      prazoEntrega, tipologiasDisponiveis, videoTour, heroVideoUrl,
       comissao, vgv, whatsappCorretor, mensagemCorretorWhatsapp,
       visibilidadeCorretor,
       "imagemCapa": fotoCapa.asset->{ url, metadata { lqip } },

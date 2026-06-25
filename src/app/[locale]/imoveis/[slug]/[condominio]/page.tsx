@@ -20,6 +20,7 @@ import {
 import type { ImovelCard } from '@/types/sanity'
 import ImovelCardComponent from '@/components/cards/ImovelCard'
 import BreadcrumbNav from '@/components/ui/BreadcrumbNav'
+import HeroMedia from '@/components/ui/HeroMedia'
 import { routing } from '@/i18n/routing'
 import { PortableText } from '@portabletext/react'
 
@@ -46,7 +47,9 @@ interface CondominioDetalhe {
   faqs?: Array<{ pergunta: string; resposta: string }>
   forcarNoindex?: boolean
   condominiosProximos?: Array<{ nome: string; slug: { current: string } }>
-  fotoCapa?: { asset?: { url: string } }
+  fotoCapa?: { asset?: { url: string; metadata?: { lqip?: string } } }
+  videoTour?: string
+  heroVideoUrl?: string
   geo?: { lat?: number; lng?: number; proximidades?: string[] }
   seo?: { titulo?: string; descricao?: string }
   bairro: { nome: string; slug: { current: string } }
@@ -183,20 +186,16 @@ export default async function CondominioPage({ params }: PageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* Hero */}
-      <section className="relative h-[55vh] min-h-[380px] flex items-end bg-ink">
-        {cond.fotoCapa?.asset?.url && (
-          <Image
-            src={cond.fotoCapa.asset.url}
-            alt={`${cond.nome} — ${cond.bairro.nome}`}
-            fill
-            className="object-cover"
-            priority
-            sizes="100vw"
-          />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/30 to-transparent" />
-        <div className="relative container-site pb-10 z-10">
+      {/* Hero — prioridade: heroVideoUrl > videoTour > fotoCapa */}
+      <HeroMedia
+        videoUrl={cond.heroVideoUrl ?? cond.videoTour}
+        imageUrl={cond.fotoCapa?.asset?.url}
+        imageLqip={cond.fotoCapa?.asset?.metadata?.lqip}
+        imageAlt={`${cond.nome} — ${cond.bairro.nome}`}
+        height="75vh"
+        minHeight="480px"
+      >
+        <div className="container-site pb-10">
           <BreadcrumbNav
             items={[
               { label: 'Início', href: '/' },
@@ -215,7 +214,7 @@ export default async function CondominioPage({ params }: PageProps) {
             {cond.anoEntrega && ` · Entregue em ${cond.anoEntrega}`}
           </p>
         </div>
-      </section>
+      </HeroMedia>
 
       <div className="container-site py-12">
 

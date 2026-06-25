@@ -183,6 +183,13 @@ export const condominio = defineType({
       description: 'URL completa do YouTube. Ex: https://www.youtube.com/watch?v=xxx',
     }),
     defineField({
+      name: 'heroVideoUrl',
+      title: 'Vídeo do hero (URL)',
+      type: 'url',
+      group: 'basico',
+      description: 'YouTube, Vimeo ou MP4. Se vazio, usa o Vídeo tour no hero. Prioridade: heroVideoUrl > videoTour > fotoCapa.',
+    }),
+    defineField({
       name: 'ordem',
       title: 'Ordem de exibição',
       type: 'number',

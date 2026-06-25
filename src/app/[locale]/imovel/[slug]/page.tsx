@@ -184,6 +184,7 @@ export default async function ImovelPDIPage({ params }: PageProps) {
           novidade={imovel.novidade}
           condominioAnoEntrega={imovel.condominioAnoEntrega}
           tourUrl={tourUrl}
+          videoUrl={imovel.videoUrl}
         />
       )}
 

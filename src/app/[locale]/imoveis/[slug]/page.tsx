@@ -20,6 +20,7 @@ import {
 import type { Bairro, ImovelCard, CondominioCard } from '@/types/sanity'
 import ImovelCardComponent from '@/components/cards/ImovelCard'
 import BreadcrumbNav from '@/components/ui/BreadcrumbNav'
+import HeroMedia from '@/components/ui/HeroMedia'
 import { routing } from '@/i18n/routing'
 
 export const revalidate = 3600
@@ -113,6 +114,7 @@ export default async function BairroPage({ params }: PageProps) {
     faqs?: Array<{ pergunta: string; resposta: string }>
     bairrosProximos?: Array<{ nome: string; slug: { current: string } }>
     faixaPreco?: { min?: number; max?: number; tipoPredominante?: string }
+    heroVideoUrl?: string
   }
 
   // JSON-LD — BreadcrumbList + CollectionPage + FAQPage
@@ -155,19 +157,15 @@ export default async function BairroPage({ params }: PageProps) {
       />
 
       {/* Hero */}
-      <section className="relative h-[60vh] min-h-[400px] flex items-end bg-ink">
-        {bairro.fotoCapa?.asset?.url && (
-          <Image
-            src={bairro.fotoCapa.asset.url}
-            alt={`${bairro.nome} — vista aérea`}
-            fill
-            className="object-cover"
-            priority
-            sizes="100vw"
-          />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/30 to-transparent" />
-        <div className="relative container-site pb-10 z-10">
+      <HeroMedia
+        videoUrl={bairroTyped.heroVideoUrl}
+        imageUrl={bairro.fotoAerea?.asset?.url ?? bairro.fotoCapa?.asset?.url}
+        imageLqip={bairro.fotoAerea?.asset?.metadata?.lqip ?? bairro.fotoCapa?.asset?.metadata?.lqip}
+        imageAlt={`${bairro.nome} — vista aérea`}
+        height="70vh"
+        minHeight="480px"
+      >
+        <div className="container-site pb-10">
           <BreadcrumbNav
             items={[
               { label: 'Início', href: '/' },
@@ -188,7 +186,7 @@ export default async function BairroPage({ params }: PageProps) {
             </p>
           )}
         </div>
-      </section>
+      </HeroMedia>
 
       <div className="container-site py-12">
 
