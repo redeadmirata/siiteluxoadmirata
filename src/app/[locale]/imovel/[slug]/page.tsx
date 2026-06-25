@@ -33,7 +33,7 @@ function buildImovelPath(imovel: ImovelPDI, slug: string): string {
   const isIlhaPura = imovel.condominioRef?.bairroSlug === 'ilha-pura' && !!condSlug
   if (!isIlhaPura) return `/imovel/${slug}`
   const finalidadeSeg =
-    imovel.finalidade === 'Locacao'
+    imovel.finalidade === 'Locação'
       ? 'aluguel'
       : imovel.finalidade === 'Temporada'
         ? 'temporada'

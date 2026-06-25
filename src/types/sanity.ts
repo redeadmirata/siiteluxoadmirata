@@ -34,7 +34,7 @@ export interface BairroRef {
   slug: { current: string }
   cidade: string
   estado: 'RJ' | 'RS'
-  mercado: 'Rio de Janeiro' | 'Serra Gaucha'
+  mercado: 'Rio de Janeiro' | 'Serra Gaúcha'
 }
 
 export interface Bairro extends BairroRef {
@@ -61,12 +61,12 @@ export type ImovelTipo =
   | 'Cobertura duplex'
   | 'Penthouse'
   | 'Casa'
-  | 'Casa em condominio'
+  | 'Casa em condomínio'
   | 'Terreno'
 
-export type ImovelFinalidade = 'Venda' | 'Locacao' | 'Temporada'
-export type ImovelMercado = 'Rio de Janeiro' | 'Serra Gaucha'
-export type ImovelStatus = 'Disponivel' | 'Vendido' | 'Locado' | 'Em negociacao'
+export type ImovelFinalidade = 'Venda' | 'Locação' | 'Temporada'
+export type ImovelMercado = 'Rio de Janeiro' | 'Serra Gaúcha'
+export type ImovelStatus = 'Disponível' | 'Vendido' | 'Locado' | 'Em negociação'
 
 export interface ImovelImagem {
   arquivo: SanityImageFile & {
