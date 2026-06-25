@@ -155,7 +155,7 @@ export default async function BairroPage({ params }: PageProps) {
       />
 
       {/* Hero */}
-      <section className="relative h-[60vh] min-h-[400px] flex items-end">
+      <section className="relative h-[60vh] min-h-[400px] flex items-end bg-ink">
         {bairro.fotoCapa?.asset?.url && (
           <Image
             src={bairro.fotoCapa.asset.url}

@@ -184,7 +184,7 @@ export default async function CondominioPage({ params }: PageProps) {
       />
 
       {/* Hero */}
-      <section className="relative h-[55vh] min-h-[380px] flex items-end">
+      <section className="relative h-[55vh] min-h-[380px] flex items-end bg-ink">
         {cond.fotoCapa?.asset?.url && (
           <Image
             src={cond.fotoCapa.asset.url}
