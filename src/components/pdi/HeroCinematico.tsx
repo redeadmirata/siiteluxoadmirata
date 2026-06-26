@@ -22,7 +22,6 @@ import Image from 'next/image'
 import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { urlForImovelImage } from '@/sanity/client'
-import { formatPreco, formatArea } from '@/lib/formatters'
 import type { ImovelImagem } from '@/types/sanity'
 import HeroMediaVideo from '@/components/ui/HeroMediaVideo'
 
@@ -45,14 +44,9 @@ export interface HeroCinematicoProps {
 
 export default function HeroCinematico({
   titulo,
-  preco,
-  precoSobConsulta,
   bairroNome,
   cidade,
-  quartos,
-  areaUtil,
   imagens,
-  condominioNome,
   novidade,
   finalidade,
   condominioAnoEntrega,
