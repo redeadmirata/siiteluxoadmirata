@@ -62,7 +62,7 @@ export const IMOVEIS_FILTRADOS_QUERY = groq`
 export const IMOVEL_PDI_QUERY = groq`
   *[_type == "imovel" && slug.current == $slug][0] {
     _id, titulo, slug, tipo, finalidade, mercado, status, destaque,
-    novidade, exclusivo,
+    novidade, condicao, exclusivo,
     preco, condominio, iptu, areaUtil, areaTotal,
     quartos, suites, banheiros, vagas, andar,
     ${bairroFragment},
@@ -463,6 +463,4 @@ export const ILHAPURA_IMOVEIS_QUERY = groq`
   *[_type == "imovel" && condominioRef->bairro->slug.current == "ilha-pura" && defined(slug.current) && defined(condominioRef->slug.current)] {
     "slug": slug.current,
     "condSlug": condominioRef->slug.current,
-    finalidade
-  }
-`
+    finalid

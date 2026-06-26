@@ -112,6 +112,24 @@ export const imovel = defineType({
       initialValue: false,
     }),
     defineField({
+      name: 'condicao',
+      title: 'Condição do imóvel',
+      description:
+        'Define o badge principal e os blocos especiais da PDI. ' +
+        '"Obra por Administração" exibe o bloco Sem Banco / Sem Juros.',
+      type: 'string',
+      group: 'basico',
+      options: {
+        list: [
+          { title: '✅ Pronto para Morar', value: 'pronto' },
+          { title: '🚀 Lançamento', value: 'lancamento' },
+          { title: '🏗️ Em Obras', value: 'em-obras' },
+          { title: '🏦 Obra por Administração (Sem Banco · Sem Juros)', value: 'obra-administracao' },
+        ],
+        layout: 'radio',
+      },
+    }),
+    defineField({
       name: 'precoSobConsulta',
       title: 'Preço sob consulta (oculta valor)',
       type: 'boolean',

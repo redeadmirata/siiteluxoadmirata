@@ -146,7 +146,7 @@ export default async function ImovelPDIPage({ params }: PageProps) {
     imovel.tourVirtual ??
     imagens.find((i) => i.arquivo.urlMatterport)?.arquivo.urlMatterport
 
-  const isObraAdmin = imovel.novidade === true && imovel.finalidade === 'Venda'
+  const isObraAdmin = imovel.condicao === 'obra-administracao'
 
   return (
     <>
@@ -171,9 +171,8 @@ export default async function ImovelPDIPage({ params }: PageProps) {
           areaUtil={imovel.areaUtil}
           imagens={imagens}
           condominioNome={imovel.condominioNome}
-          novidade={imovel.novidade}
+          condicao={imovel.condicao}
           finalidade={imovel.finalidade}
-          condominioAnoEntrega={imovel.condominioAnoEntrega}
           tourUrl={tourUrl}
           videoUrl={imovel.videoUrl}
         />
@@ -254,3 +253,4 @@ export default async function ImovelPDIPage({ params }: PageProps) {
     </>
   )
 }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    

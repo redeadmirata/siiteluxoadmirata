@@ -121,6 +121,7 @@ export interface ImovelCard {
   exclusivo?: boolean
   permuta?: boolean
   novidade?: boolean
+  condicao?: 'pronto' | 'lancamento' | 'em-obras' | 'obra-administracao'
   preco?: number
   precoSobConsulta?: boolean
   areaUtil?: number
@@ -357,7 +358,4 @@ export interface BairroPlaneado extends BairroFull {
   incorporadora?: string
   areaTotal?: number
   anoInauguracao?: number
-  amenidades?: string[]
-  condominios?: CondominioResumido[]
-  totalCondominios?: number
-}
+  amenidades?: str

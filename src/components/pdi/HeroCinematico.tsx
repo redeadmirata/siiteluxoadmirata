@@ -35,7 +35,9 @@ export interface HeroCinematicoProps {
   areaUtil?: number
   imagens: ImovelImagem[]
   condominioNome?: string
+  /** @deprecated use condicao */
   novidade?: boolean
+  condicao?: 'pronto' | 'lancamento' | 'em-obras' | 'obra-administracao'
   finalidade?: string
   condominioAnoEntrega?: number
   tourUrl?: string
@@ -47,9 +49,8 @@ export default function HeroCinematico({
   bairroNome,
   cidade,
   imagens,
-  novidade,
+  condicao,
   finalidade,
-  condominioAnoEntrega,
   tourUrl,
   videoUrl,
 }: HeroCinematicoProps) {
@@ -60,12 +61,13 @@ export default function HeroCinematico({
 
   const capa   = imagens.find((i) => i.arquivo.principal) ?? imagens[0]
 
-  // Badges
-  const currentYear   = new Date().getFullYear()
-  const isLancamento  = novidade === true
-  const isPronto      = !isLancamento && !!condominioAnoEntrega && condominioAnoEntrega <= currentYear
-  const isLocacao     = finalidade === 'Locação'
-  const isTemporada   = finalidade === 'Temporada'
+  // Badges — derivados do campo `condicao`
+  const isLancamento      = condicao === 'lancamento'
+  const isPronto          = condicao === 'pronto'
+  const isEmObras         = condicao === 'em-obras'
+  const isObraAdmin       = condicao === 'obra-administracao'
+  const isLocacao         = finalidade === 'Locação'
+  const isTemporada       = finalidade === 'Temporada'
 
   // ── GSAP parallax (apenas para foto, não vídeo) ───────────────────
   useEffect(() => {
@@ -195,7 +197,27 @@ export default function HeroCinematico({
               Pronto para morar
             </motion.span>
           )}
-          {isLocacao && !isLancamento && (
+          {isEmObras && (
+            <motion.span
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55, delay: 0.9 }}
+              className="bg-white/10 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/70 backdrop-blur-sm"
+            >
+              Em obras
+            </motion.span>
+          )}
+          {isObraAdmin && (
+            <motion.span
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55, delay: 0.9 }}
+              className="bg-gold px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-white"
+            >
+              Sem banco · Sem juros
+            </motion.span>
+          )}
+          {isLocacao && (
             <motion.span
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -368,33 +390,4 @@ export default function HeroCinematico({
           </div>
 
           {/* Thumbnails */}
-          <div className="flex-shrink-0 overflow-x-auto px-6 py-4">
-            <div className="flex justify-center gap-1.5">
-              {imagens.map((img, i) => (
-                <button
-                  key={i}
-                  onClick={() => setLightboxIndice(i)}
-                  className={`relative h-12 w-16 flex-shrink-0 overflow-hidden transition-opacity ${
-                    i === lightboxIndice
-                      ? 'opacity-100 ring-1 ring-gold'
-                      : 'opacity-35 hover:opacity-70'
-                  }`}
-                  aria-label={`Ir para foto ${i + 1}`}
-                  aria-current={i === lightboxIndice}
-                >
-                  <Image
-                    src={getUrl(img, 120)}
-                    alt=""
-                    fill
-                    sizes="64px"
-                    className="object-cover"
-                  />
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  )
-}
+          <div className="flex-shrink-0 overflow-x-auto px-6 
