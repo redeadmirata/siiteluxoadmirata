@@ -1,15 +1,27 @@
 'use client'
 
+/**
+ * ImovelGallery
+ * Grade fotográfica editorial para PDI.
+ *
+ * Desktop: grid assimétrico 3 colunas com cards de alturas variadas.
+ * Mobile:  grade 2 colunas uniforme.
+ * Exibe até 9 fotos na grade; botão "ver todas" abre lightbox completo.
+ *
+ * Aceita também props de controle externo (aberto / onFechar) para
+ * compatibilidade com o uso legado em page.tsx.
+ */
+
 import Image from 'next/image'
 import { useState, useEffect, useCallback } from 'react'
+import { motion } from 'framer-motion'
 import { urlForImovelImage } from '@/sanity/client'
 import type { ImovelImagem } from '@/types/sanity'
-import { CardStack, type CardStackItem } from '@/components/ui/card-stack'
 
 interface ImovelGalleryProps {
   imagens: ImovelImagem[]
   titulo: string
-  /** Controlado externamente — true abre o lightbox */
+  /** Controlado externamente — true abre o lightbox diretamente */
   aberto?: boolean
   onFechar?: () => void
 }
@@ -20,16 +32,8 @@ export default function ImovelGallery({
   aberto = false,
   onFechar,
 }: ImovelGalleryProps) {
-  const [indice, setIndice] = useState(0)
+  const [indice, setIndice]   = useState(0)
   const [visivel, setVisivel] = useState(aberto)
-  const [isMobile, setIsMobile] = useState(false)
-
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 640)
-    check()
-    window.addEventListener('resize', check)
-    return () => window.removeEventListener('resize', check)
-  }, [])
 
   useEffect(() => setVisivel(aberto), [aberto])
 
@@ -47,12 +51,11 @@ export default function ImovelGallery({
     [imagens.length],
   )
 
-  // Teclado
   useEffect(() => {
     if (!visivel) return
     const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') fechar()
-      if (e.key === 'ArrowLeft') anterior()
+      if (e.key === 'Escape')     fechar()
+      if (e.key === 'ArrowLeft')  anterior()
       if (e.key === 'ArrowRight') proximo()
     }
     window.addEventListener('keydown', handler)
@@ -68,71 +71,135 @@ export default function ImovelGallery({
     }
   }
 
-  // ── Monta items para o CardStack ─────────────────────────────────
-  const stackItems: CardStackItem[] = imagens.map((img, i) => ({
-    id: i,
-    title: img.arquivo.alt ?? `Foto ${i + 1} de ${titulo}`,
-    imageSrc: getUrl(img, 900),
-    lqip: img.arquivo.asset?.metadata?.lqip,
-  }))
+  function abrirLightbox(i: number) {
+    setIndice(i)
+    setVisivel(true)
+  }
+
+  // ── Grid: até 9 fotos ─────────────────────────────────────────────
+  // Layout assimétrico: foto 1 é grande (2 linhas), fotos 2-9 regulares
+  const preview = imagens.slice(0, 9)
+  const restante = imagens.length - preview.length
 
   if (!visivel) {
     return (
       <section aria-label="Galeria de fotos" className="section-padding">
-        <h2 className="text-xs tracking-widest uppercase text-gold mb-8">
-          Galeria ({imagens.length} fotos)
-        </h2>
-
-        {/* CardStack — 3D fan carousel */}
-        <CardStack
-          items={stackItems}
-          cardWidth={isMobile ? 220 : 360}
-          cardHeight={isMobile ? 150 : 240}
-          maxVisible={isMobile ? 3 : 5}
-          spreadDeg={isMobile ? 28 : 36}
-          overlap={0.5}
-          autoAdvance
-          intervalMs={3500}
-          pauseOnHover
-          loop
-          onClickCard={(_item, idx) => {
-            setIndice(idx)
-            setVisivel(true)
-          }}
-        />
-
-        {/* Ver todas no lightbox */}
-        <div className="mt-6 flex justify-center">
-          <button
-            onClick={() => { setIndice(0); setVisivel(true) }}
-            className="btn-outline text-xs px-6 py-2"
-            aria-label={`Ver todas as ${imagens.length} fotos`}
-          >
-            Ver todas as fotos ({imagens.length})
-          </button>
+        {/* Cabeçalho */}
+        <div className="mb-8 flex items-end justify-between">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.3em] text-gold mb-1">
+              Galeria
+            </p>
+            <h2 className="text-2xl font-light text-ink" style={{ fontFamily: 'var(--font-display)' }}>
+              {imagens.length} fotos
+            </h2>
+          </div>
+          {imagens.length > 9 && (
+            <button
+              onClick={() => abrirLightbox(0)}
+              className="btn-outline text-xs px-5 py-2"
+            >
+              Ver todas ({imagens.length})
+            </button>
+          )}
         </div>
+
+        {/* Grade fotográfica */}
+        <div
+          className="grid gap-1 md:gap-1.5"
+          style={{
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gridTemplateRows: 'auto',
+          }}
+        >
+          {preview.map((img, i) => {
+            // Foto 0: ocupa 2 linhas na 1ª coluna (apenas desktop)
+            const isCapa = i === 0
+            return (
+              <motion.button
+                key={i}
+                onClick={() => abrirLightbox(i)}
+                initial={{ opacity: 0, scale: 0.98 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, margin: '-60px' }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: i * 0.04 }}
+                className={`group relative overflow-hidden bg-stone focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold ${
+                  isCapa ? 'md:[grid-row:span_2]' : ''
+                }`}
+                style={{ aspectRatio: isCapa ? '4/5' : '4/3' }}
+                aria-label={`Ver foto ${i + 1} de ${imagens.length} — ${titulo}`}
+              >
+                <Image
+                  src={getUrl(img, isCapa ? 900 : 600)}
+                  alt={img.arquivo.alt ?? `Foto ${i + 1} — ${titulo}`}
+                  fill
+                  sizes={isCapa ? '33vw' : '25vw'}
+                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                  placeholder={img.arquivo.asset?.metadata?.lqip ? 'blur' : 'empty'}
+                  blurDataURL={img.arquivo.asset?.metadata?.lqip}
+                />
+
+                {/* Hover overlay */}
+                <div className="absolute inset-0 bg-ink/0 transition-colors duration-500 group-hover:bg-ink/20" />
+
+                {/* Ícone expand no hover */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                  <div className="rounded-full bg-black/50 p-3 backdrop-blur-sm">
+                    <svg className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <path d="M3 8V3h5M17 8V3h-5M3 12v5h5M17 12v5h-5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Overlay "ver mais" na última foto */}
+                {i === preview.length - 1 && restante > 0 && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-ink/75 backdrop-blur-sm">
+                    <span className="text-2xl font-light text-white" style={{ fontFamily: 'var(--font-display)' }}>
+                      +{restante}
+                    </span>
+                    <span className="mt-1 text-[11px] uppercase tracking-widest text-white/70">
+                      fotos
+                    </span>
+                  </div>
+                )}
+              </motion.button>
+            )
+          })}
+        </div>
+
+        {/* CTA ver todas (mobile: sempre visível se >9, desktop: só se sem overlay) */}
+        {imagens.length > 9 && (
+          <div className="mt-6 flex justify-center md:hidden">
+            <button
+              onClick={() => abrirLightbox(0)}
+              className="btn-outline text-xs px-6 py-2"
+            >
+              Ver todas as {imagens.length} fotos
+            </button>
+          </div>
+        )}
       </section>
     )
   }
 
-  // ── Lightbox ─────────────────────────────────────────────────────
+  // ── Lightbox ──────────────────────────────────────────────────────
   const imgAtual = imagens[indice]
 
   return (
     <div
-      className="fixed inset-0 z-modal bg-black/95 flex flex-col"
+      className="fixed inset-0 z-[100] flex flex-col bg-black/96"
       role="dialog"
       aria-modal="true"
       aria-label="Galeria de fotos em tela cheia"
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 flex-shrink-0">
-        <span className="text-white/60 text-sm">
+      <div className="flex flex-shrink-0 items-center justify-between px-6 py-4">
+        <span className="font-mono text-sm text-white/40">
           {indice + 1} / {imagens.length}
         </span>
         <button
           onClick={fechar}
-          className="text-white/60 hover:text-white transition-colors text-2xl leading-none"
+          className="p-2 text-2xl leading-none text-white/50 transition-colors hover:text-white"
           aria-label="Fechar galeria"
         >
           ✕
@@ -140,11 +207,11 @@ export default function ImovelGallery({
       </div>
 
       {/* Imagem principal */}
-      <div className="flex-1 relative flex items-center justify-center px-16 min-h-0">
-        <div className="relative w-full h-full max-w-5xl mx-auto">
+      <div className="relative flex min-h-0 flex-1 items-center justify-center px-12">
+        <div className="relative mx-auto h-full w-full max-w-5xl">
           <Image
             key={indice}
-            src={getUrl(imgAtual, 1600)}
+            src={getUrl(imgAtual, 1800)}
             alt={imgAtual.arquivo.alt ?? `Foto ${indice + 1}`}
             fill
             sizes="90vw"
@@ -154,18 +221,16 @@ export default function ImovelGallery({
             priority
           />
         </div>
-
-        {/* Setas */}
         <button
           onClick={anterior}
-          className="absolute left-2 top-1/2 -translate-y-1/2 text-white/60 hover:text-white text-3xl px-3 py-4 transition-colors"
+          className="absolute left-2 top-1/2 -translate-y-1/2 px-4 py-6 text-4xl text-white/40 transition-colors hover:text-white"
           aria-label="Foto anterior"
         >
           ‹
         </button>
         <button
           onClick={proximo}
-          className="absolute right-2 top-1/2 -translate-y-1/2 text-white/60 hover:text-white text-3xl px-3 py-4 transition-colors"
+          className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-6 text-4xl text-white/40 transition-colors hover:text-white"
           aria-label="Próxima foto"
         >
           ›
@@ -173,14 +238,14 @@ export default function ImovelGallery({
       </div>
 
       {/* Thumbnails */}
-      <div className="flex-shrink-0 px-6 py-4 overflow-x-auto">
-        <div className="flex gap-2 justify-center">
+      <div className="flex-shrink-0 overflow-x-auto px-6 py-4">
+        <div className="flex justify-center gap-1.5">
           {imagens.map((img, i) => (
             <button
               key={i}
               onClick={() => setIndice(i)}
-              className={`relative w-16 h-12 flex-shrink-0 overflow-hidden transition-opacity ${
-                i === indice ? 'opacity-100 ring-1 ring-gold' : 'opacity-40 hover:opacity-70'
+              className={`relative h-12 w-16 flex-shrink-0 overflow-hidden transition-opacity ${
+                i === indice ? 'opacity-100 ring-1 ring-gold' : 'opacity-35 hover:opacity-70'
               }`}
               aria-label={`Ir para foto ${i + 1}`}
               aria-current={i === indice}

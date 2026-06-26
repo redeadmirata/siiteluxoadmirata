@@ -8,8 +8,7 @@ import { formatPreco, formatArea } from '@/lib/formatters'
 import { routing } from '@/i18n/routing'
 
 import BreadcrumbNav from '@/components/ui/BreadcrumbNav'
-import HeroPDI from '@/components/pdi/HeroPDI'
-import PhotoStrip from '@/components/pdi/PhotoStrip'
+import HeroCinematico from '@/components/pdi/HeroCinematico'
 import ObraAdminBanner from '@/components/pdi/ObraAdminBanner'
 import FichaTecnica from '@/components/pdi/FichaTecnica'
 import StorytellingBlock from '@/components/pdi/StorytellingBlock'
@@ -160,66 +159,42 @@ export default async function ImovelPDIPage({ params }: PageProps) {
         bairroNome={imovel.bairro?.nome}
       />
 
-      <div className="container-site pt-6 pb-2">
-        <BreadcrumbNav
-          items={[
-            { label: t('home'), href: '/' },
-            { label: t('properties'), href: '/imoveis' },
-            ...(imovel.bairro && bairroSlug
-              ? [{ label: imovel.bairro.nome, href: `/imoveis/${bairroSlug}` }]
-              : []),
-            { label: imovel.titulo },
-          ]}
-        />
-      </div>
-
       {imagens.length > 0 && (
-        <HeroPDI
+        <HeroCinematico
           titulo={imovel.titulo}
           preco={imovel.preco}
+          precoSobConsulta={imovel.precoSobConsulta}
           bairroNome={imovel.bairro?.nome}
           cidade={imovel.bairro?.cidade}
+          quartos={imovel.quartos}
+          areaUtil={imovel.areaUtil}
           imagens={imagens}
           condominioNome={imovel.condominioNome}
           novidade={imovel.novidade}
+          finalidade={imovel.finalidade}
           condominioAnoEntrega={imovel.condominioAnoEntrega}
           tourUrl={tourUrl}
           videoUrl={imovel.videoUrl}
         />
       )}
 
-      {imagens.length >= 3 && (
-        <PhotoStrip
-          imagens={imagens}
-          size={180}
-          label="Galeria de fotos do imovel"
-        />
-      )}
-
       <div className="container-site">
+        {/* Breadcrumb — abaixo do hero full-screen */}
+        <div className="pt-6 pb-2">
+          <BreadcrumbNav
+            items={[
+              { label: t('home'), href: '/' },
+              { label: t('properties'), href: '/imoveis' },
+              ...(imovel.bairro && bairroSlug
+                ? [{ label: imovel.bairro.nome, href: `/imoveis/${bairroSlug}` }]
+                : []),
+              { label: imovel.titulo },
+            ]}
+          />
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-12 py-10">
           <main>
-            <div className="hidden md:block mb-8">
-              {imovel.bairro && (
-                <p className="text-xs tracking-widest uppercase text-gold mb-2">
-                  {imovel.bairro.nome} · {imovel.bairro.cidade}
-                </p>
-              )}
-              {imovel.condominioNome && (
-                <p className="text-base font-light text-muted mb-1 tracking-wide">
-                  {imovel.condominioNome}
-                </p>
-              )}
-              <h1 className="text-display-lg text-ink leading-tight mb-3">
-                {imovel.titulo}
-              </h1>
-              {imovel.preco && (
-                <p className="text-price text-3xl text-ink">
-                  {formatPreco(imovel.preco)}
-                </p>
-              )}
-            </div>
-
             <FichaTecnica imovel={imovel} />
 
             {imovel.descricaoPtBr && (
