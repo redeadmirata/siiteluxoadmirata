@@ -165,23 +165,17 @@ export default function HeroCinematico({
           }}
         />
 
-        {/* ── Gradientes editoriais ────────────────────────────────── */}
-        {/* Base: escurece para o texto */}
+        {/* ── Gradiente editorial sutil — vignette cinematográfica ─── */}
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 z-[3]"
           style={{
-            background:
-              'linear-gradient(to top, rgba(10,15,30,0.97) 0%, rgba(10,15,30,0.65) 30%, rgba(10,15,30,0.15) 60%, transparent 85%)',
-          }}
-        />
-        {/* Lateral: melhora legibilidade do texto à esquerda */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-[3]"
-          style={{
-            background:
-              'linear-gradient(to right, rgba(10,15,30,0.55) 0%, rgba(10,15,30,0.15) 50%, transparent 75%)',
+            background: [
+              /* inferior: ancora o eyebrow */
+              'linear-gradient(to top, rgba(10,15,30,0.72) 0%, rgba(10,15,30,0.28) 18%, transparent 40%)',
+              /* superior: evita superexposição do topo */
+              'linear-gradient(to bottom, rgba(10,15,30,0.35) 0%, transparent 22%)',
+            ].join(', '),
           }}
         />
 
@@ -261,104 +255,36 @@ export default function HeroCinematico({
           </motion.div>
         )}
 
-        {/* ── Texto overlay — base esquerda ───────────────────────── */}
-        <div className="absolute bottom-0 left-0 right-0 z-10 px-6 pb-14 pt-24 md:px-10 md:pb-16 lg:px-16 lg:pb-20">
+        {/* ── Texto overlay — só eyebrow (bairro · cidade) ───────── */}
+        <div className="absolute bottom-0 left-0 right-0 z-10 px-6 pb-10 md:px-10 md:pb-12 lg:px-16 lg:pb-14">
 
-          {/* Localização */}
+          {/* Eyebrow: localização apenas */}
           {(bairroNome || cidade) && (
             <motion.p
-              initial={{ opacity: 0, y: 22 }}
+              initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
-              className="mb-3 text-[10px] uppercase tracking-[0.4em] text-gold md:mb-4"
+              transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
+              className="text-[10px] uppercase tracking-[0.42em] text-gold"
             >
               {[bairroNome, cidade].filter(Boolean).join(' · ')}
             </motion.p>
           )}
 
-          {/* Condomínio */}
-          {condominioNome && (
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.28 }}
-              className="mb-1.5 text-sm font-light tracking-wide text-white/60 md:text-base"
-            >
-              {condominioNome}
-            </motion.p>
-          )}
-
-          {/* Título */}
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1], delay: 0.38 }}
-            className="mb-5 font-light leading-[1.04] text-white md:mb-6"
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(2.2rem, 5.5vw, 5.2rem)',
-            }}
-          >
-            {titulo}
-          </motion.h1>
-
-          {/* Preço + stats + tour */}
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.52 }}
-            className="flex flex-wrap items-center gap-x-5 gap-y-2"
-          >
-            {/* Preço */}
-            {preco && !precoSobConsulta && (
-              <span
-                className="text-xl text-white md:text-2xl"
-                style={{ fontFamily: 'var(--font-mono)', fontWeight: 300 }}
-              >
-                {formatPreco(preco)}
-              </span>
-            )}
-            {precoSobConsulta && (
-              <span className="text-sm font-light tracking-wide text-white/55">
-                Valor sob consulta
-              </span>
-            )}
-
-            {/* Divisor */}
-            {(preco || precoSobConsulta) && (quartos || areaUtil) && (
-              <span aria-hidden="true" className="h-3.5 w-px bg-white/20" />
-            )}
-
-            {/* Quartos */}
-            {quartos && (
-              <span className="text-sm font-light text-white/50">
-                {quartos}&nbsp;{quartos === 1 ? 'quarto' : 'quartos'}
-              </span>
-            )}
-
-            {/* Área */}
-            {areaUtil && (
-              <span className="text-sm font-light text-white/50">
-                {formatArea(areaUtil)}
-              </span>
-            )}
-
-            {/* Tour virtual */}
-            {tourUrl && (
-              <a
-                href={tourUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="ml-auto flex items-center gap-2 text-[11px] uppercase tracking-widest text-white/55 transition-colors duration-300 hover:text-gold"
-                aria-label="Abrir tour virtual 360°"
+          {/* Tour virtual — discreto, canto inferior direito */}
+          {tourUrl && (
+            <a
+              href={tourUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="absolute bottom-10 right-6 flex items-center gap-2 text-[11px] uppercase tracking-widest text-white/45 transition-colors duration-300 hover:text-gold md:bottom-12 md:right-10 lg:bottom-14 lg:right-16"
+              aria-label="Abrir tour virtual 360°"
               >
                 <span className="flex h-7 w-7 items-center justify-center rounded-full border border-current font-mono text-[10px]">
                   360°
                 </span>
                 <span className="hidden sm:inline">Tour virtual</span>
-              </a>
-            )}
-          </motion.div>
+            </a>
+          )}
         </div>
 
         {/* ── Scroll indicator ────────────────────────────────────── */}

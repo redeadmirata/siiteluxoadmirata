@@ -6,6 +6,7 @@ import { IMOVEL_PDI_QUERY, IMOVEIS_SLUGS_QUERY } from '@/sanity/queries'
 import type { ImovelPDI } from '@/types/sanity'
 import { formatPreco, formatArea } from '@/lib/formatters'
 import { routing } from '@/i18n/routing'
+import PDITitulo from '@/components/pdi/PDITitulo'
 
 import BreadcrumbNav from '@/components/ui/BreadcrumbNav'
 import HeroCinematico from '@/components/pdi/HeroCinematico'
@@ -178,9 +179,17 @@ export default async function ImovelPDIPage({ params }: PageProps) {
         />
       )}
 
+      {/* ── Título com blur-fade — aparece ao rolar abaixo do hero ── */}
+      <PDITitulo
+        titulo={imovel.titulo}
+        condominioNome={imovel.condominioNome}
+        quartos={imovel.quartos}
+        areaUtil={imovel.areaUtil}
+      />
+
       <div className="container-site">
         {/* Breadcrumb — abaixo do hero full-screen */}
-        <div className="pt-6 pb-2">
+        <div className="pt-3 pb-2">
           <BreadcrumbNav
             items={[
               { label: t('home'), href: '/' },
