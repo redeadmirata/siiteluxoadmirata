@@ -146,7 +146,7 @@ export default async function ImovelPDIPage({ params }: PageProps) {
     imovel.tourVirtual ??
     imagens.find((i) => i.arquivo.urlMatterport)?.arquivo.urlMatterport
 
-  const isObraAdmin = imovel.novidade === true
+  const isObraAdmin = imovel.novidade === true && imovel.finalidade === 'Venda'
 
   return (
     <>
