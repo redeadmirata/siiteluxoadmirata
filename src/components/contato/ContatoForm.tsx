@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { trackLead } from '@/services/analytics'
 
 const ASSUNTOS = [
   'Quero comprar um imóvel',
@@ -56,6 +57,9 @@ export default function ContatoForm() {
     } catch {
       /* não bloqueia o fluxo do WhatsApp */
     }
+
+    // Conversão (Pixel 'Lead' + GA 'generate_lead') — no-op sem consentimento
+    trackLead({ titulo: assunto || 'Formulário de contato' })
 
     const texto = [
       `Olá! Entrei em contato pelo site da Admirata.`,

@@ -6,8 +6,11 @@ interface Props {
   consent: boolean
 }
 
+// ID público do GA4 (stream admirata.com.br). Pode ser sobrescrito pela env.
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID ?? 'G-E5BR36BRDR'
+
 export default function GoogleAnalytics({ consent }: Props) {
-  const id = process.env.NEXT_PUBLIC_GA_ID
+  const id = GA_ID
   if (!id || !consent) return null
 
   return (
