@@ -69,5 +69,5 @@ export { Heading } from './Heading'
 export { Text }    from './Text'
 
 // ─── Utilitários ─────────────────────────────────────────────────────────────
-export { BreadcrumbNav }  from './BreadcrumbNav'
-export { WhatsAppButton } from './WhatsAppButton'
+export { default as BreadcrumbNav }  from './BreadcrumbNav'
+export { default as WhatsAppButton } from './WhatsAppButton'
