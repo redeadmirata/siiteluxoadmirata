@@ -1,7 +1,5 @@
 import type { MetadataRoute } from 'next'
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://admirata.com.br'
-
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'Admirata Imóveis',

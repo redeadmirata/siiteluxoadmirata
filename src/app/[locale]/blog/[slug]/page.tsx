@@ -4,9 +4,8 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { PortableText } from '@portabletext/react'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
-import { client } from '@/sanity/client'
+import { client, urlForImage } from '@/sanity/client'
 import { BLOG_POST_QUERY, BLOG_SLUGS_QUERY } from '@/sanity/queries'
-import { urlForImage } from '@/sanity/client'
 import { routing } from '@/i18n/routing'
 
 export const revalidate = 3600
