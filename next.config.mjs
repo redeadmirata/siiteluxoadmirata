@@ -157,10 +157,10 @@ const nextConfig = {
         destination: '/en/imoveis/:slug',
         permanent: true,
       },
-      // /fr/bairros/[slug] → /fr/imoveis/[slug]
+      // /es/bairros/[slug] → /es/imoveis/[slug]
       {
-        source: '/fr/bairros/:slug',
-        destination: '/fr/imoveis/:slug',
+        source: '/es/bairros/:slug',
+        destination: '/es/imoveis/:slug',
         permanent: true,
       },
       // /bairros (listing) → /imoveis
@@ -175,8 +175,8 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: '/fr/bairros',
-        destination: '/fr/imoveis',
+        source: '/es/bairros',
+        destination: '/es/imoveis',
         permanent: true,
       },
       // Páginas ainda não construídas — temporário até criação das páginas reais

@@ -63,7 +63,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       languages: {
         'pt-BR': `${siteUrl}/bairros/${params.slug}/`,
         'en-US': `${siteUrl}/en/bairros/${params.slug}/`,
-        'fr-FR': `${siteUrl}/fr/bairros/${params.slug}/`,
+        'es-ES': `${siteUrl}/es/bairros/${params.slug}/`,
       },
     },
     robots: {

@@ -24,7 +24,7 @@
     "titleTemplate": "%s | Admirata",
     "defaultDescription": "Encontre apartamentos, coberturas e casas de alto padrão no Rio de Janeiro e Serra Gaúcha. Admirata — imobiliária de luxo.",
     "twitterHandle": "@admirataimoveis",
-    "ogImage": "/og-default.jpg"
+    "ogImage": "/opengraph-image"
   },
   "listing": {
     "pageSize": 12,

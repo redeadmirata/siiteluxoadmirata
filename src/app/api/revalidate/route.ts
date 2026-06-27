@@ -10,14 +10,29 @@
  *   Method:  POST
  *   Trigger: "On Publish"
  *   GROQ filter: _type in ["imovel","condominio","bairro","post","lancamento"]
- *
- * Dev: GET /api/revalidate?tag=imovel  (sem secret — apenas local)
  */
 
 import { revalidateTag, revalidatePath } from 'next/cache'
 import { type NextRequest, NextResponse } from 'next/server'
 
 const REVALIDATE_SECRET = process.env.SANITY_REVALIDATE_SECRET
+
+function authorize(req: NextRequest): NextResponse | null {
+  if (!REVALIDATE_SECRET) {
+    return NextResponse.json(
+      { error: 'Revalidation is not configured' },
+      { status: 503 },
+    )
+  }
+
+  const authHeader = req.headers.get('authorization') ?? ''
+  const token = authHeader.replace(/^Bearer\s+/i, '').trim()
+  if (token !== REVALIDATE_SECRET) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  return null
+}
 
 /** Mapeia tipos de documento Sanity → cache tags a revalidar */
 function getTagsForType(type: string, slug?: string): string[] {
@@ -37,23 +52,17 @@ function getTagsForType(type: string, slug?: string): string[] {
     case 'configuracao':
       return ['home']
     default:
-      return ['imovel', 'condominio', 'bairro', 'blog', 'lancamento']
+      return []
   }
 }
 
 /** POST — Sanity webhook com assinatura */
 export async function POST(req: NextRequest) {
+  const authError = authorize(req)
+  if (authError) return authError
+
   try {
     const body = await req.json() as { _type?: string; slug?: { current?: string } }
-
-    // Verificar secret via header (Sanity envia Authorization: Bearer <secret>)
-    if (REVALIDATE_SECRET) {
-      const authHeader = req.headers.get('authorization') ?? ''
-      const token = authHeader.replace('Bearer ', '').trim()
-      if (token !== REVALIDATE_SECRET) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-      }
-    }
 
     if (!body._type) {
       return NextResponse.json({ error: 'Missing _type' }, { status: 400 })
@@ -61,6 +70,9 @@ export async function POST(req: NextRequest) {
 
     const slug = body.slug?.current
     const tags = getTagsForType(body._type, slug)
+    if (tags.length === 0) {
+      return NextResponse.json({ error: 'Unsupported _type' }, { status: 400 })
+    }
     tags.forEach((tag) => revalidateTag(tag))
 
     return NextResponse.json({
@@ -80,6 +92,9 @@ export async function POST(req: NextRequest) {
 
 /** GET — revalidação manual por tag/path (útil em dev e triggers manuais) */
 export async function GET(req: NextRequest) {
+  const authError = authorize(req)
+  if (authError) return authError
+
   const tag = req.nextUrl.searchParams.get('tag')
   const path = req.nextUrl.searchParams.get('path')
 

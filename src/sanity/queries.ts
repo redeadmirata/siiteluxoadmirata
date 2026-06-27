@@ -183,10 +183,13 @@ export const CONDOMINIO_QUERY = groq`
   *[_type == "condominio" && slug.current == $slug][0] {
     _id, nome, slug, tipo, descricao, infraestrutura, areaTotal, totalLotes,
     construtora, anoEntrega, numTorres, numUnidades, forcarNoindex,
+    status, precoMinimo, precoMaximo, areaPrivativaMin, areaPrivativaMax,
+    prazoEntrega, heroVideoUrl, videoTour,
     sobre,
     bairro->{ _id, nome, slug, cidade, estado, mercado },
     "fotoCapa": fotoCapa { asset->{ _id, url, metadata { lqip, dimensions } }, hotspot, crop },
     galeria[]{ "asset": asset.asset->{ _id, url, metadata { lqip, dimensions } }, alt, legenda },
+    plantasBaixas[]{ nome, quartos, area, "imagem": imagem.asset->{ _id, url, metadata { lqip, dimensions } } },
     faqs[] { pergunta, resposta },
     geo { lat, lng, proximidades },
     "tipologiasDisponiveis": array::unique(*[_type == "imovel" && condominioRef._ref == ^._id && status == "Disponível"].tipologia),

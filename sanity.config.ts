@@ -29,6 +29,20 @@ export default defineConfig({
               ),
             S.divider(),
             S.listItem()
+              .title('Condomínios')
+              .child(S.documentTypeList('condominio').title('Condomínios')),
+            S.listItem()
+              .title('Lançamentos')
+              .child(
+                S.documentTypeList('lancamento')
+                  .title('Lançamentos')
+                  .defaultOrdering([{ field: 'publicadoEm', direction: 'desc' }])
+              ),
+            S.listItem()
+              .title('Corretores')
+              .child(S.documentTypeList('corretor').title('Corretores')),
+            S.divider(),
+            S.listItem()
               .title('Bairros / Localidades')
               .child(
                 S.documentTypeList('bairro')

@@ -1,6 +1,11 @@
 /**
  * PDI de Condomínio — /condominios/[slug]
- * JSON-LD: BreadcrumbList + ApartmentComplex + FAQPage (condicional)
+ *
+ * Fase 3 — Home Cinematográfica de Empreendimento:
+ * a experiência principal é a landing narrativa (EmpreendimentoLanding),
+ * seguida pela listagem real de unidades disponíveis e FAQs (SEO + conversão).
+ *
+ * JSON-LD: BreadcrumbList + ApartmentComplex + FAQPage (condicional).
  */
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
@@ -12,13 +17,10 @@ import {
   CONDOMINIO_QUERY,
   IMOVEIS_POR_CONDOMINIO_QUERY,
   CONDOMINIOS_SLUGS_QUERY,
-  FOTOS_CONDOMINIO_QUERY,
 } from '@/sanity/queries'
 import type { CondominioDetalhe, ImovelCard } from '@/types/sanity'
 import { routing } from '@/i18n/routing'
-import BreadcrumbNav from '@/components/ui/BreadcrumbNav'
-import { ImageAutoSlider } from '@/components/ui/ImageAutoSlider'
-import type { SliderImage } from '@/components/ui/ImageAutoSlider'
+import { EmpreendimentoLanding, type EmpreendimentoData } from '@/components/empreendimento'
 
 export const revalidate = 3600
 export const dynamicParams = true
@@ -86,8 +88,25 @@ function formatPreco(v: number) {
 const TIPO_LABELS: Record<string, string> = {
   'condominio-fechado': 'Condomínio Fechado',
   'bairro-planejado': 'Bairro Planejado',
-  vertical: 'Condomínio Vertical',
+  vertical: 'Empreendimento Vertical',
   resort: 'Resort Residencial',
+}
+
+/** Extrai parágrafos de texto puro de um Portable Text (campo `sobre`). */
+function flattenPortableText(blocks: unknown[] | undefined): string[] {
+  if (!blocks || !Array.isArray(blocks)) return []
+  return blocks
+    .filter((b): b is { _type: string; children?: Array<{ text?: string }> } =>
+      typeof b === 'object' && b !== null && (b as { _type?: string })._type === 'block',
+    )
+    .map((b) => (b.children ?? []).map((c) => c.text ?? '').join('').trim())
+    .filter((t) => t.length > 0)
+}
+
+/** Detecta arquivo de vídeo MP4 (para hero com <video>). */
+function asMp4(url?: string): string | undefined {
+  if (!url) return undefined
+  return /\.mp4($|\?)/i.test(url) ? url : undefined
 }
 
 // ─── Page ────────────────────────────────────────────────────────────────────
@@ -95,31 +114,77 @@ const TIPO_LABELS: Record<string, string> = {
 export default async function CondominioPage({ params }: PageProps) {
   setRequestLocale(params.locale)
 
-  const [cond, imoveis, fotosData] = await Promise.all([
+  const [cond, imoveis] = await Promise.all([
     client.fetch<CondominioDetalhe | null>(CONDOMINIO_QUERY, { slug: params.slug }),
     client.fetch<ImovelCard[]>(IMOVEIS_POR_CONDOMINIO_QUERY, { condSlug: params.slug }),
-    client.fetch<{ fotos: SliderImage[] } | null>(FOTOS_CONDOMINIO_QUERY, { slug: params.slug }),
   ])
 
   if (!cond) notFound()
-
-  // Monta a galeria para o slider: prefere galeria do condomínio, senão usa imagens dos imóveis
-  const sliderImages: SliderImage[] =
-    cond.galeria && cond.galeria.length > 0
-      ? cond.galeria
-          .filter((img) => img.asset?.url)
-          .map((img) => ({
-            url: img.asset.url,
-            alt: img.alt ?? null,
-            lqip: img.asset.metadata?.lqip ?? null,
-          }))
-      : (fotosData?.fotos ?? []).filter((f) => f.url)
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://admirata.com.br'
   const localePrefix = params.locale === 'pt-BR' ? '' : `/${params.locale}`
   const pageUrl = `${siteUrl}${localePrefix}/condominios/${params.slug}`
   const capaSrc = cond.fotoCapa?.asset?.url
-  const capaLqip = cond.fotoCapa?.asset?.metadata?.lqip
+
+  // ── Monta os dados da landing cinematográfica ────────────────────────────
+  const paragrafos = flattenPortableText(cond.sobre)
+  const fallbackTexto = cond.descricao ? [cond.descricao] : []
+  const textos = paragrafos.length > 0 ? paragrafos : fallbackTexto
+
+  const galeria = (cond.galeria ?? [])
+    .filter((g) => g.asset?.url)
+    .map((g) => ({
+      src: g.asset.url,
+      alt: g.alt ?? cond.nome,
+      legenda: g.legenda,
+      lqip: g.asset.metadata?.lqip ?? undefined,
+    }))
+
+  const heroImageSrc = capaSrc ?? galeria[0]?.src
+  const heroImageLqip = cond.fotoCapa?.asset?.metadata?.lqip ?? galeria[0]?.lqip
+  const heroVideoMp4 = asMp4(cond.heroVideoUrl) ?? asMp4(cond.videoTour)
+
+  const isRS = cond.bairro?.mercado === 'Serra Gaúcha'
+  const waText = encodeURIComponent(
+    `Olá, tenho interesse em imóveis no ${cond.nome}${cond.bairro ? ` (${cond.bairro.nome})` : ''}.`,
+  )
+
+  const landingData: EmpreendimentoData = {
+    nome: cond.nome,
+    tipoLabel: cond.tipo ? TIPO_LABELS[cond.tipo] ?? cond.tipo : undefined,
+    status: cond.status,
+    bairroNome: cond.bairro?.nome,
+    cidade: cond.bairro?.cidade,
+    estado: cond.bairro?.estado,
+    heroImageSrc,
+    heroImageLqip,
+    heroVideoMp4,
+    manifesto: textos[0],
+    sobreParagrafos: textos.slice(1),
+    construtora: cond.construtora,
+    anoEntrega: cond.anoEntrega,
+    numTorres: cond.numTorres,
+    numUnidades: cond.numUnidades,
+    areaTotal: cond.areaTotal,
+    prazoEntrega: cond.prazoEntrega,
+    precoMinimo: cond.precoMinimo,
+    areaPrivativaMin: cond.areaPrivativaMin,
+    areaPrivativaMax: cond.areaPrivativaMax,
+    infraestrutura: cond.infraestrutura,
+    galeria,
+    plantas: (cond.plantasBaixas ?? []).map((p) => ({
+      nome: p.nome,
+      quartos: p.quartos,
+      area: p.area,
+      src: p.imagem?.url,
+      lqip: p.imagem?.metadata?.lqip,
+    })),
+    proximidades: cond.geo?.proximidades,
+    geo: cond.geo,
+    whatsappHref: `https://wa.me/5521998079459?text=${waText}`,
+    whatsappHrefRS: isRS ? `https://wa.me/5554992643070?text=${waText}` : undefined,
+    imoveisHref: cond.bairro ? `${localePrefix}/imoveis/${cond.bairro.slug.current}` : undefined,
+  }
 
   // ── JSON-LD ────────────────────────────────────────────────────────────────
   const graph: object[] = [
@@ -174,246 +239,124 @@ export default async function CondominioPage({ params }: PageProps) {
 
   const jsonLd = { '@context': 'https://schema.org', '@graph': graph }
 
+  // ── Unidades (Venda / Locação) ───────────────────────────────────────────
+  const venda = imoveis.filter((i) => i.finalidade === 'Venda')
+  const locacao = imoveis.filter((i) => i.finalidade === 'Locação' || i.finalidade === 'Temporada')
+
+  const CardGrid = ({ list }: { list: ImovelCard[] }) =>
+    list.length === 0 ? (
+      <div className="rounded-2xl border border-stone py-10 text-center">
+        <p className="text-sm text-muted">Nenhuma unidade disponível no momento.</p>
+        <p className="mt-1 text-xs text-muted/60">Entre em contato — novas unidades surgem com frequência.</p>
+      </div>
+    ) : (
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {list.map((imovel) => (
+          <Link
+            key={imovel._id}
+            href={`/imovel/${imovel.slug.current}`}
+            className="group block overflow-hidden rounded-2xl border border-stone transition-colors hover:border-gold/40"
+          >
+            <div className="relative aspect-[4/3] overflow-hidden bg-stone/30">
+              {imovel.imagemCapa ? (
+                <Image
+                  src={imovel.imagemCapa?.asset.url ?? ''}
+                  alt={imovel.titulo}
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  placeholder={imovel.imagemCapa?.asset.metadata?.lqip ? 'blur' : 'empty'}
+                  blurDataURL={imovel.imagemCapa?.asset.metadata?.lqip}
+                  sizes="(max-width: 640px) 100vw, 33vw"
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-sm text-stone/50">Sem foto</span>
+                </div>
+              )}
+            </div>
+            <div className="p-4">
+              <h3 className="line-clamp-1 text-sm font-semibold text-ink transition-colors group-hover:text-gold">
+                {imovel.titulo}
+              </h3>
+              <div className="mt-2 flex flex-wrap gap-3 text-xs text-muted">
+                {imovel.areaUtil && <span>{imovel.areaUtil} m²</span>}
+                {imovel.quartos && <span>{imovel.quartos} {imovel.quartos === 1 ? 'quarto' : 'quartos'}</span>}
+                {imovel.vagas && <span>{imovel.vagas} {imovel.vagas === 1 ? 'vaga' : 'vagas'}</span>}
+              </div>
+              <div className="mt-3">
+                {imovel.preco ? (
+                  <span className="text-sm font-semibold text-ink">{formatPreco(imovel.preco)}</span>
+                ) : (
+                  <span className="text-sm italic text-muted">Sob consulta</span>
+                )}
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+    )
+
   return (
-    <>
+    <main id="main-content">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      {/* ── Breadcrumb ─────────────────────────────────────────────────────── */}
-      <div className="container-site pt-8 pb-4">
-        <BreadcrumbNav
-          items={[
-            { label: 'Início', href: '/' },
-            { label: 'Condomínios', href: '/condominios' },
-            { label: cond.nome },
-          ]}
-        />
-      </div>
+      {/* ── Experiência cinematográfica (Hero → CTA) ──────────────────────── */}
+      <EmpreendimentoLanding data={landingData} />
 
-      {/* ── Hero ─────────────────────────────────────────────────────────────── */}
-      {capaSrc && (
-        <div className="relative w-full h-[55vh] min-h-[400px] max-h-[640px] overflow-hidden mb-12">
-          <Image
-            src={capaSrc}
-            alt={cond.nome}
-            fill
-            className="object-cover"
-            placeholder={capaLqip ? 'blur' : 'empty'}
-            blurDataURL={capaLqip}
-            priority
-            sizes="100vw"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/20 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 container-site pb-10">
-            {cond.tipo && (
-              <span className="inline-block text-[10px] uppercase tracking-[0.3em] text-gold mb-3">
-                {TIPO_LABELS[cond.tipo] ?? cond.tipo}
-              </span>
-            )}
-            <h1 className="text-display-xl text-white leading-tight">{cond.nome}</h1>
-            {cond.bairro && (
-              <p className="text-white/70 mt-1 text-base">
-                {cond.bairro.nome}
-                {cond.bairro.cidade ? `, ${cond.bairro.cidade}` : ''}
-              </p>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* ── Slider de fotos full-width ───────────────────────────────────────── */}
-      {sliderImages.length > 0 && (
-        <div className="mb-12">
-          <div className="container-site mb-5">
-            <h2 className="text-display-sm text-ink">Galeria</h2>
-          </div>
-          <ImageAutoSlider images={sliderImages} height={300} duracao={50} />
-        </div>
-      )}
-
-      {/* ── Layout principal ─────────────────────────────────────────────────── */}
-      <div className="container-site pb-20">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-16 items-start">
-
-          {/* ── Coluna principal ─────────────────────────────────────────── */}
-          <div>
-            {/* Hero sem imagem */}
-            {!capaSrc && (
-              <header className="mb-8">
-                {cond.tipo && (
-                  <span className="inline-block text-[10px] uppercase tracking-[0.3em] text-gold mb-3">
-                    {TIPO_LABELS[cond.tipo] ?? cond.tipo}
-                  </span>
-                )}
-                <h1 className="text-display-xl text-ink leading-tight">{cond.nome}</h1>
-                {cond.bairro && (
-                  <p className="text-muted mt-1 text-base">{cond.bairro.nome}{cond.bairro.cidade ? `, ${cond.bairro.cidade}` : ''}</p>
-                )}
-              </header>
-            )}
-
-            {/* ── Dados rápidos ─────────────────────────────────────────── */}
-            {(cond.construtora || cond.anoEntrega || cond.numTorres || cond.numUnidades || cond.areaTotal) && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-10 p-6 bg-stone/20 rounded-2xl border border-stone">
-                {cond.construtora && (
-                  <div>
-                    <p className="text-[10px] uppercase tracking-widest text-muted mb-0.5">Construtora</p>
-                    <p className="text-sm font-medium text-ink">{cond.construtora}</p>
-                  </div>
-                )}
-                {cond.anoEntrega && (
-                  <div>
-                    <p className="text-[10px] uppercase tracking-widest text-muted mb-0.5">Entrega</p>
-                    <p className="text-sm font-medium text-ink">{cond.anoEntrega}</p>
-                  </div>
-                )}
-                {cond.numTorres && (
-                  <div>
-                    <p className="text-[10px] uppercase tracking-widest text-muted mb-0.5">Torres</p>
-                    <p className="text-sm font-medium text-ink">{cond.numTorres}</p>
-                  </div>
-                )}
-                {cond.numUnidades && (
-                  <div>
-                    <p className="text-[10px] uppercase tracking-widest text-muted mb-0.5">Unidades</p>
-                    <p className="text-sm font-medium text-ink">{cond.numUnidades.toLocaleString('pt-BR')}</p>
-                  </div>
-                )}
-                {cond.areaTotal && (
-                  <div>
-                    <p className="text-[10px] uppercase tracking-widest text-muted mb-0.5">Área Total</p>
-                    <p className="text-sm font-medium text-ink">{cond.areaTotal.toLocaleString('pt-BR')} m²</p>
-                  </div>
-                )}
-                {cond.totalLotes && (
-                  <div>
-                    <p className="text-[10px] uppercase tracking-widest text-muted mb-0.5">Lotes</p>
-                    <p className="text-sm font-medium text-ink">{cond.totalLotes.toLocaleString('pt-BR')}</p>
-                  </div>
+      {/* ── Unidades disponíveis ──────────────────────────────────────────── */}
+      {imoveis.length > 0 && (
+        <section id="unidades" className="bg-stone/30 py-24 sm:py-32">
+          <div className="container-site space-y-12">
+            <div>
+              <div className="mb-5 flex items-baseline gap-3">
+                <h2 className="text-display-sm text-ink">À Venda</h2>
+                {venda.length > 0 && (
+                  <span className="text-sm font-normal text-muted">{venda.length} {venda.length === 1 ? 'unidade' : 'unidades'}</span>
                 )}
               </div>
-            )}
+              <CardGrid list={venda} />
+            </div>
 
-            {/* ── Descrição ─────────────────────────────────────────────── */}
-            {cond.descricao && (
-              <div className="mb-10">
-                <h2 className="text-display-sm text-ink mb-4">Sobre o empreendimento</h2>
-                <p className="text-muted leading-relaxed text-base">{cond.descricao}</p>
-              </div>
-            )}
-
-            {/* ── Infraestrutura ────────────────────────────────────────── */}
-            {cond.infraestrutura && cond.infraestrutura.length > 0 && (
-              <div className="mb-10">
-                <h2 className="text-display-sm text-ink mb-4">Infraestrutura</h2>
-                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2" role="list">
-                  {cond.infraestrutura.map((item) => (
-                    <li key={item} className="flex items-start gap-2 text-sm text-muted">
-                      <span className="text-gold mt-0.5 shrink-0" aria-hidden="true">✓</span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* ── Unidades disponíveis (Venda + Locação) ────────────────── */}
-            {(() => {
-              const venda   = imoveis.filter(i => i.finalidade === 'Venda')
-              const locacao = imoveis.filter(i => i.finalidade === 'Locação' || i.finalidade === 'Temporada')
-
-              const CardGrid = ({ list }: { list: typeof imoveis }) => (
-                list.length === 0 ? (
-                  <div className="py-10 text-center border border-stone rounded-2xl">
-                    <p className="text-sm text-muted">Nenhuma unidade disponível no momento.</p>
-                    <p className="text-xs text-muted/60 mt-1">
-                      Entre em contato — novas unidades surgem com frequência.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    {list.map((imovel) => (
-                      <Link
-                        key={imovel._id}
-                        href={`/imovel/${imovel.slug.current}`}
-                        className="group block border border-stone rounded-2xl overflow-hidden hover:border-gold/40 transition-colors"
-                      >
-                        <div className="relative aspect-[4/3] bg-stone/30 overflow-hidden">
-                          {imovel.imagemCapa ? (
-                            <Image
-                              src={imovel.imagemCapa?.asset.url ?? ''}
-                              alt={imovel.titulo}
-                              fill
-                              className="object-cover group-hover:scale-105 transition-transform duration-500"
-                              placeholder={imovel.imagemCapa?.asset.metadata?.lqip ? 'blur' : 'empty'}
-                              blurDataURL={imovel.imagemCapa?.asset.metadata?.lqip}
-                              sizes="(max-width: 640px) 100vw, 50vw"
-                            />
-                          ) : (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <span className="text-stone/50 text-sm">Sem foto</span>
-                            </div>
-                          )}
-                        </div>
-                        <div className="p-4">
-                          <h3 className="text-sm font-semibold text-ink group-hover:text-gold transition-colors line-clamp-1">
-                            {imovel.titulo}
-                          </h3>
-                          <div className="flex flex-wrap gap-3 mt-2 text-xs text-muted">
-                            {imovel.areaUtil && <span>{imovel.areaUtil} m²</span>}
-                            {imovel.quartos && <span>{imovel.quartos} {imovel.quartos === 1 ? 'quarto' : 'quartos'}</span>}
-                            {imovel.vagas && <span>{imovel.vagas} {imovel.vagas === 1 ? 'vaga' : 'vagas'}</span>}
-                          </div>
-                          <div className="mt-3">
-                            {imovel.preco ? (
-                              <span className="text-sm font-semibold text-ink">{formatPreco(imovel.preco)}</span>
-                            ) : (
-                              <span className="text-sm text-muted italic">Sob consulta</span>
-                            )}
-                          </div>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                )
-              )
-
-              return (
-                <div className="space-y-10 mb-12">
-                  {/* Venda */}
-                  <div>
-                    <div className="flex items-baseline gap-3 mb-5">
-                      <h2 className="text-display-sm text-ink">À Venda</h2>
-                      {venda.length > 0 && (
-                        <span className="text-sm text-muted font-normal">{venda.length} {venda.length === 1 ? 'unidade' : 'unidades'}</span>
-                      )}
-                    </div>
-                    <CardGrid list={venda} />
-                  </div>
-
-                  {/* Locação */}
-                  <div>
-                    <div className="flex items-baseline gap-3 mb-5">
-                      <h2 className="text-display-sm text-ink">Para Locação</h2>
-                      {locacao.length > 0 && (
-                        <span className="text-sm text-muted font-normal">{locacao.length} {locacao.length === 1 ? 'unidade' : 'unidades'}</span>
-                      )}
-                    </div>
-                    <CardGrid list={locacao} />
-                  </div>
+            {locacao.length > 0 && (
+              <div>
+                <div className="mb-5 flex items-baseline gap-3">
+                  <h2 className="text-display-sm text-ink">Para Locação</h2>
+                  <span className="text-sm font-normal text-muted">{locacao.length} {locacao.length === 1 ? 'unidade' : 'unidades'}</span>
                 </div>
-              )
-            })()}
+                <CardGrid list={locacao} />
+              </div>
+            )}
+          </div>
+        </section>
+      )}
 
-            {/* ── Condomínios próximos ─────────────────────────────────── */}
+      {/* ── FAQs ───────────────────────────────────────────────────────────── */}
+      {cond.faqs && cond.faqs.length > 0 && (
+        <section className="bg-white py-24 sm:py-32">
+          <div className="container-site max-w-3xl">
+            <h2 className="mb-8 text-display-sm text-ink">Perguntas frequentes</h2>
+            <div className="space-y-4">
+              {cond.faqs.map((faq, i) => (
+                <details key={i} className="group rounded-xl border border-stone">
+                  <summary className="flex cursor-pointer list-none select-none items-center justify-between p-5 text-sm font-medium text-ink transition-colors hover:text-gold">
+                    <span>{faq.pergunta}</span>
+                    <span className="ml-3 shrink-0 text-gold transition-transform duration-200 group-open:rotate-45" aria-hidden="true">+</span>
+                  </summary>
+                  <div className="px-5 pb-5 text-sm leading-relaxed text-muted">{faq.resposta}</div>
+                </details>
+              ))}
+            </div>
+
+            {/* Condomínios relacionados */}
             {cond.condominiosProximos && cond.condominiosProximos.length > 0 && (
-              <div className="mb-10">
-                <h2 className="text-display-sm text-ink mb-4">Empreendimentos relacionados</h2>
+              <div className="mt-16">
+                <h2 className="mb-4 text-display-sm text-ink">Empreendimentos relacionados</h2>
                 <div className="flex flex-wrap gap-3">
                   {cond.condominiosProximos.map((c) => (
                     <Link
                       key={c.slug.current}
                       href={`/condominios/${c.slug.current}`}
-                      className="px-4 py-2 border border-stone rounded-full text-sm text-ink hover:border-gold hover:text-gold transition-colors"
+                      className="rounded-full border border-stone px-4 py-2 text-sm text-ink transition-colors hover:border-gold hover:text-gold"
                     >
                       {c.nome}
                     </Link>
@@ -421,119 +364,9 @@ export default async function CondominioPage({ params }: PageProps) {
                 </div>
               </div>
             )}
-
-            {/* ── FAQs ──────────────────────────────────────────────────── */}
-            {cond.faqs && cond.faqs.length > 0 && (
-              <div className="mb-10">
-                <h2 className="text-display-sm text-ink mb-6">Perguntas frequentes</h2>
-                <div className="space-y-4">
-                  {cond.faqs.map((faq, i) => (
-                    <details key={i} className="group border border-stone rounded-xl">
-                      <summary className="flex items-center justify-between cursor-pointer p-5 text-sm font-medium text-ink list-none select-none hover:text-gold transition-colors">
-                        <span>{faq.pergunta}</span>
-                        <span className="shrink-0 ml-3 text-gold group-open:rotate-45 transition-transform duration-200" aria-hidden="true">+</span>
-                      </summary>
-                      <div className="px-5 pb-5 text-sm text-muted leading-relaxed">
-                        {faq.resposta}
-                      </div>
-                    </details>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
-
-          {/* ── Sidebar ────────────────────────────────────────────────────── */}
-          <aside className="lg:sticky lg:top-24 space-y-6">
-
-            {/* CTA Card */}
-            <div className="p-6 bg-ink rounded-2xl text-white">
-              <p className="text-[10px] uppercase tracking-[0.3em] text-gold mb-3">
-                Fale com um especialista
-              </p>
-              <h3 className="text-lg font-semibold mb-2 leading-snug">
-                Interesse no {cond.nome}?
-              </h3>
-              <p className="text-sm text-white/60 mb-6 leading-relaxed">
-                Nossa equipe está pronta para apresentar as melhores oportunidades neste empreendimento.
-              </p>
-
-              {/* WhatsApp RJ */}
-              <a
-                href={`https://wa.me/5521998079459?text=${encodeURIComponent(`Olá, tenho interesse em imóveis no ${cond.nome}${cond.bairro ? ` (${cond.bairro.nome})` : ''}.`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 w-full py-3 bg-gold text-ink text-sm font-semibold rounded-xl hover:bg-[#d4ac1a] transition-colors mb-3"
-              >
-                WhatsApp Rio de Janeiro
-              </a>
-
-              {/* WhatsApp Serra Gaúcha (só para imóveis RS) */}
-              {cond.bairro?.mercado === 'Serra Gaúcha' && (
-                <a
-                  href={`https://wa.me/5554992643070?text=${encodeURIComponent(`Olá, tenho interesse em imóveis no ${cond.nome}${cond.bairro ? ` (${cond.bairro.nome})` : ''}.`)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 w-full py-3 bg-white/10 text-white text-sm font-semibold rounded-xl hover:bg-white/20 transition-colors mb-3"
-                >
-                  WhatsApp Serra Gaúcha
-                </a>
-              )}
-
-              <a
-                href="mailto:atendimento@admirataimoveis.com.br"
-                className="block text-center text-xs text-white/40 hover:text-white/70 transition-colors mt-2"
-              >
-                atendimento@admirataimoveis.com.br
-              </a>
-            </div>
-
-            {/* Localização */}
-            {cond.bairro && (
-              <div className="p-5 border border-stone rounded-2xl">
-                <p className="text-[10px] uppercase tracking-widest text-muted mb-3">Localização</p>
-                <p className="text-sm font-medium text-ink">{cond.bairro.nome}</p>
-                {cond.bairro.cidade && (
-                  <p className="text-xs text-muted mt-0.5">{cond.bairro.cidade}, {cond.bairro.estado === 'RJ' ? 'Rio de Janeiro' : 'Rio Grande do Sul'}</p>
-                )}
-                {cond.geo?.proximidades && cond.geo.proximidades.length > 0 && (
-                  <div className="mt-3 pt-3 border-t border-stone">
-                    <p className="text-[10px] uppercase tracking-widest text-muted mb-2">Próximo a</p>
-                    <ul className="space-y-1">
-                      {cond.geo.proximidades.map((p) => (
-                        <li key={p} className="text-xs text-muted">{p}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                <Link
-                  href={`/imoveis/${cond.bairro.slug.current}`}
-                  className="block mt-4 text-xs text-gold hover:underline"
-                >
-                  Ver todos os imóveis em {cond.bairro.nome} →
-                </Link>
-              </div>
-            )}
-
-            {/* Tipologias */}
-            {cond.tipologiasDisponiveis && cond.tipologiasDisponiveis.length > 0 && (
-              <div className="p-5 border border-stone rounded-2xl">
-                <p className="text-[10px] uppercase tracking-widest text-muted mb-3">Tipologias disponíveis</p>
-                <div className="flex flex-wrap gap-2">
-                  {cond.tipologiasDisponiveis.map((tip) => (
-                    <span
-                      key={tip}
-                      className="text-xs px-3 py-1 border border-stone rounded-full text-ink capitalize"
-                    >
-                      {tip.replace(/-/g, ' ')}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-          </aside>
-        </div>
-      </div>
-    </>
+        </section>
+      )}
+    </main>
   )
 }

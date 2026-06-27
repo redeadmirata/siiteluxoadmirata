@@ -585,7 +585,7 @@ export default async function BairrosPlanejadosPage({
             histórico de valorização. Fale com um consultor e encontre o imóvel certo.
           </p>
           <a
-            href="https://wa.me/5521999999999?text=Ol%C3%A1%2C%20quero%20conhecer%20im%C3%B3veis%20em%20bairros%20planejados%20no%20Rio"
+            href="https://wa.me/5521998079459?text=Ol%C3%A1%2C%20quero%20conhecer%20im%C3%B3veis%20em%20bairros%20planejados%20no%20Rio"
             target="_blank"
             rel="noopener noreferrer"
             style={{

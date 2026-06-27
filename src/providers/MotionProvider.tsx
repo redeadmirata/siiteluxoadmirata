@@ -15,12 +15,12 @@
  * - AnimatePresence mode='wait' para transições de página
  */
 
+import type { ReactNode } from 'react'
 import {
   LazyMotion,
   domAnimation,
   AnimatePresence,
   type AnimatePresenceProps,
-  type ReactNode,
 } from 'framer-motion'
 
 // ─── Variantes padrão reutilizáveis ───────────────────────────────────────────

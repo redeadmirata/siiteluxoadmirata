@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og'
 import { client } from '@/sanity/client'
-import type { BairroFull } from '@/features/bairros'
+import type { BairroFull } from '@/types/sanity'
 
 export const runtime = 'edge'
 export const alt = 'Admirata Imóveis'

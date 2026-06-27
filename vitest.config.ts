@@ -53,7 +53,6 @@ export default defineConfig({
     alias: {
       '@':            resolve(__dirname, './src'),
       '@/components': resolve(__dirname, './src/components'),
-      '@/features':   resolve(__dirname, './src/features'),
       '@/lib':        resolve(__dirname, './src/lib'),
       '@/hooks':      resolve(__dirname, './src/hooks'),
       '@/services':   resolve(__dirname, './src/services'),

@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from 'next'
-import { Cormorant_Garamond, Inter, JetBrains_Mono } from 'next/font/google'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages, setRequestLocale } from 'next-intl/server'
 import { routing } from '@/i18n/routing'
@@ -9,33 +8,7 @@ import NavbarWrapper from '@/components/layout/NavbarWrapper'
 import FooterWrapper from '@/components/layout/FooterWrapper'
 import Footer from '@/components/layout/Footer'
 import WhatsAppButton from '@/components/ui/WhatsAppButton'
-import { AppProviders, ThemeScript } from '@/providers'
-
-// ─── Fontes via next/font (zero penalização no LCP) ──────────────────────────
-const cormorant = Cormorant_Garamond({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600'],
-  style: ['normal', 'italic'],
-  variable: '--font-cormorant',
-  display: 'swap',
-  preload: true,
-})
-
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  variable: '--font-inter',
-  display: 'swap',
-  preload: true,
-})
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
-  weight: ['400', '500'],
-  variable: '--font-jetbrains',
-  display: 'swap',
-  preload: false,
-})
+import { AppProviders } from '@/providers'
 
 // ─── Static params para todos os locales ─────────────────────────────────────
 export function generateStaticParams() {
@@ -112,7 +85,7 @@ export async function generateMetadata({
       description: meta.description,
       images: [
         {
-          url: '/og-default.jpg',
+          url: '/opengraph-image',
           width: 1200,
           height: 630,
           alt: 'Admirata Imóveis — Imóveis de Alto Padrão',
@@ -123,7 +96,7 @@ export async function generateMetadata({
       card: 'summary_large_image',
       title: 'Admirata Imóveis',
       description: meta.description,
-      images: ['/og-default.jpg'],
+      images: ['/opengraph-image'],
     },
     alternates: {
       canonical: `${siteUrl}${localePrefix}`,
@@ -165,15 +138,15 @@ function GlobalJsonLd({ locale }: { locale: string }) {
         url: siteUrl,
         logo: {
           '@type': 'ImageObject',
-          url: `${siteUrl}/logo.png`,
-          width: 400,
-          height: 120,
+          url: `${siteUrl}/logo-horizontal.png`,
+          width: 724,
+          height: 310,
         },
-        image: `${siteUrl}/og-default.jpg`,
+        image: `${siteUrl}/opengraph-image`,
         description:
           'Curadoria de imóveis de alto padrão no Rio de Janeiro (Barra da Tijuca, Recreio, Zona Sul) e Serra Gaúcha (Gramado, Canela).',
         telephone: '+55-21-99807-9459',
-        email: 'atendimento@admirata.com.br',
+        email: 'atendimento@admirataimoveis.com.br',
         address: {
           '@type': 'PostalAddress',
           streetAddress: '',
@@ -247,31 +220,22 @@ export default async function LocaleLayout({
   const messages = await getMessages()
 
   return (
-    <html
-      lang={locale}
-      className={`${cormorant.variable} ${inter.variable} ${jetbrainsMono.variable}`}
-    >
-      <head>
-        {/* Anti-FOUC: aplica tema antes da hidratação */}
-        <ThemeScript />
-      </head>
-      <body className="antialiased">
-        <GlobalJsonLd locale={locale} />
-        <NextIntlClientProvider messages={messages}>
-          <AppProviders>
-            <a
-              href="#main-content"
-              className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[200] focus:bg-white focus:text-ink focus:px-4 focus:py-2 focus:text-sm focus:shadow-lg"
-            >
-              {locale === 'en' ? 'Skip to main content' : locale === 'es' ? 'Ir al contenido principal' : 'Pular para o conteúdo principal'}
-            </a>
-            <NavbarWrapper />
-            {children}
-            <FooterWrapper><Footer /></FooterWrapper>
-            <WhatsAppButton />
-          </AppProviders>
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <div lang={locale}>
+      <GlobalJsonLd locale={locale} />
+      <NextIntlClientProvider messages={messages}>
+        <AppProviders>
+          <a
+            href="#site-content"
+            className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[200] focus:bg-white focus:text-ink focus:px-4 focus:py-2 focus:text-sm focus:shadow-lg"
+          >
+            {locale === 'en' ? 'Skip to main content' : locale === 'es' ? 'Ir al contenido principal' : 'Pular para o conteúdo principal'}
+          </a>
+          <NavbarWrapper />
+          <div id="site-content" tabIndex={-1}>{children}</div>
+          <FooterWrapper><Footer /></FooterWrapper>
+          <WhatsAppButton />
+        </AppProviders>
+      </NextIntlClientProvider>
+    </div>
   )
 }

@@ -566,7 +566,7 @@ export default async function BairroPlanejadiSlugPage({ params, searchParams }: 
                           Ver imóveis
                         </Link>
                         <a
-                          href={`https://wa.me/${c.whatsappCorretor ?? '5521999999999'}?text=${encodeURIComponent(c.mensagemCorretorWhatsapp ?? `Olá, tenho interesse em ${c.nome} — ${bairro.nome}`)}`}
+                          href={`https://wa.me/${c.whatsappCorretor ?? '5521998079459'}?text=${encodeURIComponent(c.mensagemCorretorWhatsapp ?? `Olá, tenho interesse em ${c.nome} — ${bairro.nome}`)}`}
                           target="_blank" rel="noopener noreferrer"
                           style={{
                             fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase',
@@ -721,7 +721,7 @@ export default async function BairroPlanejadiSlugPage({ params, searchParams }: 
                 Estamos preparando a curadoria de imóveis em {bairro.nome}. Fale com um consultor para acesso antecipado.
               </p>
               <a
-                href={`https://wa.me/5521999999999?text=Tenho%20interesse%20em%20im%C3%B3veis%20em%20${encodeURIComponent(bairro.nome)}`}
+                href={`https://wa.me/5521998079459?text=Tenho%20interesse%20em%20im%C3%B3veis%20em%20${encodeURIComponent(bairro.nome)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ fontSize: 11, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--color-gold, #b8960c)', textDecoration: 'none', borderBottom: '1px solid currentColor', paddingBottom: 2 }}
@@ -782,7 +782,7 @@ export default async function BairroPlanejadiSlugPage({ params, searchParams }: 
             personalizado, sem intermediários.
           </p>
           <a
-            href={`https://wa.me/5521999999999?text=Ol%C3%A1%2C%20quero%20conhecer%20im%C3%B3veis%20em%20${encodeURIComponent(bairro.nome)}`}
+            href={`https://wa.me/5521998079459?text=Ol%C3%A1%2C%20quero%20conhecer%20im%C3%B3veis%20em%20${encodeURIComponent(bairro.nome)}`}
             target="_blank"
             rel="noopener noreferrer"
             style={{

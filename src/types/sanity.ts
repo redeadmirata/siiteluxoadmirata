@@ -184,10 +184,28 @@ export interface CondominioDetalhe extends Omit<CondominioCard, 'fotoCapa'> {
   anoEntrega?: number
   numTorres?: number
   numUnidades?: number
+  status?: string
+  precoMinimo?: number
+  precoMaximo?: number
+  areaPrivativaMin?: number
+  areaPrivativaMax?: number
+  prazoEntrega?: string
+  heroVideoUrl?: string
+  videoTour?: string
   sobre?: unknown[]
   tipologiasDisponiveis?: ImovelTipologia[]
   forcarNoindex?: boolean
   faqs?: Array<{ pergunta: string; resposta: string }>
+  plantasBaixas?: Array<{
+    nome: string
+    quartos?: string
+    area?: number
+    imagem?: {
+      _id: string
+      url: string
+      metadata?: { lqip?: string; dimensions?: { width: number; height: number } }
+    }
+  }>
   geo?: {
     lat?: number
     lng?: number

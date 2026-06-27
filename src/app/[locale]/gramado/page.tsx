@@ -338,7 +338,7 @@ export default async function GramadoPage({ params, searchParams }: PageProps) {
                 Entre em contato para acesso antecipado ao portfólio exclusivo.
               </p>
               <a
-                href="https://wa.me/5521999999999?text=Quero%20conhecer%20im%C3%B3veis%20em%20Gramado"
+                href="https://wa.me/5521998079459?text=Quero%20conhecer%20im%C3%B3veis%20em%20Gramado"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
@@ -541,7 +541,7 @@ export default async function GramadoPage({ params, searchParams }: PageProps) {
             discrição e precisão. Fale com um consultor.
           </p>
           <a
-            href="https://wa.me/5521999999999?text=Ol%C3%A1%2C%20tenho%20interesse%20em%20im%C3%B3veis%20em%20Gramado"
+            href="https://wa.me/5521998079459?text=Ol%C3%A1%2C%20tenho%20interesse%20em%20im%C3%B3veis%20em%20Gramado"
             target="_blank"
             rel="noopener noreferrer"
             style={{

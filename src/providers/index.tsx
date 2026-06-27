@@ -7,9 +7,10 @@
  *   ThemeProvider      — aplica data-theme e classe .dark no <html>
  *     QueryProvider    — TanStack Query v5 para data fetching client-side
  *       MotionProvider — LazyMotion + AnimatePresence global
- *         AnalyticsProvider — consent state + cookie banner
- *           FavoritesProvider — estado de favoritos (localStorage)
- *             {children}
+ *         SmoothScrollProvider — Lenis smooth scroll + sync GSAP ScrollTrigger
+ *           AnalyticsProvider — consent state + cookie banner
+ *             FavoritesProvider — estado de favoritos (localStorage)
+ *               {children}
  *
  * Regras:
  * - NUNCA adicionar providers diretamente nos layouts.
@@ -23,11 +24,12 @@
  */
 
 import type { ReactNode } from 'react'
-import { ThemeProvider }     from './ThemeProvider'
-import { QueryProvider }     from './QueryProvider'
-import { MotionProvider }    from './MotionProvider'
-import { AnalyticsProvider } from './AnalyticsProvider'
-import { FavoritesProvider } from './FavoritesProvider'
+import { ThemeProvider }        from './ThemeProvider'
+import { QueryProvider }        from './QueryProvider'
+import { MotionProvider }       from './MotionProvider'
+import { SmoothScrollProvider } from './SmoothScrollProvider'
+import { AnalyticsProvider }    from './AnalyticsProvider'
+import { FavoritesProvider }    from './FavoritesProvider'
 
 interface AppProvidersProps {
   children: ReactNode
@@ -38,11 +40,13 @@ export function AppProviders({ children }: AppProvidersProps) {
     <ThemeProvider>
       <QueryProvider>
         <MotionProvider>
-          <AnalyticsProvider>
-            <FavoritesProvider>
-              {children}
-            </FavoritesProvider>
-          </AnalyticsProvider>
+          <SmoothScrollProvider>
+            <AnalyticsProvider>
+              <FavoritesProvider>
+                {children}
+              </FavoritesProvider>
+            </AnalyticsProvider>
+          </SmoothScrollProvider>
         </MotionProvider>
       </QueryProvider>
     </ThemeProvider>
