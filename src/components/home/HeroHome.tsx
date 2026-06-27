@@ -14,14 +14,28 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useLocale } from 'next-intl'
 import NeonButton from '@/components/ui/NeonButton'
+import HeroMediaVideo from '@/components/ui/HeroMediaVideo'
 import MarketSwitcher, { type Mercado } from '@/components/home/MarketSwitcher'
 import MarketGate, { readMercado, writeMercado } from '@/components/home/MarketGate'
 
-// ── Configuração ──────────────────────────────────────────────────────
-// Edite aqui (ou use env var) para trocar o vídeo de fundo
-const VIDEO_SRC =
-  process.env.NEXT_PUBLIC_HERO_VIDEO_SRC ??
-  '' // deixar vazio usa apenas gradiente como fallback
+// ── Mídia do hero por região ──────────────────────────────────────────
+// Rio: vídeo local (env var pode sobrescrever com CDN). Serra: YouTube provisório.
+// HeroMediaVideo detecta mp4 vs YouTube/Vimeo automaticamente.
+const HERO_MEDIA = {
+  rio: {
+    url: process.env.NEXT_PUBLIC_HERO_VIDEO_SRC ?? '/videos/hero-rio-lagoa.mp4',
+    local: 'Lagoa Rodrigo de Freitas',
+  },
+  serra: {
+    url: 'https://youtu.be/fJhcMHHXCh4', // provisório — substituir por vídeo próprio depois
+    local: 'Gramado',
+  },
+} as const
+
+function getHeroMedia(mercado: Mercado) {
+  // '' (Ver tudo) e default → Rio
+  return mercado === 'Serra Gaúcha' ? HERO_MEDIA.serra : HERO_MEDIA.rio
+}
 
 const WA_RIO   = '5521998079459'
 const WA_SERRA = '5554992643070'
@@ -49,7 +63,6 @@ export default function HeroHome() {
   const [mercado, setMercadoState] = useState<Mercado>('')
   const [showGate, setShowGate]   = useState(false)
   const [mounted, setMounted]     = useState(false)
-  const [videoReady, setVideoReady] = useState(false)
 
   useEffect(() => {
     const v = readMercado()
@@ -74,6 +87,7 @@ export default function HeroHome() {
     : 'Olá, gostaria de conhecer imóveis da Admirata.'
   const wa = waUrl(waPhone, waText)
 
+  const heroMedia = getHeroMedia(mercado)
   const cta = getCTA(mercado)
 
   const scrollDown = () => {
@@ -95,49 +109,18 @@ export default function HeroHome() {
         }}
         aria-label="Admirata Imóveis — imóveis de alto padrão"
       >
-        {/* ── Vídeo de fundo ──────────────────────────────────────── */}
-        {VIDEO_SRC && (
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            poster="/images/hero-poster.jpg"
-            onCanPlay={() => setVideoReady(true)}
-            aria-hidden="true"
-            style={{
-              position: 'absolute',
-              inset: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              objectPosition: 'center',
-              // Fade in suave quando o vídeo estiver pronto
-              opacity: videoReady ? 1 : 0,
-              transition: 'opacity 1.2s ease',
-              filter: 'brightness(0.38)',
-            }}
-          >
-            <source src={VIDEO_SRC} type="video/mp4" />
-          </video>
-        )}
+        {/* ── Vídeo de fundo (mp4 local p/ Rio · YouTube p/ Serra) ──── */}
+        <HeroMediaVideo url={heroMedia.url} />
 
-        {/* ── Gradiente fallback + overlay ────────────────────────── */}
+        {/* ── Overlay escuro: legibilidade do texto + clima editorial ─ */}
         <div
           aria-hidden="true"
           style={{
             position: 'absolute',
             inset: 0,
-            background: VIDEO_SRC
-              // Com vídeo: overlay escuro no topo (header) e base (texto)
-              ? 'linear-gradient(180deg, rgba(9,11,21,0.70) 0%, rgba(9,11,21,0.10) 35%, rgba(9,11,21,0.10) 50%, rgba(9,11,21,0.82) 100%)'
-              // Sem vídeo: gradiente rico como antes
-              : [
-                  'radial-gradient(120% 80% at 70% 18%, rgba(80,90,120,0.45) 0%, rgba(30,34,52,0.2) 35%, transparent 60%)',
-                  'radial-gradient(90% 60% at 30% 8%, rgba(184,150,12,0.10) 0%, transparent 50%)',
-                  'linear-gradient(180deg, #1b2030 0%, #14182a 42%, #0c0e1a 78%, #090b15 100%)',
-                ].join(','),
+            zIndex: 2,
+            background:
+              'linear-gradient(180deg, rgba(9,11,21,0.78) 0%, rgba(9,11,21,0.34) 38%, rgba(9,11,21,0.36) 55%, rgba(9,11,21,0.90) 100%)',
           }}
         />
 
@@ -147,6 +130,7 @@ export default function HeroHome() {
           style={{
             position: 'absolute',
             inset: 0,
+            zIndex: 2,
             pointerEvents: 'none',
             background:
               'radial-gradient(ellipse 120% 120% at 50% 100%, rgba(9,11,21,0.7) 0%, transparent 60%)',
@@ -161,6 +145,38 @@ export default function HeroHome() {
             padding: '0 clamp(1.5rem, 4vw, 3rem) clamp(4.5rem, 10vh, 8rem)',
           }}
         >
+          {/* Local em destaque — sobre o vídeo (caption editorial) */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 14,
+              marginBottom: 22,
+            }}
+          >
+            <span
+              aria-hidden="true"
+              style={{
+                width: 32,
+                height: 1,
+                background: 'var(--color-gold, #b8960c)',
+                display: 'inline-block',
+                flexShrink: 0,
+              }}
+            />
+            <span
+              style={{
+                fontFamily: 'var(--font-display, Georgia, serif)',
+                fontSize: 'clamp(1rem, 2.2vw, 1.5rem)',
+                fontWeight: 300,
+                letterSpacing: '0.04em',
+                color: 'rgba(255,255,255,0.92)',
+              }}
+            >
+              {heroMedia.local}
+            </span>
+          </div>
+
           {/* Mercado switcher */}
           {mounted && (
             <div
@@ -195,7 +211,7 @@ export default function HeroHome() {
               gap: 20,
             }}
           >
-            <NeonButton variant="solid" size="lg" href={cta.href}>
+            <NeonButton variant="solid" size="default" href={cta.href}>
               {cta.label}
             </NeonButton>
 
