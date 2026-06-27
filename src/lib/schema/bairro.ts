@@ -31,10 +31,10 @@ export function generateBairroSchema(
   bairro: BairroFull,
   imoveis: ImovelCard[],
   localePrefix = '',
-): object {
+): Record<string, unknown> {
   const bairroUrl = `${SITE_URL}${localePrefix}/bairros/${bairro.slug.current}/`
 
-  const graph: object[] = [
+  const graph: Record<string, unknown>[] = [
 
     /* ── 1. BreadcrumbList ──────────────────────────────────────── */
     {
