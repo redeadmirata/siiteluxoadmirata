@@ -4,8 +4,8 @@
  */
 
 import { trackPixel, trackGA, trackImovelView, trackLead, trackFavorite, trackSearch } from '@/services/analytics'
-import { ANALYTICS_CURRENCY, ANALYTICS_CONTENT_TYPE } from '../constants'
-import type { TrackImovelViewParams, TrackLeadParams } from '../types'
+import { ANALYTICS_CONTENT_TYPE } from '../constants'
+import type { TrackLeadParams } from '../types'
 
 export { trackPixel, trackGA, trackImovelView, trackLead, trackFavorite, trackSearch }
 

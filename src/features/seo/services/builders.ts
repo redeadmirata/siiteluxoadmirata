@@ -53,7 +53,7 @@ export function buildImovelMeta(params: {
   descricao?: string
   noindex?: boolean
 }): Metadata {
-  const { titulo, bairroNome, tipo, slug, imagemUrl, descricao, noindex } = params
+  const { titulo, bairroNome, slug, imagemUrl, descricao, noindex } = params
 
   const description = descricao
     ?? `${titulo}${bairroNome ? ` em ${bairroNome}` : ''}. Imóvel de alto padrão na Admirata Imóveis.`

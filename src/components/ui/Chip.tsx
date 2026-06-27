@@ -1,6 +1,6 @@
 'use client'
 
-import { type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { cn } from '@/utils/cn'
 import { X } from '@/components/icons'
 
@@ -79,7 +79,6 @@ export function Chip({
   disabled = false,
 }: ChipProps) {
   const isInteractive = !!onClick || !!onRemove
-  const Tag = onClick ? 'button' : 'span'
 
   return (
     <span

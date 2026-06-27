@@ -1,4 +1,4 @@
-import { type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { cn } from '@/utils/cn'
 import { Container } from './Container'
 import { Heading } from './Heading'

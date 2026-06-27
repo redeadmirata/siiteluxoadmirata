@@ -14,7 +14,7 @@ import {
   IMOVEIS_POR_TIPOLOGIA_QUERY,
   IMOVEIS_SLUGS_QUERY,
 } from './queries'
-import { IMOVEIS_POR_PAGINA, IMOVEIS_DESTAQUE_LIMITE } from '../constants'
+import { IMOVEIS_POR_PAGINA } from '../constants'
 
 // ─── PDI ─────────────────────────────────────────────────────────────────────
 

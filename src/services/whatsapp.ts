@@ -2,11 +2,6 @@ import { WHATSAPP } from '@/config/site'
 
 type Praca = 'rj' | 'rs'
 
-interface WhatsAppOptions {
-  praca?: Praca
-  numero?: string
-}
-
 /**
  * Gera uma URL de WhatsApp com mensagem pré-preenchida.
  * Centraliza toda a lógica de construção de links — nunca construir na mão nos componentes.

@@ -1,4 +1,4 @@
-import { type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import NextImage from 'next/image'
 import { cn } from '@/utils/cn'
 

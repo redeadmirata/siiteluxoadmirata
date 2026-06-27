@@ -6,7 +6,7 @@
 
 import { useState, useCallback } from 'react'
 import { YOUTUBE_REGEX, VIMEO_REGEX, YOUTUBE_EMBED_PARAMS, VIMEO_EMBED_PARAMS, MATTERPORT_EMBED_PARAMS } from '../constants'
-import type { TourData, TourTipo } from '../types'
+import type { TourData } from '../types'
 
 export function useTour(tour: TourData) {
   const [loaded, setLoaded] = useState(false)

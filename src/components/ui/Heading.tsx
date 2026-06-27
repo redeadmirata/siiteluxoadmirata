@@ -1,4 +1,4 @@
-import { type ElementType, type HTMLAttributes } from 'react'
+import type { ElementType, HTMLAttributes } from 'react'
 import { cn } from '@/utils/cn'
 
 type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6

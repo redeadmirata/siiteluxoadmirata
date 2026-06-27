@@ -18,7 +18,7 @@ export function useCaracteristicas(caracteristicas: Caracteristica[]) {
 
     // Ordenar conforme GRUPOS_ORDEM; grupos desconhecidos vão ao final
     const ordenados = GRUPOS_ORDEM.filter((g) => map.has(g))
-    const extras = [...map.keys()].filter((g) => !GRUPOS_ORDEM.includes(g as any))
+    const extras = [...map.keys()].filter((g) => !(GRUPOS_ORDEM as readonly string[]).includes(g))
 
     return [...ordenados, ...extras].map((grupo) => ({
       grupo,

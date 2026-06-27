@@ -1,4 +1,4 @@
-import { type HTMLAttributes } from 'react'
+import type { HTMLAttributes } from 'react'
 import { cn } from '@/utils/cn'
 
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
@@ -15,9 +15,9 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
   hoverable?: boolean
 }
 
-interface CardHeaderProps extends HTMLAttributes<HTMLDivElement> {}
-interface CardBodyProps extends HTMLAttributes<HTMLDivElement> {}
-interface CardFooterProps extends HTMLAttributes<HTMLDivElement> {}
+type CardHeaderProps = HTMLAttributes<HTMLDivElement>
+type CardBodyProps   = HTMLAttributes<HTMLDivElement>
+type CardFooterProps = HTMLAttributes<HTMLDivElement>
 
 const variants = {
   default: 'bg-white border border-stone-200/80',

@@ -58,7 +58,8 @@ export function Accordion({
     if (multiple) {
       setOpenItems((prev) => {
         const next = new Set(prev)
-        next.has(id) ? next.delete(id) : next.add(id)
+        if (next.has(id)) next.delete(id)
+        else next.add(id)
         return next
       })
     } else {
@@ -75,24 +76,6 @@ export function Accordion({
   )
 }
 
-// ─── Accordion.Item ───────────────────────────────────────────────────────────
-
-function AccordionItem({
-  id,
-  children,
-  className,
-}: {
-  id: string
-  children: ReactNode
-  className?: string
-}) {
-  return (
-    <div data-accordion-id={id} className={cn('', className)}>
-      {children}
-    </div>
-  )
-}
-
 // ─── Accordion.Trigger ────────────────────────────────────────────────────────
 
 function AccordionTrigger({
@@ -102,12 +85,8 @@ function AccordionTrigger({
   children: ReactNode
   className?: string
 }) {
-  // Encontrar o id do Item pai via DOM attribute seria complexo —
-  // usamos um contexto local por Item através de closure no render
-  // Esta implementação usa um helper para o Item injetar o ID via context.
-  const { open, toggle, multiple, openItems } = useContext(AccordionContext)
-  const itemId = '' // será sobrescrito pelo padrão composto
-
+  // Trigger estático — o id é gerenciado pelo Item pai (AccordionItemSelfContained).
+  // Para um accordion interativo, use Accordion.Item com trigger prop.
   return (
     <button
       type="button"
@@ -160,7 +139,7 @@ function AccordionItemSelfContained({
   trigger,
   children,
   className,
-  defaultOpen = false,
+  defaultOpen: _defaultOpen = false,
 }: {
   id: string
   trigger: ReactNode

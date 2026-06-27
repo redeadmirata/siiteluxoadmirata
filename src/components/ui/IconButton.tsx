@@ -1,4 +1,4 @@
-import { type ButtonHTMLAttributes, type ElementType } from 'react'
+import type { ButtonHTMLAttributes, ElementType } from 'react'
 import { cn } from '@/utils/cn'
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────

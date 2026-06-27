@@ -4,9 +4,9 @@ import {
   useScroll,
   useTransform,
   motion,
-  MotionValue,
   useReducedMotion,
 } from "framer-motion";
+import type { MotionValue } from "framer-motion";
 
 export const ContainerScroll = ({
   titleComponent,
