@@ -18,6 +18,7 @@ export default function ContatoForm() {
     telefone: '',
     assunto: '',
     mensagem: '',
+    website: '', // honeypot anti-spam (não exibido)
   })
   const [enviado, setEnviado] = useState(false)
 
@@ -27,7 +28,35 @@ export default function ContatoForm() {
 
   function submit(e: React.FormEvent) {
     e.preventDefault()
-    const { nome, email, telefone, assunto, mensagem } = fields
+    const { nome, email, telefone, assunto, mensagem, website } = fields
+
+    // Captura o lead (fire-and-forget; keepalive garante o envio mesmo abrindo o WhatsApp)
+    try {
+      const params = new URLSearchParams(window.location.search)
+      fetch('/api/lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        keepalive: true,
+        body: JSON.stringify({
+          name: nome,
+          phone: telefone,
+          email,
+          message: mensagem,
+          assunto,
+          source: 'contato',
+          pageUrl: window.location.href,
+          website,
+          utm: {
+            ...(params.get('utm_source') && { source: params.get('utm_source') }),
+            ...(params.get('utm_medium') && { medium: params.get('utm_medium') }),
+            ...(params.get('utm_campaign') && { campaign: params.get('utm_campaign') }),
+          },
+        }),
+      }).catch(() => {})
+    } catch {
+      /* não bloqueia o fluxo do WhatsApp */
+    }
+
     const texto = [
       `Olá! Entrei em contato pelo site da Admirata.`,
       `*Nome:* ${nome}`,
@@ -66,6 +95,18 @@ export default function ContatoForm() {
 
   return (
     <form onSubmit={submit} className="space-y-5">
+      {/* Honeypot anti-spam — invisível para humanos */}
+      <input
+        type="text"
+        name="website"
+        value={fields.website}
+        onChange={handle}
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        style={{ position: 'absolute', left: '-9999px', width: 1, height: 1, opacity: 0 }}
+      />
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div>
           <label htmlFor="nome" className="block text-xs uppercase tracking-wider text-muted mb-1.5">

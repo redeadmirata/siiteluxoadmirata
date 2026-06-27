@@ -14,6 +14,7 @@ export type LeadSource =
   | 'lancamento'   // Página de lançamento
   | 'bairro'       // Página de bairro
   | 'blog'         // Artigo de blog
+  | 'contato'      // Formulário da página de contato
   | 'outros'
 
 export type LeadIntent =
