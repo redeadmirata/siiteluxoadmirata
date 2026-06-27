@@ -34,25 +34,47 @@ function authorize(req: NextRequest): NextResponse | null {
   return null
 }
 
-/** Mapeia tipos de documento Sanity → cache tags a revalidar */
-function getTagsForType(type: string, slug?: string): string[] {
+const HOME = '/[locale]'
+
+/**
+ * Mapeia tipo de documento Sanity → cache tags E rotas a revalidar.
+ * As rotas (revalidatePath com o padrão dinâmico) são essenciais porque a
+ * maioria dos fetches ainda NÃO declara cache tags — sem isso o webhook
+ * não revalidaria nada. As tags ficam para quando os fetches forem migrados.
+ */
+function getTargets(type: string, slug?: string): { tags: string[]; paths: string[] } {
   switch (type) {
     case 'imovel':
-      return slug ? ['imovel', `imovel:${slug}`] : ['imovel']
+      return {
+        tags: slug ? ['imovel', `imovel:${slug}`] : ['imovel'],
+        paths: [HOME, '/[locale]/imoveis', '/[locale]/imoveis/[slug]', '/[locale]/imovel/[slug]'],
+      }
     case 'condominio':
-      return slug ? ['condominio', `condominio:${slug}`] : ['condominio']
+      return {
+        tags: slug ? ['condominio', `condominio:${slug}`] : ['condominio'],
+        paths: [HOME, '/[locale]/condominios', '/[locale]/condominios/[slug]', '/[locale]/imoveis/[slug]/[condominio]'],
+      }
     case 'bairro':
-      return slug ? ['bairro', `bairro:${slug}`] : ['bairro']
+      return {
+        tags: slug ? ['bairro', `bairro:${slug}`] : ['bairro'],
+        paths: [HOME, '/[locale]/bairros', '/[locale]/bairros/[slug]', '/[locale]/bairros-planejados', '/[locale]/bairros-planejados/[slug]', '/[locale]/imoveis/[slug]'],
+      }
     case 'post':
     case 'artigo':
-      return slug ? ['blog', `blog:${slug}`] : ['blog']
+      return {
+        tags: slug ? ['blog', `blog:${slug}`] : ['blog'],
+        paths: ['/[locale]/blog', '/[locale]/blog/[slug]'],
+      }
     case 'lancamento':
-      return slug ? ['lancamento', `lancamento:${slug}`] : ['lancamento']
+      return {
+        tags: slug ? ['lancamento', `lancamento:${slug}`] : ['lancamento'],
+        paths: [HOME, '/[locale]/lancamentos', '/[locale]/lancamento/[slug]'],
+      }
     case 'siteSettings':
     case 'configuracao':
-      return ['home']
+      return { tags: ['home'], paths: [HOME] }
     default:
-      return []
+      return { tags: [], paths: [] }
   }
 }
 
@@ -69,17 +91,19 @@ export async function POST(req: NextRequest) {
     }
 
     const slug = body.slug?.current
-    const tags = getTagsForType(body._type, slug)
-    if (tags.length === 0) {
+    const { tags, paths } = getTargets(body._type, slug)
+    if (tags.length === 0 && paths.length === 0) {
       return NextResponse.json({ error: 'Unsupported _type' }, { status: 400 })
     }
     tags.forEach((tag) => revalidateTag(tag))
+    paths.forEach((path) => revalidatePath(path, 'page'))
 
     return NextResponse.json({
       revalidated: true,
       type: body._type,
       slug,
       tags,
+      paths,
       ts: new Date().toISOString(),
     })
   } catch (err) {
