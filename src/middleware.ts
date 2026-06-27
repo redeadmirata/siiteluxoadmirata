@@ -13,8 +13,10 @@ export const config = {
   // - /opengraph-image (Next.js image generation)
   // - Google Search Console verification
   matcher: [
-    // Exclui: studio, api, _next, _vercel, opengraph, arquivos estáticos (.html, .xml, .txt, .png, etc.)
-    '/((?!studio|api|_next|_vercel|opengraph-image|.*\\.html|.*\\.xml|.*\\.txt|.*\\.png|.*\\.jpg|.*\\.ico|.*\\.svg|.*\\.webp).*)',
+    // Exclui: studio, api, _next, _vercel, opengraph, arquivos estáticos
+    // (.html, .xml, .txt, imagens, VÍDEOS, fontes). Sem excluir .mp4, a rota
+    // /videos/*.mp4 cai na reescrita i18n e retorna HTML em vez do arquivo.
+    '/((?!studio|api|_next|_vercel|opengraph-image|.*\\.html|.*\\.xml|.*\\.txt|.*\\.png|.*\\.jpe?g|.*\\.ico|.*\\.svg|.*\\.webp|.*\\.gif|.*\\.mp4|.*\\.webm|.*\\.mov|.*\\.woff2?).*)',
     '/',
   ],
 }

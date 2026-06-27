@@ -63,11 +63,20 @@ export default function HeroMediaVideo({ url }: HeroMediaVideoProps) {
     return (
       <div style={layerStyle}>
         <video
+          // React não aplica de forma confiável o atributo `muted` como propriedade
+          // do DOM; sem `muted` real o Chrome bloqueia o autoplay. Forçamos via ref.
+          ref={(el) => {
+            if (!el) return
+            el.muted = true
+            el.defaultMuted = true
+            el.play?.().catch(() => {})
+          }}
           src={url}
           autoPlay
           muted
           loop
           playsInline
+          preload="auto"
           style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
         />
       </div>
