@@ -25,21 +25,21 @@ export default function ObraAdminBanner() {
   ] as const
 
   return (
-    <section className="bg-ink text-white px-5 py-14 md:px-12 md:py-20">
+    <section className="bg-ink text-white px-5 py-14 lg:px-12 lg:py-20">
       {/* Eyebrow */}
       <p className="text-[10px] tracking-[0.25em] uppercase text-gold mb-5">
         Forma de aquisição
       </p>
 
       {/* Título */}
-      <h2 className="text-2xl md:text-3xl font-light text-white leading-snug mb-12 max-w-lg">
-        Obra por Administração —<br className="hidden md:block" /> a forma mais inteligente de comprar
+      <h2 className="text-2xl lg:text-3xl font-light text-white leading-snug mb-12 max-w-lg">
+        Obra por Administração —<br className="hidden lg:block" /> a forma mais inteligente de comprar
       </h2>
 
       {/* Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-0 md:gap-px border-t border-white/10">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-0 lg:gap-px border-t border-white/10">
         {itens.map((item) => (
-          <div key={item.num} className="border-b border-white/10 md:border-b-0 md:border-r md:border-white/10 pt-7 pb-8 md:px-8 first:md:pl-0 last:md:border-r-0">
+          <div key={item.num} className="border-b border-white/10 lg:border-b-0 lg:border-r lg:border-white/10 pt-7 pb-8 lg:px-8 first:lg:pl-0 last:lg:border-r-0">
             <span className="text-gold text-[11px] font-mono tracking-widest block mb-4">
               {item.num}
             </span>

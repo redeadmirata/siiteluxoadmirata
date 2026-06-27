@@ -17,7 +17,7 @@ export default function CookieBanner({ onAccept, onDecline }: Props) {
       aria-label={t('label')}
       className="fixed bottom-0 inset-x-0 z-[150] bg-ink/95 backdrop-blur-sm border-t border-white/10"
     >
-      <div className="max-w-screen-xl mx-auto px-6 lg:px-10 py-5 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
+      <div className="max-w-screen-xl mx-auto px-6 lg:px-10 py-5 flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-8">
         <p className="text-[11px] text-white/60 leading-relaxed flex-1">
           {t('message')}{' '}
           <a

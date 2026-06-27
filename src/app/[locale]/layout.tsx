@@ -4,11 +4,12 @@ import { NextIntlClientProvider } from 'next-intl'
 import { getMessages, setRequestLocale } from 'next-intl/server'
 import { routing } from '@/i18n/routing'
 import '../globals.css'
+import '../../styles/animations.css'
 import NavbarWrapper from '@/components/layout/NavbarWrapper'
 import FooterWrapper from '@/components/layout/FooterWrapper'
 import Footer from '@/components/layout/Footer'
 import WhatsAppButton from '@/components/ui/WhatsAppButton'
-import AnalyticsProvider from '@/components/analytics/AnalyticsProvider'
+import { AppProviders, ThemeScript } from '@/providers'
 
 // ─── Fontes via next/font (zero penalização no LCP) ──────────────────────────
 const cormorant = Cormorant_Garamond({
@@ -250,20 +251,25 @@ export default async function LocaleLayout({
       lang={locale}
       className={`${cormorant.variable} ${inter.variable} ${jetbrainsMono.variable}`}
     >
+      <head>
+        {/* Anti-FOUC: aplica tema antes da hidratação */}
+        <ThemeScript />
+      </head>
       <body className="antialiased">
         <GlobalJsonLd locale={locale} />
         <NextIntlClientProvider messages={messages}>
-          <a
-            href="#main-content"
-            className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[200] focus:bg-white focus:text-ink focus:px-4 focus:py-2 focus:text-sm focus:shadow-lg"
-          >
-            {locale === 'en' ? 'Skip to main content' : locale === 'es' ? 'Ir al contenido principal' : 'Pular para o conteúdo principal'}
-          </a>
-          <NavbarWrapper />
-          {children}
-          <FooterWrapper><Footer /></FooterWrapper>
-          <WhatsAppButton />
-          <AnalyticsProvider />
+          <AppProviders>
+            <a
+              href="#main-content"
+              className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[200] focus:bg-white focus:text-ink focus:px-4 focus:py-2 focus:text-sm focus:shadow-lg"
+            >
+              {locale === 'en' ? 'Skip to main content' : locale === 'es' ? 'Ir al contenido principal' : 'Pular para o conteúdo principal'}
+            </a>
+            <NavbarWrapper />
+            {children}
+            <FooterWrapper><Footer /></FooterWrapper>
+            <WhatsAppButton />
+          </AppProviders>
         </NextIntlClientProvider>
       </body>
     </html>

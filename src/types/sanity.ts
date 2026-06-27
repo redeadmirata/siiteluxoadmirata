@@ -358,4 +358,7 @@ export interface BairroPlaneado extends BairroFull {
   incorporadora?: string
   areaTotal?: number
   anoInauguracao?: number
-  amenidades?: str
+  amenidades?: string[]
+  condominios?: CondominioResumido[]
+  totalCondominios?: number
+}

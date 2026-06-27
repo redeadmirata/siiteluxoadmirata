@@ -1,9 +1,53 @@
 {
-  "extends": ["next/core-web-vitals", "next/typescript"],
+  "extends": [
+    "next/core-web-vitals",
+    "next/typescript"
+  ],
   "rules": {
+    // ─── TypeScript ────────────────────────────────────────────────────────────
     "@typescript-eslint/no-explicit-any": "error",
-    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+    "@typescript-eslint/no-unused-vars": ["error", {
+      "argsIgnorePattern": "^_",
+      "varsIgnorePattern": "^_",
+      "caughtErrorsIgnorePattern": "^_"
+    }],
+    "@typescript-eslint/consistent-type-imports": ["error", {
+      "prefer": "type-imports",
+      "fixStyle": "inline-type-imports"
+    }],
+    "@typescript-eslint/no-import-type-side-effects": "error",
+
+    // ─── Geral ────────────────────────────────────────────────────────────────
     "prefer-const": "error",
-    "no-console": ["warn", { "allow": ["warn", "error"] }]
-  }
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "no-nested-ternary": "warn",
+    "object-shorthand": ["error", "always"],
+    "no-useless-rename": "error",
+
+    // ─── React ────────────────────────────────────────────────────────────────
+    "react/self-closing-comp": ["error", { "component": true, "html": true }],
+    "react/jsx-boolean-value": ["error", "never"],
+    "react/jsx-curly-brace-presence": ["error", { "props": "never", "children": "never" }],
+    "react-hooks/exhaustive-deps": "warn",
+
+    // ─── Imports ──────────────────────────────────────────────────────────────
+    "import/no-duplicates": "error"
+  },
+  "overrides": [
+    {
+      // Scripts de cadastro — podem usar console.log
+      "files": ["scripts/**/*.{js,mjs,ts}"],
+      "rules": {
+        "no-console": "off"
+      }
+    },
+    {
+      // Sanity Studio — tipagem mais permissiva
+      "files": ["sanity/**/*.ts", "src/sanity/**/*.ts"],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "warn"
+      }
+    }
+  ]
 }
+

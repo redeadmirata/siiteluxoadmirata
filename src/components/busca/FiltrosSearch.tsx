@@ -49,11 +49,11 @@ export default function FiltrosSearch({ totalResultados, hideFinalidade = false 
     <div className="mb-12">
       {/* ── Finalidade (Venda / Locação / Temporada) ──────────────────
           No mobile fica oculta pois o TabsFiltro sticky já cobre isso.
-          No desktop (sm:) mostra normalmente.
+          No desktop (lg:) mostra normalmente.
       ─────────────────────────────────────────────────────────────── */}
       {!hideFinalidade && (
         <div
-          className="hidden sm:flex gap-3 mb-6 border-b border-stone pb-5"
+          className="hidden lg:flex gap-3 mb-6 border-b border-stone pb-5"
           role="group"
           aria-label="Finalidade"
         >

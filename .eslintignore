@@ -1,0 +1,7 @@
+.next/
+out/
+dist/
+node_modules/
+sanity/types.ts
+*.generated.ts
+public/

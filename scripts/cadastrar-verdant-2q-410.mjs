@@ -181,4 +181,6 @@ async function main() {
 }
 
 main().catch(err => {
-  console.error('\n❌ Erro fatal:', err.messa
+  console.error('\n❌ Erro fatal:', err.message)
+  process.exit(1)
+})

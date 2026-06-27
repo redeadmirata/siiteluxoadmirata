@@ -390,4 +390,33 @@ export default function HeroCinematico({
           </div>
 
           {/* Thumbnails */}
-          <div className="flex-shrink-0 overflow-x-auto px-6 
+          <div className="flex-shrink-0 overflow-x-auto px-6 py-4">
+            <div className="flex justify-center gap-1.5">
+              {imagens.map((img, i) => (
+                <button
+                  key={i}
+                  onClick={() => setLightboxIndice(i)}
+                  className={`relative h-12 w-16 flex-shrink-0 overflow-hidden transition-opacity ${
+                    i === lightboxIndice
+                      ? 'opacity-100 ring-1 ring-gold'
+                      : 'opacity-35 hover:opacity-70'
+                  }`}
+                  aria-label={`Ir para foto ${i + 1}`}
+                  aria-current={i === lightboxIndice}
+                >
+                  <Image
+                    src={getUrl(img, 120)}
+                    alt=""
+                    fill
+                    sizes="64px"
+                    className="object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}

@@ -26,6 +26,7 @@ const CALPER_CONDOMINIOS = [
   'condominio-saint-michel',
   'condominio-astra',
   'condominio-pura-artefacto',
+  'condominio-wide-residences',
 ]
 
 console.log('🔍 Buscando imóveis Calper/Cidade Arte no Sanity...\n')

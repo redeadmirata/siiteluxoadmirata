@@ -24,6 +24,11 @@ interface EspecItem {
   valor: string
 }
 
+/** Normaliza o campo andar: strip de °/º existentes antes de adicionar o sufixo correto */
+function formatAndar(raw: string): string {
+  return raw.replace(/[°º]+$/, '').trim() + 'º'
+}
+
 function buildEspecs(imovel: FichaTecnicaProps['imovel']): EspecItem[] {
   const items: EspecItem[] = []
 
@@ -40,7 +45,7 @@ function buildEspecs(imovel: FichaTecnicaProps['imovel']): EspecItem[] {
   if (imovel.vagas)
     items.push({ label: 'Vagas', valor: String(imovel.vagas) })
   if (imovel.andar)
-    items.push({ label: 'Andar', valor: `${imovel.andar}º` })
+    items.push({ label: 'Andar', valor: formatAndar(String(imovel.andar)) })
   if (imovel.tipo)
     items.push({ label: 'Tipo', valor: imovel.tipo })
   if (imovel.finalidade)
@@ -72,56 +77,73 @@ export default function FichaTecnica({ imovel }: FichaTecnicaProps) {
   const grupos = groupCaracteristicas(imovel.caracteristicas)
 
   return (
-    <section aria-label="Ficha técnica" className="section-padding">
-      <h2 className="text-xs tracking-widest uppercase text-gold mb-8">
-        Ficha técnica
-      </h2>
+    <section aria-label="Ficha técnica" className="py-12 md:py-16">
 
-      {/* Especificações principais */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-px bg-stone">
-        {especs.map((item) => (
+      {/* ── Label editorial ───────────────────────────────────────── */}
+      <div className="flex items-center gap-4 mb-10">
+        <span className="block w-6 h-px bg-gold flex-shrink-0" aria-hidden="true" />
+        <h2 className="text-[10px] font-medium tracking-[0.22em] uppercase text-gold">
+          Ficha técnica
+        </h2>
+      </div>
+
+      {/* ── Stats row — números grandes, Cormorant, dividers hairline ── */}
+      <div className="flex flex-wrap border-t border-stone">
+        {especs.map((item, i) => (
           <div
             key={item.label}
-            className="bg-white px-5 py-4 flex flex-col gap-1"
+            className={[
+              'flex flex-col justify-center py-7 pr-8',
+              i === 0 ? 'pl-0' : 'pl-8 border-l border-stone',
+              /* forçar quebra antes de tipo e finalidade para não misturar números e texto */
+            ].join(' ')}
           >
-            <span className="text-xs uppercase tracking-wider text-muted">
+            <span
+              className="block text-[9px] font-medium tracking-[0.2em] uppercase text-muted mb-2"
+              aria-label={item.label}
+            >
               {item.label}
             </span>
-            <span className="text-price text-lg text-ink font-medium">
+            <span
+              className="text-display-md text-ink leading-none"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
               {item.valor}
             </span>
           </div>
         ))}
       </div>
 
-      {/* Características por grupo */}
+      {/* ── Características por grupo ─────────────────────────────── */}
       {Object.keys(grupos).length > 0 && (
-        <div className="mt-12 space-y-10">
+        <div className="mt-14 space-y-12">
           {Object.entries(grupos).map(([grupo, nomes]) => (
             <div key={grupo}>
-              {/* Separador + label do grupo */}
-              <div className="flex items-center gap-3 mb-5">
-                <span className="w-4 h-px bg-gold flex-shrink-0" />
-                <h3 className="text-xs uppercase tracking-widest text-muted">
+
+              {/* Grupo label */}
+              <div className="flex items-center gap-4 mb-6">
+                <span className="block w-6 h-px bg-stone flex-shrink-0" aria-hidden="true" />
+                <h3 className="text-[9px] font-medium tracking-[0.22em] uppercase text-muted">
                   {grupo}
                 </h3>
               </div>
 
-              {/* Cards das características */}
-              <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+              {/* Lista de itens — duas colunas, editorial */}
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-0">
                 {nomes.map((nome) => (
                   <li
                     key={nome}
-                    className="flex items-start gap-3 bg-stone/60 border border-stone rounded-lg px-4 py-3 text-sm text-ink leading-snug"
+                    className="flex items-start gap-3 py-3 border-b border-stone/60 text-sm text-ink leading-snug"
                   >
                     <span
-                      className="mt-1.5 w-1.5 h-1.5 rounded-full bg-gold flex-shrink-0"
+                      className="mt-[5px] w-1 h-1 rounded-full bg-gold flex-shrink-0"
                       aria-hidden="true"
                     />
                     {nome}
                   </li>
                 ))}
               </ul>
+
             </div>
           ))}
         </div>

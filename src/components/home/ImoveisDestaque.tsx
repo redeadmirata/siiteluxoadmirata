@@ -20,14 +20,14 @@ export default async function ImoveisDestaque({ imoveis }: ImoveisDestaqueProps)
     >
       {/* ── Header ─────────────────────────────────────────────────── */}
       <div className="max-w-screen-xl mx-auto px-6 lg:px-10">
-        <div className="flex items-end justify-between mb-10 sm:mb-14">
+        <div className="flex items-end justify-between mb-10 lg:mb-14">
           <div>
             <p className="text-[10px] uppercase tracking-[0.35em] text-gold mb-3">
               {t('featured.label')}
             </p>
             <h2
               id="destaque-titulo"
-              className="font-display text-4xl sm:text-5xl text-ink font-light"
+              className="font-display text-4xl lg:text-5xl text-ink font-light"
             >
               {t('featured.title')}
             </h2>
@@ -35,7 +35,7 @@ export default async function ImoveisDestaque({ imoveis }: ImoveisDestaqueProps)
 
           <Link
             href="/imoveis"
-            className="hidden sm:flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-gold hover:gap-3 transition-all duration-200 flex-shrink-0 ml-8"
+            className="hidden lg:flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-gold hover:gap-3 transition-all duration-200 flex-shrink-0 ml-8"
           >
             {t('featured.viewAll')}
             <span aria-hidden="true">→</span>
@@ -49,7 +49,7 @@ export default async function ImoveisDestaque({ imoveis }: ImoveisDestaqueProps)
         - cards de 82vw deixam ~18% de peek para indicar scroll
         - scrollbar oculta via CSS para visual clean
       */}
-      <div className="sm:hidden">
+      <div className="lg:hidden">
         <style>{`.snap-track::-webkit-scrollbar{display:none}`}</style>
         <div
           className="snap-track flex gap-3 overflow-x-auto pb-2"
@@ -92,8 +92,8 @@ export default async function ImoveisDestaque({ imoveis }: ImoveisDestaqueProps)
       </div>
 
       {/* ── DESKTOP: grid 2 / 3 colunas (inalterado) ──────────────── */}
-      <div className="hidden sm:block max-w-screen-xl mx-auto px-6 lg:px-10">
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+      <div className="hidden lg:block max-w-screen-xl mx-auto px-6 xl:px-10">
+        <div className="grid grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-12">
           {imoveis.map((imovel, i) => (
             <ImovelCard
               key={imovel._id}

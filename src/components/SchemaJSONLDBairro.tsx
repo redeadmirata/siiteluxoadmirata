@@ -1,3 +1,4 @@
+import JsonLd from '@/components/seo/JsonLd'
 import { generateBairroSchema } from '@/lib/schema/bairro'
 import type { BairroFull, ImovelCard } from '@/types/sanity'
 
@@ -12,12 +13,5 @@ export default function SchemaJSONLDBairro({
   imoveis,
   localePrefix = '',
 }: SchemaJSONLDBairroProps) {
-  const schema = generateBairroSchema(bairro, imoveis, localePrefix)
-
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-    />
-  )
+  return <JsonLd schema={generateBairroSchema(bairro, imoveis, localePrefix)} />
 }

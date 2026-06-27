@@ -1,3 +1,4 @@
+import JsonLd from '@/components/seo/JsonLd'
 import type { ImovelPDI } from '@/types/sanity'
 
 interface SchemaJSONLDProps {
@@ -44,10 +45,5 @@ export default function SchemaJSONLD({ imovel, url }: SchemaJSONLDProps) {
     ...(imovel.publicadoEm && { datePosted: imovel.publicadoEm }),
   }
 
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-    />
-  )
+  return <JsonLd schema={schema} />
 }

@@ -4,37 +4,180 @@
 
 /* ─── Design Tokens — Admirata ──────────────────────────────────────────────── */
 :root {
-  /* Cores */
-  --color-ink: #1a1a2e;
-  --color-gold: #b8960c;
-  --color-stone: #f5f0e8;
-  --color-white: #ffffff;
-  --color-text: #2b2b2b;
-  --color-muted: #8a8a9a;
+  /* ── Cores ──────────────────────────────────────────────────────────────── */
+  --color-ink:     #1a1a2e;
+  --color-gold:    #b8960c;
+  --color-stone:   #f5f0e8;
+  --color-white:   #ffffff;
+  --color-text:    #2b2b2b;
+  --color-muted:   #8a8a9a;
   --color-overlay: rgba(26, 26, 46, 0.55);
 
-  /* Gold variants */
   --color-gold-light: #d4ac1a;
-  --color-gold-dark: #8a6e09;
+  --color-gold-dark:  #8a6e09;
 
-  /* Tipografia */
+  /* ── Tipografia ─────────────────────────────────────────────────────────── */
   --font-display: var(--font-cormorant, 'Georgia', serif);
-  --font-body: var(--font-inter, system-ui, sans-serif);
-  --font-mono: var(--font-jetbrains, 'Menlo', monospace);
+  --font-body:    var(--font-inter, system-ui, sans-serif);
+  --font-mono:    var(--font-jetbrains, 'Menlo', monospace);
 
-  /* Spacing base */
-  --section-padding: clamp(4rem, 8vw, 8rem);
-  --container-max: 1440px;
-  --container-pad: clamp(1.5rem, 5vw, 6rem);
-
-  /* Easing */
-  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* ── Easing ─────────────────────────────────────────────────────────────── */
+  --ease-smooth:   cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring:   cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 
-  /* Bordas */
-  --border-gold: 1px solid rgba(184, 150, 12, 0.3);
+  /* ── Bordas ─────────────────────────────────────────────────────────────── */
+  --border-gold:  1px solid rgba(184, 150, 12, 0.3);
   --border-stone: 1px solid rgba(184, 150, 12, 0.15);
+
+  /* ── Breakpoints como referência CSS ────────────────────────────────────── */
+  /* Sincronizados com tailwind.config.ts > screens e src/lib/breakpoints.ts  */
+  --bp-xs:  360px;
+  --bp-sm:  390px;
+  --bp-md:  430px;
+  --bp-lg:  768px;
+  --bp-xl:  1024px;
+  --bp-2xl: 1280px;
+  --bp-3xl: 1440px;
+  --bp-4xl: 1600px;
+  --bp-5xl: 1920px;
+  --bp-6xl: 2560px;
+
+  /* ── Layout responsivo — valores base: < 360px (xs) ─────────────────────── */
+  --container-max:   1440px;
+  --container-pad:   1.25rem; /* 20px */
+  --section-padding: 3rem;    /* 48px */
+  --nav-height:      4rem;    /* 64px */
+}
+
+/* sm → 390px: iPhone 14 / Pixel 8 */
+@media (min-width: 390px) {
+  :root {
+    --container-pad:   1.5rem; /* 24px */
+    --section-padding: 3.5rem; /* 56px */
+  }
+}
+
+/* lg → 768px: tablet portrait */
+@media (min-width: 768px) {
+  :root {
+    --container-pad:   2.5rem; /* 40px */
+    --section-padding: 5rem;   /* 80px */
+    --nav-height:      5rem;   /* 80px */
+  }
+}
+
+/* xl → 1024px: iPad landscape / laptop small */
+@media (min-width: 1024px) {
+  :root {
+    --container-pad:   3.5rem; /* 56px */
+    --section-padding: 6rem;   /* 96px */
+  }
+}
+
+/* 2xl → 1280px: laptop standard */
+@media (min-width: 1280px) {
+  :root {
+    --container-pad:   5rem;   /* 80px */
+    --section-padding: 7rem;   /* 112px */
+  }
+}
+
+/* 3xl → 1440px: desktop padrão — referência primária */
+@media (min-width: 1440px) {
+  :root {
+    --container-pad:   6rem;   /* 96px */
+    --section-padding: 8rem;   /* 128px */
+  }
+}
+
+/* 4xl → 1600px: desktop large */
+@media (min-width: 1600px) {
+  :root {
+    --container-pad:   7rem;   /* 112px */
+    --section-padding: 9rem;   /* 144px */
+  }
+}
+
+/* 5xl → 1920px: Full HD */
+@media (min-width: 1920px) {
+  :root {
+    --container-pad:   8rem;   /* 128px */
+    --section-padding: 10rem;  /* 160px */
+  }
+}
+
+/* 6xl → 2560px: 2K / QHD — respiro lateral máximo */
+@media (min-width: 2560px) {
+  :root {
+    --container-pad:   12rem;  /* 192px */
+    --section-padding: 12rem;
+  }
+}
+
+/* ─── Modo Escuro — [data-theme="dark"] ─────────────────────────────────────── */
+/*
+ * ThemeProvider aplica data-theme="dark" no <html>.
+ * ThemeScript (anti-FOUC) garante a classe antes da hidratação.
+ *
+ * Paleta dark luxury Admirata:
+ * - Backgrounds profundos e quentes (navy escuro, não cinza frio)
+ * - Texto creme — jamais branco puro (dureza visual em luxury)
+ * - Gold ligeiramente mais brilhante para compensar fundo escuro
+ * - Surfaces com elevação sutil via tonalidade (sem sombra excessiva)
+ */
+[data-theme="dark"] {
+  /* ── Cores principais ────────────────────────────────────────────────────── */
+  --color-ink:     #e8e0d0;          /* Invertido: texto creme em fundo escuro */
+  --color-stone:   #0e0e1a;          /* Invertido: fundo principal deep navy */
+  --color-text:    #e0d8c8;          /* Texto principal — creme quente */
+  --color-muted:   #7a7a8a;          /* Texto secundário — levemente mais claro */
+  --color-white:   #ffffff;
+
+  /* ── Gold — ajustado para legibilidade no escuro ─────────────────────────── */
+  --color-gold:       #c9a420;       /* Gold mais brilhante (fundo escuro reduz percepção) */
+  --color-gold-light: #e8bc2a;
+  --color-gold-dark:  #a07a0a;
+
+  /* ── Overlay ─────────────────────────────────────────────────────────────── */
+  --color-overlay: rgba(0, 0, 0, 0.70);
+
+  /* ── Superfícies com elevação ────────────────────────────────────────────── */
+  /* Não existem em modo claro (fundo = stone). Em dark, cards e painéis
+     precisam de elevação via cor para criar hierarquia sem sombras pesadas. */
+  --color-surface:          #1a1a2e; /* Cards, painéis */
+  --color-surface-elevated: #222238; /* Modais, dropdowns */
+  --color-surface-raised:   #2a2a42; /* Tooltips, popovers */
+
+  /* ── Bordas ──────────────────────────────────────────────────────────────── */
+  --color-border:           rgba(255, 255, 255, 0.08);
+  --color-border-strong:    rgba(255, 255, 255, 0.16);
+  --border-gold:            1px solid rgba(201, 164, 32, 0.35);
+  --border-stone:           1px solid rgba(255, 255, 255, 0.08);
+
+  /* ── Layout (inalterado — semântico, não precisa mudar) ──────────────────── */
+  /* --container-max, --container-pad, --section-padding, --nav-height: iguais */
+}
+
+/* ─── Utilitários dark mode ──────────────────────────────────────────────────── */
+
+/* Scrollbar escura */
+[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: #0e0e1a;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: #3a3a52;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gold);
+}
+
+/* Seleção de texto dark */
+[data-theme="dark"] ::selection {
+  background-color: var(--color-gold);
+  color: #0e0e1a;
 }
 
 /* ─── Reset ──────────────────────────────────────────────────────────────────── */

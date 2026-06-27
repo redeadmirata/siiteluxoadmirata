@@ -4,8 +4,8 @@
  * Sticky abaixo do header mobile (top-14 = 56px).
  * Controla: finalidade (Venda / Locação) + novidade + exclusivo.
  *
- * Visível apenas em mobile (sm:hidden).
- * No desktop, a linha de finalidade do FiltrosSearch cuida disso.
+ * Visível apenas em mobile (lg:hidden).
+ * No desktop (≥768px), a linha de finalidade do FiltrosSearch cuida disso.
  */
 'use client'
 
@@ -67,7 +67,7 @@ export default function TabsFiltro() {
       {/* Oculta scrollbar no webkit sem plugin extra */}
       <style>{`.tabs-filtro::-webkit-scrollbar{display:none}`}</style>
       <nav
-        className="tabs-filtro sm:hidden flex gap-5 overflow-x-auto bg-white border-b border-stone-100 sticky top-14 z-40"
+        className="tabs-filtro lg:hidden flex gap-5 overflow-x-auto bg-white border-b border-stone-100 sticky top-14 z-40"
         style={{
           scrollbarWidth: 'none',
           WebkitOverflowScrolling: 'touch',

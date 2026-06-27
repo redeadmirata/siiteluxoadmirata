@@ -1,0 +1,117 @@
+/**
+ * Animações reutilizáveis da Admirata
+ * Complementa globals.css — foco em keyframes para GSAP e Framer Motion.
+ *
+ * Import em globals.css:
+ *   @import './animations.css';
+ *
+ * Ou em componentes específicos:
+ *   import '@/styles/animations.css'
+ */
+
+/* ─── Blur Fade — padrão de entrada editorial ─────────────────────────────── */
+
+@keyframes blur-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+.animate-blur-fade {
+  animation: blur-fade-in 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* ─── Stagger helpers (com --delay como CSS var) ──────────────────────────── */
+
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.10s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.20s; }
+.stagger-5 { animation-delay: 0.25s; }
+.stagger-6 { animation-delay: 0.30s; }
+
+/* ─── Hover de imagem — scale suave ──────────────────────────────────────── */
+
+.img-hover-scale {
+  overflow: hidden;
+}
+
+.img-hover-scale img,
+.img-hover-scale > * {
+  transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.img-hover-scale:hover img,
+.img-hover-scale:hover > * {
+  transform: scale(1.04);
+}
+
+/* ─── Linha dourada animada (para CTAs e bordas on-hover) ────────────────── */
+
+.gold-underline {
+  position: relative;
+}
+
+.gold-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background-color: var(--color-gold);
+  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.gold-underline:hover::after {
+  width: 100%;
+}
+
+/* ─── Reveal de texto — para headlines grandes ───────────────────────────── */
+
+@keyframes clip-reveal {
+  from { clip-path: inset(0 100% 0 0); }
+  to   { clip-path: inset(0 0% 0 0); }
+}
+
+.animate-clip-reveal {
+  animation: clip-reveal 0.8s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+}
+
+/* ─── Pulse suave — para badges e indicadores ────────────────────────────── */
+
+@keyframes soft-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.animate-soft-pulse {
+  animation: soft-pulse 2s ease-in-out infinite;
+}
+
+/* ─── Preferência por movimento reduzido ─────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-blur-fade,
+  .animate-clip-reveal,
+  .animate-soft-pulse {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    filter: none;
+    clip-path: none;
+  }
+
+  .img-hover-scale img,
+  .img-hover-scale > * {
+    transition: none;
+  }
+}

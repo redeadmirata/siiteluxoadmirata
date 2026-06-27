@@ -316,74 +316,93 @@ export default async function CondominioPage({ params }: PageProps) {
               </div>
             )}
 
-            {/* ── Imóveis disponíveis ───────────────────────────────────── */}
-            <div className="mb-12">
-              <div className="flex items-baseline justify-between mb-6">
-                <h2 className="text-display-sm text-ink">
-                  Imóveis disponíveis
-                  {imoveis.length > 0 && (
-                    <span className="ml-2 text-base text-muted font-normal">({imoveis.length})</span>
-                  )}
-                </h2>
-              </div>
+            {/* ── Unidades disponíveis (Venda + Locação) ────────────────── */}
+            {(() => {
+              const venda   = imoveis.filter(i => i.finalidade === 'Venda')
+              const locacao = imoveis.filter(i => i.finalidade === 'Locação' || i.finalidade === 'Temporada')
 
-              {imoveis.length === 0 ? (
-                <div className="py-12 text-center border border-stone rounded-2xl">
-                  <p className="text-muted">Nenhum imóvel disponível no momento.</p>
-                  <p className="text-sm text-muted/60 mt-2">
-                    Entre em contato para verificar disponibilidade futura.
-                  </p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  {imoveis.map((imovel) => (
-                    <Link
-                      key={imovel._id}
-                      href={`/imovel/${imovel.slug.current}`}
-                      className="group block border border-stone rounded-2xl overflow-hidden hover:border-gold/40 transition-colors"
-                    >
-                      {/* Thumb */}
-                      <div className="relative aspect-[4/3] bg-stone/30 overflow-hidden">
-                        {imovel.imagemCapa ? (
-                          <Image
-                            src={imovel.imagemCapa?.asset.url ?? ''}
-                            alt={imovel.titulo}
-                            fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-500"
-                            placeholder={imovel.imagemCapa?.asset.metadata?.lqip ? 'blur' : 'empty'}
-                            blurDataURL={imovel.imagemCapa?.asset.metadata?.lqip}
-                            sizes="(max-width: 640px) 100vw, 50vw"
-                          />
-                        ) : (
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="text-stone/50 text-sm">Sem foto</span>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Info */}
-                      <div className="p-4">
-                        <h3 className="text-sm font-semibold text-ink group-hover:text-gold transition-colors line-clamp-1">
-                          {imovel.titulo}
-                        </h3>
-                        <div className="flex flex-wrap gap-3 mt-2 text-xs text-muted">
-                          {imovel.areaUtil && <span>{imovel.areaUtil} m²</span>}
-                          {imovel.quartos && <span>{imovel.quartos} {imovel.quartos === 1 ? 'quarto' : 'quartos'}</span>}
-                          {imovel.vagas && <span>{imovel.vagas} {imovel.vagas === 1 ? 'vaga' : 'vagas'}</span>}
-                        </div>
-                        <div className="mt-3">
-                          {imovel.preco ? (
-                            <span className="text-sm font-semibold text-ink">{formatPreco(imovel.preco)}</span>
+              const CardGrid = ({ list }: { list: typeof imoveis }) => (
+                list.length === 0 ? (
+                  <div className="py-10 text-center border border-stone rounded-2xl">
+                    <p className="text-sm text-muted">Nenhuma unidade disponível no momento.</p>
+                    <p className="text-xs text-muted/60 mt-1">
+                      Entre em contato — novas unidades surgem com frequência.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    {list.map((imovel) => (
+                      <Link
+                        key={imovel._id}
+                        href={`/imovel/${imovel.slug.current}`}
+                        className="group block border border-stone rounded-2xl overflow-hidden hover:border-gold/40 transition-colors"
+                      >
+                        <div className="relative aspect-[4/3] bg-stone/30 overflow-hidden">
+                          {imovel.imagemCapa ? (
+                            <Image
+                              src={imovel.imagemCapa?.asset.url ?? ''}
+                              alt={imovel.titulo}
+                              fill
+                              className="object-cover group-hover:scale-105 transition-transform duration-500"
+                              placeholder={imovel.imagemCapa?.asset.metadata?.lqip ? 'blur' : 'empty'}
+                              blurDataURL={imovel.imagemCapa?.asset.metadata?.lqip}
+                              sizes="(max-width: 640px) 100vw, 50vw"
+                            />
                           ) : (
-                            <span className="text-sm text-muted italic">Sob consulta</span>
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <span className="text-stone/50 text-sm">Sem foto</span>
+                            </div>
                           )}
                         </div>
-                      </div>
-                    </Link>
-                  ))}
+                        <div className="p-4">
+                          <h3 className="text-sm font-semibold text-ink group-hover:text-gold transition-colors line-clamp-1">
+                            {imovel.titulo}
+                          </h3>
+                          <div className="flex flex-wrap gap-3 mt-2 text-xs text-muted">
+                            {imovel.areaUtil && <span>{imovel.areaUtil} m²</span>}
+                            {imovel.quartos && <span>{imovel.quartos} {imovel.quartos === 1 ? 'quarto' : 'quartos'}</span>}
+                            {imovel.vagas && <span>{imovel.vagas} {imovel.vagas === 1 ? 'vaga' : 'vagas'}</span>}
+                          </div>
+                          <div className="mt-3">
+                            {imovel.preco ? (
+                              <span className="text-sm font-semibold text-ink">{formatPreco(imovel.preco)}</span>
+                            ) : (
+                              <span className="text-sm text-muted italic">Sob consulta</span>
+                            )}
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )
+              )
+
+              return (
+                <div className="space-y-10 mb-12">
+                  {/* Venda */}
+                  <div>
+                    <div className="flex items-baseline gap-3 mb-5">
+                      <h2 className="text-display-sm text-ink">À Venda</h2>
+                      {venda.length > 0 && (
+                        <span className="text-sm text-muted font-normal">{venda.length} {venda.length === 1 ? 'unidade' : 'unidades'}</span>
+                      )}
+                    </div>
+                    <CardGrid list={venda} />
+                  </div>
+
+                  {/* Locação */}
+                  <div>
+                    <div className="flex items-baseline gap-3 mb-5">
+                      <h2 className="text-display-sm text-ink">Para Locação</h2>
+                      {locacao.length > 0 && (
+                        <span className="text-sm text-muted font-normal">{locacao.length} {locacao.length === 1 ? 'unidade' : 'unidades'}</span>
+                      )}
+                    </div>
+                    <CardGrid list={locacao} />
+                  </div>
                 </div>
-              )}
-            </div>
+              )
+            })()}
 
             {/* ── Condomínios próximos ─────────────────────────────────── */}
             {cond.condominiosProximos && cond.condominiosProximos.length > 0 && (

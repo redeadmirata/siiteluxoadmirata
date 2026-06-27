@@ -17,12 +17,12 @@ export default async function CondominiosDestaque({ condominios }: Props) {
     <section className="py-20 px-6 bg-ink text-white" aria-label={tHome('condominios.label')}>
       <div className="max-w-screen-xl mx-auto">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-12">
+        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-12">
           <div>
             <p className="text-[10px] uppercase tracking-[0.3em] text-gold mb-3">
               {tHome('condominios.label')}
             </p>
-            <h2 className="font-display text-3xl sm:text-4xl text-white leading-tight">
+            <h2 className="font-display text-3xl lg:text-4xl text-white leading-tight">
               {tHome('condominios.title')}
             </h2>
             <div className="mt-4 w-12 h-px bg-gold" />
@@ -37,7 +37,7 @@ export default async function CondominiosDestaque({ condominios }: Props) {
         </div>
 
         {/* Grid horizontal scroll em mobile */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           {condominios.map((c) => (
             <Link
               key={c._id}

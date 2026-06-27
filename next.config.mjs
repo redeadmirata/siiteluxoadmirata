@@ -4,7 +4,10 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Permite imagens do CDN do Sanity
+  // ─── Compressão ──────────────────────────────────────────────────────────────
+  compress: true,
+
+  // ─── Imagens ─────────────────────────────────────────────────────────────────
   images: {
     remotePatterns: [
       {
@@ -19,8 +22,27 @@ const nextConfig = {
       },
     ],
     formats: ['image/avif', 'image/webp'],
-    // Qualidade padrão — sobrescrita por componente via quality prop
     deviceSizes: [375, 640, 768, 1024, 1280, 1440, 1920],
+    imageSizes: [16, 32, 64, 96, 128, 256],
+    // Cache de imagens por 30 dias no CDN da Vercel
+    minimumCacheTTL: 60 * 60 * 24 * 30,
+    // Qualidade padrão balanceada para imóveis
+    qualities: [75, 85, 95],
+    dangerouslyAllowSVG: false,
+  },
+
+  // ─── Experimental ────────────────────────────────────────────────────────────
+  experimental: {
+    // Tree-shaking agressivo de pacotes grandes — evita importar o lucide inteiro
+    optimizePackageImports: [
+      'lucide-react',
+      'framer-motion',
+      '@headlessui/react',
+      '@portabletext/react',
+    ],
+    // PPR (Partial Prerendering) — shell estático + conteúdo dinâmico via Suspense
+    // Habilitar quando Next.js 15 for adotado. Em 14 é experimental e pode instabilizar.
+    // ppr: true,
   },
 
   // Headers de segurança e cache

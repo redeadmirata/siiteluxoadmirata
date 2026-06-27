@@ -218,7 +218,7 @@ export default async function Footer() {
           <p className="text-[9px] uppercase tracking-[0.35em] text-white/25 mb-8">
             {t('maisBuscados')}
           </p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-6 gap-y-8">
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-x-6 gap-y-8">
             {MAIS_BUSCADOS.map(({ titulo, links }) => (
               <nav key={titulo} aria-label={`Links: ${titulo}`}>
                 <h3 className="text-[9px] uppercase tracking-[0.25em] text-white/35 mb-3">
@@ -245,10 +245,10 @@ export default async function Footer() {
         <div className="h-px bg-white/8 mb-8" aria-hidden="true" />
 
         {/* Rodapé inferior */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-[11px] text-white/30">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 text-[11px] text-white/30">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
             <span>{t('copyright', { year: ano })}</span>
-            <span aria-hidden="true" className="hidden sm:inline">|</span>
+            <span aria-hidden="true" className="hidden lg:inline">|</span>
             <span>{t('creci')}</span>
           </div>
           <div className="flex items-center gap-4">

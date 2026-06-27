@@ -1,0 +1,19 @@
+# Build
+.next/
+out/
+dist/
+
+# Sanity
+.sanity/
+
+# Generated
+sanity/types.ts
+*.generated.ts
+
+# Deps
+node_modules/
+
+# Misc
+*.min.js
+*.min.css
+public/

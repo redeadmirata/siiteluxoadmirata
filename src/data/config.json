@@ -1,0 +1,45 @@
+{
+  "site": {
+    "name": "Admirata",
+    "url": "https://admirata.com.br",
+    "description": "Imóveis de alto padrão no Rio de Janeiro e Serra Gaúcha.",
+    "locale": "pt-BR",
+    "defaultLocale": "pt-BR",
+    "locales": ["pt-BR", "en", "es"]
+  },
+  "contact": {
+    "email": "atendimento@admirataimoveis.com.br",
+    "whatsapp": "21998079459",
+    "instagram": "admirataimoveis",
+    "phone": "(21) 99807-9459"
+  },
+  "social": {
+    "instagram": "https://instagram.com/admirataimoveis",
+    "facebook": "https://facebook.com/admirataimoveis",
+    "youtube": "https://youtube.com/@admirataimoveis",
+    "linkedin": "https://linkedin.com/company/admirataimoveis"
+  },
+  "seo": {
+    "defaultTitle": "Admirata | Imóveis de Luxo no Rio de Janeiro",
+    "titleTemplate": "%s | Admirata",
+    "defaultDescription": "Encontre apartamentos, coberturas e casas de alto padrão no Rio de Janeiro e Serra Gaúcha. Admirata — imobiliária de luxo.",
+    "twitterHandle": "@admirataimoveis",
+    "ogImage": "/og-default.jpg"
+  },
+  "listing": {
+    "pageSize": 12,
+    "defaultSort": "destaque",
+    "sortOptions": [
+      { "value": "destaque",      "label": "Destaques" },
+      { "value": "preco-asc",     "label": "Menor preço" },
+      { "value": "preco-desc",    "label": "Maior preço" },
+      { "value": "area-desc",     "label": "Maior área" },
+      { "value": "recentes",      "label": "Mais recentes" }
+    ]
+  },
+  "analytics": {
+    "gtmId": "",
+    "gaId": "",
+    "metaPixelId": ""
+  }
+}

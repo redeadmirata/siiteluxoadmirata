@@ -28,7 +28,7 @@ export default function BreadcrumbNav({ items, className = '', dark = false }: B
       className={`text-xs tracking-wide ${baseText} ${className}`}
     >
       {/* Desktop: todos os itens */}
-      <span className="hidden md:flex items-center gap-1.5">
+      <span className="hidden lg:flex items-center gap-1.5">
         {items.map((item, i) => (
           <span key={i} className="flex items-center gap-1.5">
             {i > 0 && <span className="opacity-40" aria-hidden="true">/</span>}
@@ -46,7 +46,7 @@ export default function BreadcrumbNav({ items, className = '', dark = false }: B
       </span>
 
       {/* Mobile: início / … / título truncado */}
-      <span className="flex md:hidden items-center gap-1.5 overflow-hidden">
+      <span className="flex lg:hidden items-center gap-1.5 overflow-hidden">
         {mobileItems.map((item, i) => (
           <span key={i} className="flex items-center gap-1.5 min-w-0">
             {i > 0 && <span className="opacity-40 flex-shrink-0" aria-hidden="true">/</span>}

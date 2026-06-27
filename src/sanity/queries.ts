@@ -98,7 +98,7 @@ export const IMOVEIS_DESTAQUE_QUERY = groq`
 /** Imóveis por condomínio (NÍVEL 2 — lista de imóveis do condomínio) */
 export const IMOVEIS_POR_CONDOMINIO_QUERY = groq`
   *[_type == "imovel" && condominioRef->slug.current == $condSlug && status == "Disponível"] | order(publicadoEm desc)[0...24] {
-    _id, titulo, slug, tipo, preco, areaUtil, quartos, vagas, tipologia,
+    _id, titulo, slug, tipo, finalidade, preco, areaUtil, quartos, vagas, tipologia,
     ${bairroFragment},
     "imagemCapa": coalesce(imagens[arquivo.principal == true][0], imagens[0]).arquivo {
       asset->{ _id, url, metadata { lqip, dimensions } },
@@ -463,4 +463,6 @@ export const ILHAPURA_IMOVEIS_QUERY = groq`
   *[_type == "imovel" && condominioRef->bairro->slug.current == "ilha-pura" && defined(slug.current) && defined(condominioRef->slug.current)] {
     "slug": slug.current,
     "condSlug": condominioRef->slug.current,
-    finalid
+    finalidade
+  }
+`

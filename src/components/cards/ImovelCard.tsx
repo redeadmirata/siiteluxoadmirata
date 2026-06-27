@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { urlForImovelImage } from '@/sanity/client'
-import { formatPreco, formatArea } from '@/lib/formatters'
+import { formatCurrency as formatPreco, formatArea } from '@/utils'
+import { getCapaUrl } from '@/lib/imovel'
 import type { ImovelCard as ImovelCardType } from '@/types/sanity'
 import FavoritoButton from './FavoritoButton'
 
@@ -10,16 +10,6 @@ interface ImovelCardProps {
   /** LCP hint — true para os primeiros 3 cards da página */
   priority?: boolean
   className?: string
-}
-
-function getCapaUrl(imagemCapa: ImovelCardType['imagemCapa']): string {
-  if (!imagemCapa) return ''
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return urlForImovelImage(imagemCapa as any, 800)
-  } catch {
-    return imagemCapa.asset?.url ?? ''
-  }
 }
 
 export default function ImovelCard({ imovel, priority = false, className = '' }: ImovelCardProps) {
