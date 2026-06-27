@@ -46,6 +46,7 @@ export default function manifest(): MetadataRoute.Manifest {
         src: '/screenshot-mobile.jpg',
         sizes: '390x844',
         type: 'image/jpeg',
+        // @ts-expect-error — label não está tipado no Next.js MetadataRoute.Manifest
         label: 'Admirata Imóveis — Imóvel em destaque',
       },
     ],
