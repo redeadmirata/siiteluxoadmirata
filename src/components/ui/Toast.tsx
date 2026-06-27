@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from 'react'
 import { cn } from '@/utils/cn'
-import { CheckCircle, CircleAlert, Info, AlertCircle, X } from '@/components/icons'
+import { CheckCircle, Info, AlertCircle, X } from '@/components/icons'
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -54,7 +54,7 @@ const toastStyles: Record<ToastType, {
   },
   error: {
     container: 'border-l-4 border-l-red-500',
-    icon:      <CircleAlert className="h-5 w-5" aria-hidden />,
+    icon:      <AlertCircle className="h-5 w-5" aria-hidden />,
     iconColor: 'text-red-500',
   },
   info: {
