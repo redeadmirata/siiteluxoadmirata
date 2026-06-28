@@ -24,7 +24,7 @@ export default function ImovelCard({ imovel, priority = false, className = '' }:
 
   return (
     <Link
-      href={`/imoveis/${slug.current}`}
+      href={`/imovel/${slug.current}`}
       className={`group block ${className}`}
       aria-label={`${titulo} — ${bairro?.nome ?? ''}`}
     >

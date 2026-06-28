@@ -26,7 +26,7 @@ export default function ImovelCardMobile({ imovel, priority = false }: ImovelCar
   const capaUrl = getCapaUrl(imagemCapa, 640)
   const lqip    = imagemCapa?.asset?.metadata?.lqip
   const badge   = getImovelBadge(imovel)
-  const href    = `/imoveis/${slug.current}`
+  const href    = `/imovel/${slug.current}`
 
   const specs = [
     areaUtil ? { val: formatArea(areaUtil), lbl: 'Área' }   : null,

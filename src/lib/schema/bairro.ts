@@ -88,7 +88,7 @@ export function generateBairroSchema(
       numberOfItems: imoveis.length,
       itemListElement: imoveis.map((imovel, i) => {
         const imagemUrl = imovel.imagemCapa?.asset?.url
-        const imovelUrl = `${SITE_URL}/imoveis/${imovel.slug.current}/`
+        const imovelUrl = `${SITE_URL}/imovel/${imovel.slug.current}`
 
         return {
           '@type': 'ListItem',
