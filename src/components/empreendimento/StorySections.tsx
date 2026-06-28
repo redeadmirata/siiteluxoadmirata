@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { m } from 'framer-motion'
 import type { EmpreendimentoData } from './types'
 import { formatNumero } from './formatters'
@@ -73,7 +74,21 @@ export function ArquiteturaSection({ data }: { data: EmpreendimentoData }) {
             </m.dl>
           )}
         </div>
-        {imagem && (
+        {data.arquiteturaLogoSrc && (
+          <Reveal>
+            <div className="border-ink/10 flex min-h-[420px] items-center justify-center rounded-2xl border bg-white p-10 shadow-sm sm:p-16">
+              <Image
+                src={data.arquiteturaLogoSrc}
+                alt={`Logo ${data.nome}`}
+                width={720}
+                height={720}
+                sizes="(max-width: 1024px) 80vw, 40vw"
+                className="h-auto w-full max-w-md object-contain"
+              />
+            </div>
+          </Reveal>
+        )}
+        {!data.arquiteturaLogoSrc && imagem && (
           <Reveal>
             <ParallaxImage src={imagem.src} alt={imagem.alt} lqip={imagem.lqip} />
           </Reveal>
@@ -118,9 +133,17 @@ export function LocalizacaoSection({ data }: { data: EmpreendimentoData }) {
   if (data.estado === 'RJ') estadoLabel = 'Rio de Janeiro'
   else if (data.estado === 'RS') estadoLabel = 'Rio Grande do Sul'
   const mapsHref =
-    data.geo?.lat && data.geo?.lng
+    data.mapsHref ??
+    (data.geo?.lat && data.geo?.lng
       ? `https://www.google.com/maps/search/?api=1&query=${data.geo.lat},${data.geo.lng}`
-      : undefined
+      : undefined)
+  const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+  let mapEmbedSrc: string | undefined
+  if (data.geo?.lat && data.geo?.lng) {
+    mapEmbedSrc = googleMapsApiKey
+      ? `https://www.google.com/maps/embed/v1/place?key=${googleMapsApiKey}&q=${data.geo.lat},${data.geo.lng}&zoom=17&maptype=satellite`
+      : `https://www.google.com/maps?q=${data.geo.lat},${data.geo.lng}&z=17&output=embed`
+  }
 
   return (
     <SectionShell id="localizacao">
@@ -171,6 +194,21 @@ export function LocalizacaoSection({ data }: { data: EmpreendimentoData }) {
           >
             Ver no mapa
           </a>
+        </Reveal>
+      )}
+
+      {mapEmbedSrc && (
+        <Reveal delay={0.15} className="mt-12">
+          <div className="border-ink/10 aspect-[16/9] overflow-hidden rounded-2xl border bg-stone shadow-sm">
+            <iframe
+              src={mapEmbedSrc}
+              title={`Mapa de localização do ${data.nome}`}
+              loading="lazy"
+              allowFullScreen
+              referrerPolicy="no-referrer-when-downgrade"
+              className="h-full w-full border-0"
+            />
+          </div>
         </Reveal>
       )}
     </SectionShell>

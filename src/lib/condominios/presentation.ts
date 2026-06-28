@@ -3,6 +3,7 @@ import { SITE, WHATSAPP } from '@/config/site'
 import type { EmpreendimentoData } from '@/components/empreendimento/types'
 import type { ClubeData } from '@/data/clube-verdant'
 import type { ClubeDia } from '@/data/clube-verdant-programacao'
+import { getCondominioPresentationOverride } from '@/data/condominios'
 import type { CondominioDetalhe } from '@/types/sanity'
 
 const TIPO_LABELS: Readonly<Record<string, string>> = {
@@ -55,6 +56,16 @@ export function asMp4(url?: string) {
   return /\.mp4($|\?)/i.test(url) ? url : undefined
 }
 
+function replacePresentationText(
+  text: string,
+  replacements: ReadonlyArray<{ from: string; to: string }> = []
+) {
+  return replacements.reduce(
+    (result, replacement) => result.split(replacement.from).join(replacement.to),
+    text
+  )
+}
+
 export function buildCondominioMetadata(
   condominio: CondominioDetalhe,
   locale: string,
@@ -62,11 +73,15 @@ export function buildCondominioMetadata(
 ): Metadata {
   const localePrefix = getLocalePrefix(locale)
   const canonicalUrl = `${SITE.url}${localePrefix}${getCanonicalPath(condominio, slug)}`
+  const override = getCondominioPresentationOverride(slug)
   const titulo = condominio.seo?.titulo ?? `${condominio.nome} — Condomínio de Alto Padrão`
   const plural = condominio.totalImoveis !== 1
   const descricao =
     condominio.seo?.descricao ??
     `Conheça o ${condominio.nome}${condominio.bairro ? ` em ${condominio.bairro.nome}` : ''}. ${condominio.totalImoveis} imóvel${plural ? 'is' : ''} disponível${plural ? 'is' : ''}. Admirata Imóveis.`
+  const openGraphImageUrl = override?.heroImageSrc
+    ? `${SITE.url}${override.heroImageSrc}`
+    : condominio.fotoCapa?.asset?.url
 
   return {
     title: titulo,
@@ -77,9 +92,7 @@ export function buildCondominioMetadata(
       description: descricao,
       type: 'website',
       url: canonicalUrl,
-      images: condominio.fotoCapa?.asset?.url
-        ? [{ url: condominio.fotoCapa.asset.url, alt: condominio.nome }]
-        : [],
+      images: openGraphImageUrl ? [{ url: openGraphImageUrl, alt: condominio.nome }] : [],
     },
     robots:
       condominio.forcarNoindex || condominio.totalImoveis === 0 ? { index: false } : undefined,
@@ -91,9 +104,11 @@ export function buildEmpreendimentoData(
   locale: string
 ): EmpreendimentoData {
   const localePrefix = getLocalePrefix(locale)
+  const override = getCondominioPresentationOverride(condominio.slug.current)
   const paragrafos = flattenPortableText(condominio.sobre)
   let textos = paragrafos
   if (textos.length === 0 && condominio.descricao) textos = [condominio.descricao]
+  textos = textos.map((texto) => replacePresentationText(texto, override?.textReplacements))
   const galeria = (condominio.galeria ?? [])
     .filter((item) => item.asset?.url)
     .map((item) => ({
@@ -103,9 +118,20 @@ export function buildEmpreendimentoData(
       lqip: item.asset.metadata?.lqip ?? undefined,
     }))
   const capaSrc = condominio.fotoCapa?.asset?.url
-  const heroImageSrc = capaSrc ?? galeria[0]?.src
-  const heroImageLqip = condominio.fotoCapa?.asset?.metadata?.lqip ?? galeria[0]?.lqip
+  const heroImageSrc = override?.heroImageSrc ?? capaSrc ?? galeria[0]?.src
+  const heroImageLqip = override?.heroImageSrc
+    ? undefined
+    : (condominio.fotoCapa?.asset?.metadata?.lqip ?? galeria[0]?.lqip)
   const heroVideoMp4 = asMp4(condominio.heroVideoUrl) ?? asMp4(condominio.videoTour)
+  const plantas = override?.plantas
+    ? override.plantas.map((planta) => ({ ...planta }))
+    : (condominio.plantasBaixas ?? []).map((planta) => ({
+        nome: planta.nome,
+        quartos: planta.quartos,
+        area: planta.area,
+        src: planta.imagem?.url,
+        lqip: planta.imagem?.metadata?.lqip,
+      }))
   const isSerraGaucha = condominio.bairro?.mercado === 'Serra Gaúcha'
   const whatsappText = encodeURIComponent(
     `Olá, tenho interesse em imóveis no ${condominio.nome}${condominio.bairro ? ` (${condominio.bairro.nome})` : ''}.`
@@ -121,6 +147,7 @@ export function buildEmpreendimentoData(
     heroImageSrc,
     heroImageLqip,
     heroVideoMp4,
+    arquiteturaLogoSrc: override?.arquiteturaLogoSrc,
     manifesto: textos[0],
     sobreParagrafos: textos.slice(1),
     construtora: condominio.construtora,
@@ -134,15 +161,12 @@ export function buildEmpreendimentoData(
     areaPrivativaMax: condominio.areaPrivativaMax,
     infraestrutura: condominio.infraestrutura,
     galeria,
-    plantas: (condominio.plantasBaixas ?? []).map((planta) => ({
-      nome: planta.nome,
-      quartos: planta.quartos,
-      area: planta.area,
-      src: planta.imagem?.url,
-      lqip: planta.imagem?.metadata?.lqip,
-    })),
-    proximidades: condominio.geo?.proximidades,
-    geo: condominio.geo,
+    plantas,
+    proximidades: override?.proximidades
+      ? [...override.proximidades]
+      : condominio.geo?.proximidades,
+    geo: override?.geo ?? condominio.geo,
+    mapsHref: override?.mapsHref,
     whatsappHref: `https://wa.me/${WHATSAPP.rj}?text=${whatsappText}`,
     whatsappHrefRS: isSerraGaucha ? `https://wa.me/${WHATSAPP.rs}?text=${whatsappText}` : undefined,
     imoveisHref: condominio.bairro
@@ -159,7 +183,11 @@ export function buildCondominioJsonLd(
 ) {
   const localePrefix = getLocalePrefix(locale)
   const pageUrl = `${SITE.url}${localePrefix}/condominios/${slug}`
-  const capaSrc = condominio.fotoCapa?.asset?.url
+  const override = getCondominioPresentationOverride(slug)
+  const capaSrc = override?.heroImageSrc
+    ? `${SITE.url}${override.heroImageSrc}`
+    : condominio.fotoCapa?.asset?.url
+  const geo = override?.geo ?? condominio.geo
   const graph: Array<Record<string, unknown>> = [
     {
       '@type': 'BreadcrumbList',
@@ -190,12 +218,12 @@ export function buildCondominioJsonLd(
             },
           }
         : {}),
-      ...(condominio.geo?.lat && condominio.geo?.lng
+      ...(geo?.lat && geo?.lng
         ? {
             geo: {
               '@type': 'GeoCoordinates',
-              latitude: condominio.geo.lat,
-              longitude: condominio.geo.lng,
+              latitude: geo.lat,
+              longitude: geo.lng,
             },
           }
         : {}),

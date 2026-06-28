@@ -8,6 +8,7 @@ export interface EmpreendimentoData {
   heroImageSrc?: string
   heroImageLqip?: string
   heroVideoMp4?: string
+  arquiteturaLogoSrc?: string
   manifesto?: string
   sobreParagrafos?: string[]
   construtora?: string
@@ -24,6 +25,7 @@ export interface EmpreendimentoData {
   plantas?: Array<{ nome: string; quartos?: string; area?: number; src?: string; lqip?: string }>
   proximidades?: string[]
   geo?: { lat?: number; lng?: number }
+  mapsHref?: string
   whatsappHref: string
   whatsappHrefRS?: string
   imoveisHref?: string

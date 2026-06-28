@@ -55,6 +55,34 @@ describe('apresentação de condomínios', () => {
     expect(landing.whatsappHref).toContain('wa.me/5521998079459')
   })
 
+  it('aplica a apresentação local específica do Verdant Valley', () => {
+    const verdant: CondominioDetalhe = {
+      ...condominio,
+      nome: 'Verdant Valley Residence',
+      slug: { current: 'verdant-valley' },
+      sobre: [
+        {
+          _type: 'block',
+          children: [{ text: 'Um condomínio de alto padrão em Jacarepaguá.' }],
+        },
+        {
+          _type: 'block',
+          children: [{ text: 'Unidades com acabamento de alto padrão.' }],
+        },
+      ],
+    }
+
+    const landing = buildEmpreendimentoData(verdant, 'pt-BR')
+
+    expect(landing.heroImageSrc).toBe('/images/verdant-valley/hero-residence.jpg')
+    expect(landing.arquiteturaLogoSrc).toBe('/images/verdant-valley/logo-verdant-valley.png')
+    expect(landing.geo).toEqual({ lat: -22.9703479, lng: -43.4229203 })
+    expect(landing.plantas).toHaveLength(3)
+    expect([landing.manifesto, ...(landing.sobreParagrafos ?? [])].join(' ')).not.toMatch(
+      /alto padrão/i
+    )
+  })
+
   it('inclui a programação do clube no JSON-LD do condomínio', () => {
     const jsonLd = buildCondominioJsonLd(condominio, 'pt-BR', 'residencial-teste', clubeVerdant)
 
