@@ -169,28 +169,6 @@ export default function CidadesDestaque() {
     >
       <div style={{ maxWidth: 1440, margin: '0 auto' }}>
 
-        {/* header */}
-        <div style={{ marginBottom: 'clamp(2.5rem, 6vw, 4rem)', maxWidth: 600 }}>
-          <p style={{
-            fontSize: 10,
-            textTransform: 'uppercase',
-            letterSpacing: '0.42em',
-            color: 'var(--color-gold)',
-            marginBottom: 16,
-          }}>
-            Onde atuamos
-          </p>
-          <h2 style={{
-            fontFamily: 'var(--font-display)',
-            fontWeight: 300,
-            fontSize: 'clamp(2rem, 5vw, 3.5rem)',
-            color: '#fff',
-            lineHeight: 1.06,
-          }}>
-            Dois mercados,\numa curadoria.
-          </h2>
-        </div>
-
         {/* cards */}
         <div style={{
           display: 'flex',
