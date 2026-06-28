@@ -21,6 +21,13 @@ import {
 import type { CondominioDetalhe, ImovelCard } from '@/types/sanity'
 import { routing } from '@/i18n/routing'
 import { EmpreendimentoLanding, type EmpreendimentoData } from '@/components/empreendimento'
+import ClubeSection from '@/components/clube/ClubeSection'
+import { clubeVerdant, type ClubeData } from '@/data/clube-verdant'
+
+/** Clubes destacados por slug de condomínio (orientado a dados) */
+const CLUBES: Record<string, ClubeData> = {
+  'verdant-valley': clubeVerdant,
+}
 
 export const revalidate = 3600
 export const dynamicParams = true
@@ -121,6 +128,8 @@ export default async function CondominioPage({ params }: PageProps) {
 
   if (!cond) notFound()
 
+  const clube = CLUBES[params.slug]
+
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://admirata.com.br'
   const localePrefix = params.locale === 'pt-BR' ? '' : `/${params.locale}`
   const pageUrl = `${siteUrl}${localePrefix}/condominios/${params.slug}`
@@ -218,18 +227,31 @@ export default async function CondominioPage({ params }: PageProps) {
         },
       }),
       numberOfRooms: cond.numUnidades,
-      amenityFeature: cond.infraestrutura?.map((f) => ({
-        '@type': 'LocationFeatureSpecification',
-        name: f,
-        value: true,
-      })),
+      amenityFeature: [
+        ...(cond.infraestrutura ?? []).map((f) => ({
+          '@type': 'LocationFeatureSpecification',
+          name: f,
+          value: true,
+        })),
+        // Atividades do clube enriquecem o SEO (condomínio com natação, beach tennis, etc.)
+        ...(clube
+          ? clube.programacao.flatMap((c) =>
+              c.atividades.map((a) => ({
+                '@type': 'LocationFeatureSpecification',
+                name: a.nome,
+                value: true,
+              })),
+            )
+          : []),
+      ],
     },
   ]
 
-  if (cond.faqs && cond.faqs.length > 0) {
+  const allFaqs = [...(cond.faqs ?? []), ...(clube ? clube.seo.faqs : [])]
+  if (allFaqs.length > 0) {
     graph.push({
       '@type': 'FAQPage',
-      mainEntity: cond.faqs.map((faq) => ({
+      mainEntity: allFaqs.map((faq) => ({
         '@type': 'Question',
         name: faq.pergunta,
         acceptedAnswer: { '@type': 'Answer', text: faq.resposta },
@@ -302,6 +324,9 @@ export default async function CondominioPage({ params }: PageProps) {
 
       {/* ── Experiência cinematográfica (Hero → CTA) ──────────────────────── */}
       <EmpreendimentoLanding data={landingData} />
+
+      {/* ── Destaque do Clube (seção imersiva) ────────────────────────────── */}
+      {clube && <ClubeSection data={clube} whatsappHref={landingData.whatsappHref} />}
 
       {/* ── Unidades disponíveis ──────────────────────────────────────────── */}
       {imoveis.length > 0 && (
