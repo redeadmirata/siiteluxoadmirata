@@ -49,7 +49,7 @@ export const corretor = defineType({
       name: 'whatsapp',
       title: 'WhatsApp (apenas números)',
       type: 'string',
-      description: 'Ex: 5521999999999',
+      description: 'Ex: 5521998079459',
     }),
     defineField({
       name: 'email',

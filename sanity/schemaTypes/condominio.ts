@@ -423,7 +423,7 @@ export const condominio = defineType({
       title: 'WhatsApp dedicado para corretores',
       type: 'string',
       group: 'corretor',
-      description: 'Número com DDI. Ex: 5521999999999 — pode ser diferente do WhatsApp de clientes.',
+      description: 'Número com DDI. Ex: 5521998079459 — pode ser diferente do WhatsApp de clientes.',
     }),
     defineField({
       name: 'mensagemCorretorWhatsapp',
