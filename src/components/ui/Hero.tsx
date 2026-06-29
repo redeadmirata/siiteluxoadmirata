@@ -70,7 +70,7 @@ export function Hero({
           alt=""
           fill
           priority
-          quality={90}
+          quality={85}
           sizes="100vw"
           className="object-cover"
           aria-hidden

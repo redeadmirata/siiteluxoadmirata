@@ -106,7 +106,7 @@ export function Gallery({ images, layout = 'grid', lightbox = true, columns = 3,
               width={1200}
               height={800}
               className="max-h-[90vh] max-w-[90vw] object-contain"
-              quality={90}
+              quality={85}
             />
 
             {/* Caption */}
@@ -168,7 +168,7 @@ function GalleryThumb({
         fill
         sizes="(max-width: 768px) 50vw, 33vw"
         className="object-cover transition-transform duration-500 group-hover:scale-105"
-        quality={80}
+        quality={85}
       />
       <div className="absolute inset-0 bg-ink/0 group-hover:bg-ink/20 transition-colors duration-300" />
     </button>
