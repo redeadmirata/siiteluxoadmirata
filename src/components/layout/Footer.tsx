@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 import FooterNewsletter from './FooterNewsletter'
@@ -32,22 +33,43 @@ const MAIS_BUSCADOS = [
   {
     titulo: 'Apartamentos',
     links: [
-      { label: 'Apartamento Barra da Tijuca', href: '/imoveis?tipo=Apartamento&bairroSlug=barra-da-tijuca' },
-      { label: 'Apartamento Recreio', href: '/imoveis?tipo=Apartamento&bairroSlug=recreio-dos-bandeirantes' },
+      {
+        label: 'Apartamento Barra da Tijuca',
+        href: '/imoveis?tipo=Apartamento&bairroSlug=barra-da-tijuca',
+      },
+      {
+        label: 'Apartamento Recreio',
+        href: '/imoveis?tipo=Apartamento&bairroSlug=recreio-dos-bandeirantes',
+      },
       { label: 'Apartamento Leblon', href: '/imoveis?tipo=Apartamento&bairroSlug=leblon' },
       { label: 'Apartamento Ipanema', href: '/imoveis?tipo=Apartamento&bairroSlug=ipanema' },
       { label: 'Apartamento Gramado', href: '/imoveis?tipo=Apartamento&bairroSlug=gramado' },
-      { label: 'Apartamento alto padrão RJ', href: '/imoveis?tipo=Apartamento&mercado=Rio+de+Janeiro' },
+      {
+        label: 'Apartamento alto padrão RJ',
+        href: '/imoveis?tipo=Apartamento&mercado=Rio+de+Janeiro',
+      },
     ],
   },
   {
     titulo: 'Coberturas',
     links: [
-      { label: 'Cobertura Barra da Tijuca', href: '/imoveis?tipo=Cobertura&bairroSlug=barra-da-tijuca' },
-      { label: 'Cobertura duplex Recreio', href: '/imoveis?tipo=Cobertura&bairroSlug=recreio-dos-bandeirantes' },
+      {
+        label: 'Cobertura Barra da Tijuca',
+        href: '/imoveis?tipo=Cobertura&bairroSlug=barra-da-tijuca',
+      },
+      {
+        label: 'Cobertura duplex Recreio',
+        href: '/imoveis?tipo=Cobertura&bairroSlug=recreio-dos-bandeirantes',
+      },
       { label: 'Cobertura Leblon', href: '/imoveis?tipo=Cobertura&bairroSlug=leblon' },
-      { label: 'Penthouse Barra da Tijuca', href: '/imoveis?tipo=Penthouse&bairroSlug=barra-da-tijuca' },
-      { label: 'Penthouse Recreio', href: '/imoveis?tipo=Penthouse&bairroSlug=recreio-dos-bandeirantes' },
+      {
+        label: 'Penthouse Barra da Tijuca',
+        href: '/imoveis?tipo=Penthouse&bairroSlug=barra-da-tijuca',
+      },
+      {
+        label: 'Penthouse Recreio',
+        href: '/imoveis?tipo=Penthouse&bairroSlug=recreio-dos-bandeirantes',
+      },
       { label: 'Cobertura de luxo RJ', href: '/imoveis?tipo=Cobertura&mercado=Rio+de+Janeiro' },
     ],
   },
@@ -55,7 +77,10 @@ const MAIS_BUSCADOS = [
     titulo: 'Casas',
     links: [
       { label: 'Casa Barra da Tijuca', href: '/imoveis?tipo=Casa&bairroSlug=barra-da-tijuca' },
-      { label: 'Casa em condomínio Recreio', href: '/imoveis?tipo=Casa&bairroSlug=recreio-dos-bandeirantes' },
+      {
+        label: 'Casa em condomínio Recreio',
+        href: '/imoveis?tipo=Casa&bairroSlug=recreio-dos-bandeirantes',
+      },
       { label: 'Casa Gramado RS', href: '/imoveis?tipo=Casa&bairroSlug=gramado' },
       { label: 'Casa de luxo Rio de Janeiro', href: '/imoveis?tipo=Casa&mercado=Rio+de+Janeiro' },
       { label: 'Casa Canela RS', href: '/imoveis?tipo=Casa&bairroSlug=canela' },
@@ -77,7 +102,10 @@ const MAIS_BUSCADOS = [
     titulo: 'Bairros',
     links: [
       { label: 'Imóveis Barra da Tijuca', href: '/imoveis?bairroSlug=barra-da-tijuca' },
-      { label: 'Imóveis Recreio dos Bandeirantes', href: '/imoveis?bairroSlug=recreio-dos-bandeirantes' },
+      {
+        label: 'Imóveis Recreio dos Bandeirantes',
+        href: '/imoveis?bairroSlug=recreio-dos-bandeirantes',
+      },
       { label: 'Imóveis Leblon', href: '/imoveis?bairroSlug=leblon' },
       { label: 'Imóveis Ipanema', href: '/imoveis?bairroSlug=ipanema' },
       { label: 'Imóveis Gramado RS', href: '/gramado' },
@@ -102,33 +130,37 @@ export default async function Footer() {
   const ano = new Date().getFullYear()
 
   return (
-    <footer className="bg-ink text-white/70" aria-label="Rodapé">
+    <footer className="bg-ink text-white/80" aria-label="Rodapé">
       {/* Newsletter */}
       <FooterNewsletter />
 
       {/* Divisor dourado */}
-      <div className="h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent" aria-hidden="true" />
+      <div
+        className="via-gold/40 h-px bg-gradient-to-r from-transparent to-transparent"
+        aria-hidden="true"
+      />
 
       {/* Corpo principal */}
-      <div className="max-w-screen-xl mx-auto px-6 lg:px-10 pt-16 pb-10">
-        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr_1fr_1fr] gap-12 lg:gap-8 mb-16">
-
+      <div className="mx-auto max-w-screen-xl px-6 pb-10 pt-16 lg:px-10">
+        <div className="mb-16 grid grid-cols-1 gap-12 lg:grid-cols-[2fr_1fr_1fr_1fr] lg:gap-8">
           {/* Coluna 1: Brand */}
           <div>
             <Link
               href="/"
-              className="inline-flex items-center gap-3 mb-6 group"
+              className="group mb-6 inline-flex items-center"
               aria-label="Admirata Imóveis — início"
             >
-              <span className="flex items-center justify-center w-10 h-10 border border-gold/50 font-display text-base text-gold group-hover:border-gold transition-colors">
-                A
-              </span>
-              <span className="text-xs tracking-[0.22em] uppercase text-white/80 group-hover:text-white transition-colors">
-                Admirata Imóveis
-              </span>
+              <Image
+                src="/logo-horizontal.png"
+                alt="Admirata Imóveis"
+                width={250}
+                height={86}
+                sizes="220px"
+                className="h-auto w-[220px] transition-opacity group-hover:opacity-85"
+              />
             </Link>
 
-            <p className="text-sm text-white/45 leading-relaxed max-w-xs mb-6">
+            <p className="mb-6 max-w-xs text-sm leading-relaxed text-white/65">
               {t('description')}
             </p>
 
@@ -137,25 +169,31 @@ export default async function Footer() {
                 href="https://wa.me/5521998079459?text=Ol%C3%A1%2C%20tenho%20interesse%20em%20im%C3%B3veis%20da%20Admirata."
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-xs tracking-wider text-gold hover:text-[#d4ac1a] transition-colors"
+                className="inline-flex items-center gap-2 text-xs tracking-wider text-gold transition-colors hover:text-[#d4ac1a]"
               >
-                <span aria-hidden="true" className="text-base leading-none">+</span>
+                <span aria-hidden="true" className="text-base leading-none">
+                  +
+                </span>
                 WhatsApp Rio de Janeiro
               </a>
               <a
                 href="https://wa.me/5554992643070?text=Ol%C3%A1%2C%20tenho%20interesse%20em%20im%C3%B3veis%20da%20Admirata."
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-xs tracking-wider text-gold hover:text-[#d4ac1a] transition-colors"
+                className="inline-flex items-center gap-2 text-xs tracking-wider text-gold transition-colors hover:text-[#d4ac1a]"
               >
-                <span aria-hidden="true" className="text-base leading-none">+</span>
+                <span aria-hidden="true" className="text-base leading-none">
+                  +
+                </span>
                 WhatsApp Serra Gaúcha
               </a>
               <a
                 href="mailto:atendimento@admirataimoveis.com.br"
-                className="inline-flex items-center gap-2 text-xs tracking-wider text-white/50 hover:text-white transition-colors"
+                className="inline-flex items-center gap-2 text-xs tracking-wider text-white/70 transition-colors hover:text-white"
               >
-                <span aria-hidden="true" className="text-base leading-none">@</span>
+                <span aria-hidden="true" className="text-base leading-none">
+                  @
+                </span>
                 atendimento@admirataimoveis.com.br
               </a>
             </div>
@@ -163,13 +201,16 @@ export default async function Footer() {
 
           {/* Coluna 2: Imóveis */}
           <nav aria-label="Links de imóveis">
-            <h3 className="text-[10px] uppercase tracking-[0.3em] text-gold mb-5">
+            <h3 className="mb-5 text-[10px] uppercase tracking-[0.3em] text-gold">
               {t('imoveis')}
             </h3>
             <ul className="flex flex-col gap-3" role="list">
               {NAV_IMOVEIS.map(({ href, label }) => (
                 <li key={href}>
-                  <Link href={href} className="text-xs text-white/50 hover:text-white transition-colors">
+                  <Link
+                    href={href}
+                    className="text-xs text-white/70 transition-colors hover:text-white"
+                  >
                     {label}
                   </Link>
                 </li>
@@ -179,13 +220,16 @@ export default async function Footer() {
 
           {/* Coluna 3: Empresa */}
           <nav aria-label="Links da empresa">
-            <h3 className="text-[10px] uppercase tracking-[0.3em] text-gold mb-5">
+            <h3 className="mb-5 text-[10px] uppercase tracking-[0.3em] text-gold">
               {t('empresa')}
             </h3>
             <ul className="flex flex-col gap-3" role="list">
               {NAV_EMPRESA.map(({ href, label }) => (
                 <li key={href}>
-                  <Link href={href} className="text-xs text-white/50 hover:text-white transition-colors">
+                  <Link
+                    href={href}
+                    className="text-xs text-white/70 transition-colors hover:text-white"
+                  >
                     {label}
                   </Link>
                 </li>
@@ -195,13 +239,16 @@ export default async function Footer() {
 
           {/* Coluna 4: Mercados */}
           <nav aria-label="Mercados e localizações">
-            <h3 className="text-[10px] uppercase tracking-[0.3em] text-gold mb-5">
+            <h3 className="mb-5 text-[10px] uppercase tracking-[0.3em] text-gold">
               {t('localizacoes')}
             </h3>
             <ul className="flex flex-col gap-3" role="list">
               {MERCADOS.map(({ href, label }) => (
                 <li key={label}>
-                  <Link href={href} className="text-xs text-white/50 hover:text-white transition-colors">
+                  <Link
+                    href={href}
+                    className="text-xs text-white/70 transition-colors hover:text-white"
+                  >
                     {label}
                   </Link>
                 </li>
@@ -211,17 +258,17 @@ export default async function Footer() {
         </div>
 
         {/* Divisor */}
-        <div className="h-px bg-white/8 mb-12" aria-hidden="true" />
+        <div className="bg-white/8 mb-12 h-px" aria-hidden="true" />
 
         {/* Mais buscados — SEO section (kept in PT for SEO value) */}
         <div className="mb-12">
-          <p className="text-[9px] uppercase tracking-[0.35em] text-white/25 mb-8">
+          <p className="mb-8 text-[9px] uppercase tracking-[0.35em] text-white/55">
             {t('maisBuscados')}
           </p>
-          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-x-6 gap-y-8">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-8 lg:grid-cols-3 xl:grid-cols-5">
             {MAIS_BUSCADOS.map(({ titulo, links }) => (
               <nav key={titulo} aria-label={`Links: ${titulo}`}>
-                <h3 className="text-[9px] uppercase tracking-[0.25em] text-white/35 mb-3">
+                <h3 className="mb-3 text-[9px] uppercase tracking-[0.25em] text-white/65">
                   {titulo}
                 </h3>
                 <ul className="flex flex-col gap-2" role="list">
@@ -229,7 +276,7 @@ export default async function Footer() {
                     <li key={label}>
                       <Link
                         href={href}
-                        className="text-[11px] text-white/30 hover:text-white/70 leading-relaxed transition-colors duration-150"
+                        className="text-[11px] leading-relaxed text-white/55 transition-colors duration-150 hover:text-white/85"
                       >
                         {label}
                       </Link>
@@ -242,21 +289,23 @@ export default async function Footer() {
         </div>
 
         {/* Divisor */}
-        <div className="h-px bg-white/8 mb-8" aria-hidden="true" />
+        <div className="bg-white/8 mb-8 h-px" aria-hidden="true" />
 
         {/* Rodapé inferior */}
-        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 text-[11px] text-white/30">
+        <div className="flex flex-col items-start justify-between gap-4 text-[11px] text-white/55 lg:flex-row lg:items-center">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
             <span>{t('copyright', { year: ano })}</span>
-            <span aria-hidden="true" className="hidden lg:inline">|</span>
+            <span aria-hidden="true" className="hidden lg:inline">
+              |
+            </span>
             <span>{t('creci')}</span>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/politica-de-privacidade" className="hover:text-white/60 transition-colors">
+            <Link href="/politica-de-privacidade" className="transition-colors hover:text-white/60">
               {t('privacy')}
             </Link>
             <span aria-hidden="true">|</span>
-            <Link href="/termos-de-uso" className="hover:text-white/60 transition-colors">
+            <Link href="/termos-de-uso" className="transition-colors hover:text-white/60">
               {t('terms')}
             </Link>
           </div>

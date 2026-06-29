@@ -5,12 +5,15 @@ export default function ClubeGallery({ galeria = [] }: { galeria?: ClubeData['ga
   if (galeria.length === 0) return null
 
   return (
-    <section aria-labelledby="clube-gallery-title" className="bg-stone/30 py-24 sm:py-32">
+    <section
+      aria-labelledby="clube-gallery-title"
+      className="bg-[#070910] py-24 text-white sm:py-32"
+    >
       <div className="container-site">
         <p className="text-[10px] uppercase tracking-[0.38em] text-gold">Atmosfera</p>
         <h3
           id="clube-gallery-title"
-          className="mt-5 font-display text-5xl font-light text-ink sm:text-6xl"
+          className="mt-5 font-display text-5xl font-light text-white sm:text-6xl"
         >
           Um resort à porta de casa
         </h3>

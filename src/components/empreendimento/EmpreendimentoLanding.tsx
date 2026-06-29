@@ -24,10 +24,13 @@ export default function EmpreendimentoLanding({ data }: { data: EmpreendimentoDa
     data.numTorres ||
     data.anoEntrega ||
     data.areaTotal ||
+    data.arquiteturaLogoSrc ||
     data.sobreParagrafos?.[0]
   )
   const temLifestyle = (data.sobreParagrafos?.length ?? 0) > 1
-  const temLocalizacao = Boolean(data.bairroNome || (data.proximidades?.length ?? 0) > 0)
+  const temLocalizacao = Boolean(
+    data.bairroNome || data.geo?.lat || data.geo?.lng || (data.proximidades?.length ?? 0) > 0
+  )
   const temDiferenciais = Boolean(
     data.precoMinimo ||
     data.numUnidades ||

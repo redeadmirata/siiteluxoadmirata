@@ -188,6 +188,7 @@ export const CONDOMINIO_QUERY = groq`
     sobre,
     bairro->{ _id, nome, slug, cidade, estado, mercado },
     "fotoCapa": fotoCapa { asset->{ _id, url, metadata { lqip, dimensions } }, hotspot, crop },
+    "logoEmpreendimento": logoEmpreendimento { asset->{ _id, url, metadata { lqip, dimensions } }, alt },
     galeria[]{ "asset": asset.asset->{ _id, url, metadata { lqip, dimensions } }, alt, legenda },
     plantasBaixas[]{ nome, quartos, area, "imagem": imagem.asset->{ _id, url, metadata { lqip, dimensions } } },
     faqs[] { pergunta, resposta },

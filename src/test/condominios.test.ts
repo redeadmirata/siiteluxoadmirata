@@ -45,12 +45,28 @@ describe('apresentação de condomínios', () => {
 
   it('gera metadata canônica e conteúdo de landing a partir dos dados', () => {
     const metadata = buildCondominioMetadata(condominio, 'pt-BR', 'residencial-teste')
-    const landing = buildEmpreendimentoData(condominio, 'pt-BR')
+    const landing = buildEmpreendimentoData(
+      {
+        ...condominio,
+        logoEmpreendimento: {
+          asset: {
+            _id: 'logo-1',
+            url: 'https://cdn.sanity.io/logo.png',
+            metadata: {
+              lqip: 'data:image/jpeg;base64,logo',
+              dimensions: { width: 800, height: 800, aspectRatio: 1 },
+            },
+          },
+        },
+      },
+      'pt-BR'
+    )
 
     expect(metadata.alternates?.canonical).toBe(
       'https://admirata.com.br/condominios/residencial-teste'
     )
     expect(landing.nome).toBe('Residencial Teste')
+    expect(landing.arquiteturaLogoSrc).toBe('https://cdn.sanity.io/logo.png')
     expect(landing.manifesto).toBe('Descrição do condomínio.')
     expect(landing.whatsappHref).toContain('wa.me/5521998079459')
   })

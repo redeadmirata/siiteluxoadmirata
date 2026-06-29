@@ -212,6 +212,7 @@ export interface CondominioDetalhe extends Omit<CondominioCard, 'fotoCapa'> {
     proximidades?: string[]
   }
   fotoCapa?: SanityImageFile
+  logoEmpreendimento?: SanityImageFile
   galeria?: GaleriaItem[]
   condominiosProximos?: Array<{ nome: string; slug: { current: string } }>
   seo?: { titulo?: string; descricao?: string }

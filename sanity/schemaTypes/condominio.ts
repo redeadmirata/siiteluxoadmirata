@@ -125,7 +125,8 @@ export const condominio = defineType({
           },
         }),
       ],
-      description: 'Tipologias existentes — usadas para gerar páginas de tipologia (Nível 3 da hierarquia).',
+      description:
+        'Tipologias existentes — usadas para gerar páginas de tipologia (Nível 3 da hierarquia).',
     }),
     defineField({
       name: 'status',
@@ -187,7 +188,8 @@ export const condominio = defineType({
       title: 'Vídeo do hero (URL)',
       type: 'url',
       group: 'basico',
-      description: 'YouTube, Vimeo ou MP4. Se vazio, usa o Vídeo tour no hero. Prioridade: heroVideoUrl > videoTour > fotoCapa.',
+      description:
+        'YouTube, Vimeo ou MP4. Se vazio, usa o Vídeo tour no hero. Prioridade: heroVideoUrl > videoTour > fotoCapa.',
     }),
     defineField({
       name: 'ordem',
@@ -204,7 +206,8 @@ export const condominio = defineType({
       type: 'array',
       group: 'conteudo',
       of: [defineArrayMember({ type: 'block' })],
-      description: 'Texto ÚNICO e original. Sem este campo, a página recebe noindex automático (anti-thin-content).',
+      description:
+        'Texto ÚNICO e original. Sem este campo, a página recebe noindex automático (anti-thin-content).',
     }),
     defineField({
       name: 'descricao',
@@ -269,9 +272,7 @@ export const condominio = defineType({
       type: 'image',
       group: 'midia',
       options: { hotspot: true },
-      fields: [
-        defineField({ name: 'alt', title: 'Texto alternativo', type: 'string' }),
-      ],
+      fields: [defineField({ name: 'alt', title: 'Texto alternativo', type: 'string' })],
     }),
     defineField({
       name: 'galeria',
@@ -282,7 +283,12 @@ export const condominio = defineType({
         defineArrayMember({
           type: 'object',
           fields: [
-            defineField({ name: 'asset', title: 'Imagem', type: 'image', options: { hotspot: true } }),
+            defineField({
+              name: 'asset',
+              title: 'Imagem',
+              type: 'image',
+              options: { hotspot: true },
+            }),
             defineField({ name: 'alt', title: 'Alt', type: 'string' }),
             defineField({ name: 'legenda', title: 'Legenda', type: 'string' }),
           ],
@@ -367,7 +373,8 @@ export const condominio = defineType({
       title: 'Tabela de preços (PDF)',
       type: 'file',
       group: 'corretor',
-      description: 'PDF da tabela atualizada. Visível apenas para corretores logados (futuramente).',
+      description:
+        'PDF da tabela atualizada. Visível apenas para corretores logados (futuramente).',
       options: { accept: '.pdf' },
     }),
     defineField({
@@ -423,7 +430,8 @@ export const condominio = defineType({
       title: 'WhatsApp dedicado para corretores',
       type: 'string',
       group: 'corretor',
-      description: 'Número com DDI. Ex: 5521998079459 — pode ser diferente do WhatsApp de clientes.',
+      description:
+        'Número com DDI. Ex: 5521998079459 — pode ser diferente do WhatsApp de clientes.',
     }),
     defineField({
       name: 'mensagemCorretorWhatsapp',
