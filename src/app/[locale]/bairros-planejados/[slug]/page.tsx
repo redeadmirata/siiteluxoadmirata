@@ -308,22 +308,33 @@ export default async function BairroPlanejadiSlugPage({ params, searchParams }: 
         dangerouslySetInnerHTML={{ __html: JSON.stringify({ '@context': 'https://schema.org', '@graph': jsonLd }) }}
       />
 
-      {/* ── Hero ── */}
+      {/* ── Hero: vídeo imersivo sem texto ── */}
       <section
         style={{
           position: 'relative',
-          minHeight: '85vh',
-          display: 'flex',
-          alignItems: 'flex-end',
+          height: '100svh',
+          minHeight: 520,
           background: '#0a0f1e',
           overflow: 'hidden',
-          paddingTop: 72,
         }}
       >
-        {/* Vídeo imersivo (zIndex 1 — sobrepõe a foto) */}
+        {/* Breadcrumb flutuante (único texto sobre o vídeo) */}
+        <div style={{ position: 'absolute', top: 88, left: 0, right: 0, zIndex: 10, padding: '0 clamp(1.5rem, 5vw, 4rem)' }}>
+          <BreadcrumbNav
+            items={[
+              { label: 'Início', href: '/' },
+              { label: 'Rio de Janeiro', href: '/bairros' },
+              { label: 'Bairros Planejados', href: '/bairros-planejados' },
+              { label: bairro.nome },
+            ]}
+            dark
+          />
+        </div>
+
+        {/* Vídeo imersivo */}
         <HeroMediaVideo url={bairro.heroVideoUrl} />
 
-        {/* Imagem aérea (fallback, zIndex 0) */}
+        {/* Imagem (fallback sem vídeo) */}
         {heroImage && !bairro.heroVideoUrl && (
           <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
             <Image
@@ -335,173 +346,189 @@ export default async function BairroPlanejadiSlugPage({ params, searchParams }: 
               sizes="100vw"
               placeholder={heroLqip ? 'blur' : 'empty'}
               blurDataURL={heroLqip}
-              style={{
-                transform: 'scale(1.04)',
-                transformOrigin: 'center',
-                animation: 'kenBurns 22s ease-in-out infinite alternate',
-              }}
+              style={{ animation: 'kenBurns 22s ease-in-out infinite alternate' }}
             />
           </div>
         )}
 
-        {/* Gradiente (zIndex 2 — acima do vídeo) */}
+        {/* Gradiente suave apenas na base */}
         <div
           aria-hidden="true"
           style={{
             position: 'absolute',
             inset: 0,
             zIndex: 2,
-            background: (heroImage || bairro.heroVideoUrl)
-              ? 'linear-gradient(to top, rgba(9,11,21,0.92) 0%, rgba(9,11,21,0.55) 45%, rgba(9,11,21,0.25) 100%)'
-              : 'linear-gradient(160deg, #0a0f1e 0%, #1a1a2e 60%, #090b15 100%)',
+            background: 'linear-gradient(to top, rgba(9,11,21,0.6) 0%, transparent 40%)',
           }}
         />
+      </section>
 
-        {/* Glow dourado (sem imagem nem vídeo) */}
-        {!heroImage && !bairro.heroVideoUrl && (
-          <div
-            aria-hidden="true"
-            style={{
-              position: 'absolute',
-              inset: 0,
-              zIndex: 2,
-              background: 'radial-gradient(ellipse 65% 50% at 60% 30%, rgba(184,150,12,0.1) 0%, transparent 65%)',
-            }}
-          />
-        )}
-
-        {/* Linha dourada (zIndex 3) */}
-        <div
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            zIndex: 3,
-            left: 'clamp(1.5rem, 5vw, 4rem)',
-            top: '15%',
-            bottom: '15%',
-            width: 1,
-            background: 'linear-gradient(to bottom, transparent, rgba(184,150,12,0.5) 30%, rgba(184,150,12,0.5) 70%, transparent)',
-          }}
-        />
-
-        {/* Conteúdo */}
+      {/* ── Strip: intro texto ── */}
+      {bairro.introTexto && (
         <div
           style={{
-            position: 'relative',
-            zIndex: 2,
-            width: '100%',
-            maxWidth: 1280,
-            margin: '0 auto',
-            padding: 'clamp(3rem, 7vh, 5.5rem) clamp(2rem, 6vw, 5rem)',
+            background: '#0d1020',
+            borderBottom: '1px solid rgba(184,150,12,0.2)',
+            padding: 'clamp(1.25rem, 3vw, 1.75rem) clamp(2rem, 8vw, 8rem)',
+            textAlign: 'center',
           }}
         >
-          <BreadcrumbNav
-            items={[
-              { label: 'Início', href: '/' },
-              { label: 'Rio de Janeiro', href: '/bairros' },
-              { label: 'Bairros Planejados', href: '/bairros-planejados' },
-              { label: bairro.nome },
-            ]}
-            dark
-          />
-
-          <div style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
-            <span
-              style={{
-                padding: '0.3rem 0.85rem',
-                border: '1px solid rgba(184,150,12,0.5)',
-                fontSize: 9,
-                letterSpacing: '0.35em',
-                textTransform: 'uppercase',
-                color: 'var(--color-gold, #b8960c)',
-                borderRadius: 2,
-              }}
-            >
-              Bairro Planejado
-            </span>
-            {bairro.regiao && (
-              <span style={{ fontSize: 11, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)' }}>
-                {bairro.regiao} · {bairro.cidade ?? 'Rio de Janeiro'}
-              </span>
-            )}
-          </div>
-
-          <h1
+          <p
             style={{
-              fontFamily: 'var(--font-display)',
+              color: 'rgba(255,255,255,0.72)',
+              fontSize: 'clamp(0.9rem, 1.4vw, 1.05rem)',
               fontWeight: 300,
-              fontSize: 'clamp(3rem, 8vw, 6.5rem)',
-              color: '#fff',
-              lineHeight: 1.02,
+              lineHeight: 1.8,
               letterSpacing: '0.01em',
-              marginBottom: '1.25rem',
+              maxWidth: '70rem',
+              margin: '0 auto',
             }}
           >
-            {params.slug === 'ilha-pura' ? (
-              <ShimmerText variant="gold">{bairro.nome}</ShimmerText>
-            ) : (
-              bairro.nome
-            )}
-          </h1>
+            {bairro.introTexto}
+          </p>
+        </div>
+      )}
 
-          {bairro.introTexto && (
-            <p
+      {/* ── Banner: logo + stats + CTAs ── */}
+      <section
+        style={{
+          background: '#1c1f2e',
+          padding: 'clamp(3rem, 6vw, 5rem) clamp(2rem, 8vw, 8rem)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '2.5rem',
+        }}
+      >
+        {/* Logo Cidade Arte */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.35rem' }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 0 }}>
+            <span
               style={{
-                color: 'rgba(255,255,255,0.65)',
-                fontSize: 'clamp(1rem, 1.5vw, 1.15rem)',
+                fontFamily: "'Helvetica Neue', Arial, sans-serif",
                 fontWeight: 300,
-                lineHeight: 1.75,
-                maxWidth: '46rem',
-                marginBottom: '2.5rem',
+                fontSize: 'clamp(1.8rem, 4vw, 3rem)',
+                color: '#fff',
+                letterSpacing: '-0.02em',
               }}
             >
-              {bairro.introTexto}
-            </p>
-          )}
-
-          {/* Stats */}
-          <div style={{ display: 'flex', gap: 'clamp(2rem, 5vw, 4rem)', flexWrap: 'wrap' }}>
-            {bairro.incorporadora && (
-              <div>
-                <p style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1rem, 1.5vw, 1.2rem)', fontWeight: 300, color: '#fff', lineHeight: 1, marginBottom: 5 }}>
-                  {bairro.incorporadora}
-                </p>
-                <p style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>
-                  Incorporadora
-                </p>
-              </div>
-            )}
-            {bairro.areaTotal && (
-              <div>
-                <p style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.5rem, 2.5vw, 2rem)', fontWeight: 300, color: 'var(--color-gold, #b8960c)', lineHeight: 1, marginBottom: 5 }}>
-                  {(bairro.areaTotal / 1000).toFixed(0)}mil m²
-                </p>
-                <p style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>
-                  Área total
-                </p>
-              </div>
-            )}
-            {bairro.condominios && bairro.condominios.length > 0 && (
-              <div>
-                <p style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.5rem, 2.5vw, 2rem)', fontWeight: 300, color: 'var(--color-gold, #b8960c)', lineHeight: 1, marginBottom: 5 }}>
-                  {bairro.condominios.length}
-                </p>
-                <p style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>
-                  Condomínios
-                </p>
-              </div>
-            )}
-            {imoveis.length > 0 && (
-              <div>
-                <p style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.5rem, 2.5vw, 2rem)', fontWeight: 300, color: 'var(--color-gold, #b8960c)', lineHeight: 1, marginBottom: 5 }}>
-                  {imoveis.length}+
-                </p>
-                <p style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>
-                  Imóveis disponíveis
-                </p>
-              </div>
-            )}
+              cidade
+            </span>
+            <span
+              style={{
+                fontFamily: "'Helvetica Neue', Arial, sans-serif",
+                fontWeight: 700,
+                fontSize: 'clamp(1.8rem, 4vw, 3rem)',
+                color: '#fff',
+                letterSpacing: '-0.02em',
+              }}
+            >
+              arte
+            </span>
           </div>
+          <span
+            style={{
+              fontFamily: "'Helvetica Neue', Arial, sans-serif",
+              fontWeight: 300,
+              fontSize: 'clamp(0.6rem, 1vw, 0.75rem)',
+              color: 'rgba(255,255,255,0.7)',
+              letterSpacing: '0.45em',
+              textTransform: 'uppercase',
+            }}
+          >
+            BARRA
+          </span>
+        </div>
+
+        {/* Stats */}
+        <div style={{ display: 'flex', gap: 'clamp(2.5rem, 6vw, 5rem)', flexWrap: 'wrap', justifyContent: 'center' }}>
+          {bairro.incorporadora && (
+            <div style={{ textAlign: 'center' }}>
+              <p style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1rem, 1.5vw, 1.2rem)', fontWeight: 300, color: '#fff', lineHeight: 1, marginBottom: 5 }}>
+                {bairro.incorporadora}
+              </p>
+              <p style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>
+                Incorporadora
+              </p>
+            </div>
+          )}
+          {bairro.condominios && bairro.condominios.length > 0 && (
+            <div style={{ textAlign: 'center' }}>
+              <p style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.5rem, 2.5vw, 2rem)', fontWeight: 300, color: 'var(--color-gold, #b8960c)', lineHeight: 1, marginBottom: 5 }}>
+                {bairro.condominios.length}
+              </p>
+              <p style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>
+                Condomínios
+              </p>
+            </div>
+          )}
+          {imoveis.length > 0 && (
+            <div style={{ textAlign: 'center' }}>
+              <p style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.5rem, 2.5vw, 2rem)', fontWeight: 300, color: 'var(--color-gold, #b8960c)', lineHeight: 1, marginBottom: 5 }}>
+                {imoveis.length}+
+              </p>
+              <p style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>
+                Imóveis disponíveis
+              </p>
+            </div>
+          )}
+          {bairro.areaTotal && (
+            <div style={{ textAlign: 'center' }}>
+              <p style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.5rem, 2.5vw, 2rem)', fontWeight: 300, color: 'var(--color-gold, #b8960c)', lineHeight: 1, marginBottom: 5 }}>
+                {(bairro.areaTotal / 1000).toFixed(0)}mil m²
+              </p>
+              <p style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>
+                Área total
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* CTAs */}
+        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+          <a
+            href="#condominios"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '0.875rem 2rem',
+              background: 'var(--color-gold, #b8960c)',
+              color: '#fff',
+              fontSize: '0.8rem',
+              fontWeight: 500,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              textDecoration: 'none',
+              borderRadius: 2,
+              transition: 'opacity 0.2s',
+            }}
+          >
+            Ver Condomínios
+          </a>
+          <a
+            href="https://wa.me/5521999999999?text=Olá!%20Tenho%20interesse%20no%20Cidade%20Arte%20Barra"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '0.875rem 2rem',
+              background: 'transparent',
+              color: '#fff',
+              fontSize: '0.8rem',
+              fontWeight: 400,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              textDecoration: 'none',
+              border: '1px solid rgba(255,255,255,0.3)',
+              borderRadius: 2,
+              transition: 'border-color 0.2s',
+            }}
+          >
+            Falar com Corretor
+          </a>
         </div>
       </section>
 
@@ -526,7 +553,7 @@ export default async function BairroPlanejadiSlugPage({ params, searchParams }: 
 
       {/* ── Condomínios ── */}
       {bairro.condominios && bairro.condominios.length > 0 && (
-        <section style={{ background: '#fff', padding: 'clamp(3rem, 6vw, 5rem) clamp(1.5rem, 5vw, 4rem)' }}>
+        <section id="condominios" style={{ background: '#fff', padding: 'clamp(3rem, 6vw, 5rem) clamp(1.5rem, 5vw, 4rem)' }}>
           <div style={{ maxWidth: 1280, margin: '0 auto' }}>
             <p style={{ fontSize: 10, letterSpacing: '0.45em', textTransform: 'uppercase', color: 'var(--color-gold, #b8960c)', marginBottom: '0.75rem' }}>
               Empreendimentos
