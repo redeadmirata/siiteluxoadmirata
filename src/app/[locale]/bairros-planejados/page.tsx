@@ -16,6 +16,16 @@ export const revalidate = 3600
 // ─── Fallback editorial enquanto não há dados no Sanity ────────────────────
 const BAIRROS_FALLBACK = [
   {
+    slug: 'cidade-arte-barra',
+    nome: 'Cidade Arte',
+    cidade: 'Rio de Janeiro',
+    regiao: 'Barra da Tijuca',
+    incorporadora: 'Calper',
+    introTexto: 'O primeiro bairro planejado da Barra Olímpica — arquitetura contemporânea, 1.800 árvores nativas, parques, quadras e uma nova forma de viver na Barra da Tijuca.',
+    totalCondominios: 5,
+    totalImoveis: 0,
+  },
+  {
     slug: 'ilha-pura',
     nome: 'Ilha Pura',
     cidade: 'Rio de Janeiro',

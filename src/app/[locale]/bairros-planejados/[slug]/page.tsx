@@ -89,6 +89,75 @@ interface PageProps {
   searchParams: { finalidade?: string }
 }
 
+
+// ── Fallback estático para bairros sem documento no Sanity ainda ──────────
+const STATIC_BAIRROS: Record<string, BairroData> = {
+  'cidade-arte-barra': {
+    _id: 'static-cidade-arte-barra',
+    nome: 'Cidade Arte',
+    slug: { current: 'cidade-arte-barra' },
+    cidade: 'Rio de Janeiro',
+    estado: 'RJ',
+    mercado: 'Rio de Janeiro',
+    regiao: 'Barra da Tijuca',
+    incorporadora: 'Calper',
+    introTexto: 'O primeiro bairro planejado da Barra Olímpica — onde arquitetura contemporânea, 1.800 árvores nativas e infraestrutura completa se unem em uma nova forma de viver.',
+    descricao: 'O Cidade Arte é o primeiro bairro planejado da Barra Olímpica concebido com o conceito de arte, design e qualidade de vida. Desenvolvido pela Calper, o projeto propõe uma nova forma de viver, integrando arquitetura contemporânea, paisagismo, mobilidade, segurança e espaços públicos planejados.',
+    caracteristicas: [
+      'Bairro planejado',
+      'Conceito de arte e design',
+      'Urbanismo inteligente',
+      'Arquitetura contemporânea',
+      'Paisagismo integrado',
+      'Mais de 1.800 árvores nativas',
+      'Vista para o Maciço da Pedra Branca',
+      'Espaços públicos planejados',
+      'Infraestrutura moderna',
+      'Segurança integrada',
+      'Alto potencial de valorização',
+    ],
+    amenidades: [
+      { titulo: 'Piscina de Ondas', descricao: 'Piscina de ondas com design paisagístico', icone: '🌊' },
+      { titulo: 'Quadras Esportivas', descricao: 'Quadras de grama e areia, futmesa e espaços polivalentes', icone: '⚽' },
+      { titulo: 'Academia ao Ar Livre', descricao: 'Fitness externo integrado ao paisagismo', icone: '🏋️' },
+      { titulo: 'Parque Inclusivo', descricao: 'Área de lazer inclusiva para todas as idades', icone: '🌳' },
+      { titulo: 'Pet Park', descricao: 'Espaço dedicado aos animais de estimação', icone: '🐾' },
+      { titulo: 'Sky Lounge', descricao: 'Lounge com vista panorâmica para o bairro', icone: '🌆' },
+      { titulo: 'Praças & Alamedas', descricao: 'Caminhos arborizados e espaços de convivência', icone: '🌿' },
+      { titulo: 'Mobilidade', descricao: 'Acesso à Av. Abelardo Bueno, BRT, Transolímpica e Metrô', icone: '🚇' },
+    ],
+    faqs: [
+      {
+        pergunta: 'O que é o Cidade Arte?',
+        resposta: 'O Cidade Arte é o primeiro bairro planejado da Barra Olímpica, desenvolvido pela Calper. Reúne condomínios residenciais de alto padrão, áreas verdes, lazer e infraestrutura completa em um único endereço próximo à Avenida Abelardo Bueno.',
+      },
+      {
+        pergunta: 'Quais condomínios fazem parte do Cidade Arte?',
+        resposta: 'O bairro planejado inclui os empreendimentos Arte Wave Surf Residences, Arte Design, Arte Botânica, Arte Jardim Residencial e Arte Wood Residences — todos da construtora Calper.',
+      },
+      {
+        pergunta: 'Onde fica o Cidade Arte?',
+        resposta: 'Localizado na Barra Olímpica, próximo à Avenida Abelardo Bueno, na Barra da Tijuca — Rio de Janeiro. Com acesso rápido à Linha Amarela, Transolímpica, BRT e ao Parque Olímpico.',
+      },
+      {
+        pergunta: 'Qual é o potencial de valorização do Cidade Arte?',
+        resposta: 'A Barra Olímpica concentra os maiores investimentos urbanos do Rio de Janeiro. A expansão da infraestrutura e novos empreendimentos tornam a região uma das áreas com maior potencial de valorização da cidade.',
+      },
+    ],
+    heroVideoUrl: 'https://www.youtube.com/watch?v=1yRU6RWfs9g',
+    fotoCapa: {
+      asset: { url: '/images/cidade-arte-barra/hero-alameda-noite.jpg' },
+    },
+    fotoAerea: {
+      asset: { url: '/images/cidade-arte-barra/aerea-02.jpg' },
+    },
+    condominios: [],
+    totalImoveis: 0,
+    metaTitle: 'Cidade Arte Barra | Bairro Planejado Calper na Barra Olímpica | Admirata',
+    metaDescription: 'Condomínios de alto padrão no Cidade Arte, bairro planejado da Calper na Barra Olímpica. Arte Wave, Arte Design, Arte Botânica, Arte Jardim e Arte Wood. Curadoria exclusiva Admirata.',
+  },
+}
+
 export async function generateStaticParams() {
   const slugs = await client.fetch<Array<{ slug: string }>>(
     BAIRROS_PLANEJADOS_SLUGS_QUERY,
@@ -96,15 +165,20 @@ export async function generateStaticParams() {
     { next: { revalidate: 3600 } }
   ).catch(() => [] as Array<{ slug: string }>)
 
+  // Garantir que slugs estáticos também sejam pré-gerados
+  const staticSlugs = Object.keys(STATIC_BAIRROS).map((s) => ({ slug: s }))
+  const allSlugs = [...slugs, ...staticSlugs.filter((s) => !slugs.find((x) => x.slug === s.slug))]
+
   return routing.locales.flatMap((locale) =>
-    slugs.map((s) => ({ locale, slug: s.slug }))
+    allSlugs.map((s) => ({ locale, slug: s.slug }))
   )
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const bairro = await client
+  const bairroSanity = await client
     .fetch<BairroData | null>(BAIRRO_PLANEJADO_QUERY, { slug: params.slug }, { next: { revalidate: 3600 } })
     .catch(() => null)
+  const bairro = bairroSanity ?? STATIC_BAIRROS[params.slug] ?? null
 
   if (!bairro) return { title: 'Bairro Planejado | Admirata' }
 
@@ -141,7 +215,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function BairroPlanejadiSlugPage({ params, searchParams }: PageProps) {
   setRequestLocale(params.locale)
 
-  const [bairro, imoveis] = await Promise.all([
+  const [bairroSanity, imoveis] = await Promise.all([
     client
       .fetch<BairroData | null>(BAIRRO_PLANEJADO_QUERY, { slug: params.slug }, { next: { revalidate: 3600 } })
       .catch(() => null),
@@ -165,6 +239,8 @@ export default async function BairroPlanejadiSlugPage({ params, searchParams }: 
       )
       .catch(() => [] as ImovelCard[]),
   ])
+
+  const bairro = bairroSanity ?? STATIC_BAIRROS[params.slug] ?? null
 
   if (!bairro) notFound()
 
