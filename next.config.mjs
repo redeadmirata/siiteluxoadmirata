@@ -27,7 +27,9 @@ const nextConfig = {
     // Cache de imagens por 30 dias no CDN da Vercel
     minimumCacheTTL: 60 * 60 * 24 * 30,
     // Qualidade padrão balanceada para imóveis
-    qualities: [75, 85, 95],
+    // Todas as qualidades solicitadas pelos componentes via next/image.
+    // Valores ausentes fazem o otimizador da Vercel responder 400.
+    qualities: [75, 80, 85, 90, 95],
     dangerouslyAllowSVG: false,
   },
 
