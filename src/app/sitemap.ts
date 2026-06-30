@@ -3,6 +3,7 @@ import { client } from '@/sanity/client'
 import {
   IMOVEIS_SLUGS_QUERY,
   BAIRROS_SLUGS_QUERY,
+  BAIRROS_PLANEJADOS_SLUGS_QUERY,
   BLOG_SLUGS_QUERY,
   CONDOMINIOS_SLUGS_QUERY,
   CONDOMINIOS_SLUGS_HIERARQUIA_QUERY,
@@ -17,6 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [
     imovelSlugs,
     bairroSlugs,
+    bairroPlanejadoSlugs,
     blogSlugs,
     condominioSlugs,
     condominioHierarquia,
@@ -26,6 +28,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ] = await Promise.all([
     client.fetch<Array<{ slug: string; _updatedAt: string }>>(IMOVEIS_SLUGS_QUERY),
     client.fetch<Array<{ slug: string; _updatedAt: string }>>(BAIRROS_SLUGS_QUERY),
+    client.fetch<Array<{ slug: string }>>(BAIRROS_PLANEJADOS_SLUGS_QUERY),
     client.fetch<Array<{ slug: string }>>(BLOG_SLUGS_QUERY),
     client.fetch<Array<{ slug: string }>>(CONDOMINIOS_SLUGS_QUERY),
     client.fetch<Array<{ bairroSlug: string; condSlug: string }>>(CONDOMINIOS_SLUGS_HIERARQUIA_QUERY),
@@ -40,7 +43,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/blog`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.6 },
     { url: `${BASE_URL}/lancamentos`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
     { url: `${BASE_URL}/condominios`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
-    { url: `${BASE_URL}/ilhapura`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.85 },
+    { url: `${BASE_URL}/bairros-planejados`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.85 },
     { url: `${BASE_URL}/imoveis/cobertura`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.75 },
     { url: `${BASE_URL}/imoveis/frente-mar`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.75 },
     { url: `${BASE_URL}/imoveis/vista-mar`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.75 },
@@ -73,6 +76,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: new Date(_updatedAt),
     changeFrequency: 'weekly' as const,
     priority: 0.8,
+  }))
+
+  const bairroPlanejadoRoutes: MetadataRoute.Sitemap = bairroPlanejadoSlugs.map(({ slug }) => ({
+    url: `${BASE_URL}/bairros-planejados/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.85,
   }))
 
   const condominioRoutes: MetadataRoute.Sitemap = condominioHierarquia.map(({ bairroSlug, condSlug }) => ({
@@ -109,6 +119,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...staticRoutes,
     ...imovelRoutes,
     ...bairroRoutes,
+    ...bairroPlanejadoRoutes,
     ...condominioDetailRoutes,
     ...ilhapuraCondominioRoutes,
     ...condominioRoutes,

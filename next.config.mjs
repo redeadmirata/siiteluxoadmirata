@@ -80,11 +80,6 @@ const nextConfig = {
   async rewrites() {
     return {
       beforeFiles: [
-        // Landing do empreendimento: /ilhapura → /bairros-planejados/ilha-pura
-        {
-          source: '/:locale(pt-BR|en|es)/ilhapura',
-          destination: '/:locale/bairros-planejados/ilha-pura',
-        },
         // Condomínio: /ilhapura/condominios/[slug] → /condominios/[slug]
         {
           source: '/:locale(pt-BR|en|es)/ilhapura/condominios/:slug',
@@ -112,6 +107,33 @@ const nextConfig = {
       'saint-michel',
     ]
     const ILHAPURA_LOCALE_PREFIXES = ['', '/en', '/es']
+    const BAIRROS_PLANEJADOS = [
+      'cidade-arte-barra',
+      'ilha-pura',
+      'rio2',
+      'cidade-jardim',
+      'peninsula',
+      'pontal-oceanico',
+    ]
+    const bairroPlanejadoRedirects = BAIRROS_PLANEJADOS.flatMap((slug) =>
+      ILHAPURA_LOCALE_PREFIXES.flatMap((prefix) => [
+        {
+          source: `${prefix}/imoveis/${slug}`,
+          destination: `${prefix}/bairros-planejados/${slug}`,
+          permanent: true,
+        },
+        {
+          source: `${prefix}/bairros/${slug}`,
+          destination: `${prefix}/bairros-planejados/${slug}`,
+          permanent: true,
+        },
+      ])
+    )
+    const ilhaPuraLandingRedirects = ILHAPURA_LOCALE_PREFIXES.map((prefix) => ({
+      source: `${prefix}/ilhapura`,
+      destination: `${prefix}/bairros-planejados/ilha-pura`,
+      permanent: true,
+    }))
     const ilhapuraCondoRedirects = ILHAPURA_CONDOS.flatMap((slug) =>
       ILHAPURA_LOCALE_PREFIXES.map((prefix) => ({
         source: `${prefix}/condominios/${slug}`,
@@ -145,6 +167,10 @@ const nextConfig = {
         destination: 'https://admirata.com.br/:path*',
         permanent: true,
       },
+      // Uma única hierarquia canônica para todos os bairros planejados.
+      ...bairroPlanejadoRedirects,
+      // URL histórica da landing Ilha Pura.
+      ...ilhaPuraLandingRedirects,
       // Ilha Pura: /condominios/[slug] → /ilhapura/condominios/[slug]
       ...ilhapuraCondoRedirects,
       // Ilha Pura: /imovel/[unidade] → /ilhapura/condominios/[cond]/[finalidade]/[unidade]

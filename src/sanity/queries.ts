@@ -356,7 +356,7 @@ export const IMOVEIS_SLUGS_QUERY = groq`
 
 /** Slugs de bairros — generateStaticParams + sitemap */
 export const BAIRROS_SLUGS_QUERY = groq`
-  *[_type == "bairro" && defined(slug.current)] {
+  *[_type == "bairro" && defined(slug.current) && bairroplanejado != true] {
     "slug": slug.current,
     _updatedAt
   }

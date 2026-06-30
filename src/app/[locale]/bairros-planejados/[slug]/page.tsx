@@ -17,7 +17,6 @@ import {
 import type { ImovelCard } from '@/types/sanity'
 import ImovelCardComponent from '@/components/cards/ImovelCard'
 import BreadcrumbNav from '@/components/ui/BreadcrumbNav'
-import ShimmerText from '@/components/ui/ShimmerText'
 import HeroMediaVideo from '@/components/ui/HeroMediaVideo'
 import { routing } from '@/i18n/routing'
 
