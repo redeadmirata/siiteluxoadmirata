@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       languages: {
         'pt-BR': `${siteUrl}/blog`,
         'en-US': `${siteUrl}/en/blog`,
-        'fr-FR': `${siteUrl}/fr/blog`,
+        'es-AR': `${siteUrl}/es/blog`,
       },
     },
     openGraph: {
@@ -48,11 +48,11 @@ const CATEGORIA_LABELS: Record<string, Record<string, string>> = {
     mercado: 'Real Estate Market',
     arquitetura: 'Architecture & Design',
   },
-  fr: {
-    'lifestyle-rj': 'Art de vivre RJ',
-    'serra-gaucha': 'Serra Gaúcha',
-    mercado: 'Marché Immobilier',
-    arquitetura: 'Architecture & Design',
+  es: {
+    'lifestyle-rj': 'Estilo de vida RJ',
+    'serra-gaucha': 'Serra Gaucha',
+    mercado: 'Mercado inmobiliario',
+    arquitetura: 'Arquitectura y dise\u00f1o',
   },
 }
 
@@ -72,7 +72,7 @@ interface BlogCard {
 }
 
 function formatData(iso: string, locale: string) {
-  const loc = locale === 'en' ? 'en-US' : locale === 'fr' ? 'fr-FR' : 'pt-BR'
+  const loc = locale === 'en' ? 'en-US' : locale === 'es' ? 'es-AR' : 'pt-BR'
   return new Date(iso).toLocaleDateString(loc, {
     day: 'numeric',
     month: 'long',
@@ -258,7 +258,7 @@ function BlogPostCard({
       )}
       <time dateTime={post.publicadoEm} className="text-[11px] text-muted/60">
         {new Date(post.publicadoEm).toLocaleDateString(
-          locale === 'en' ? 'en-US' : locale === 'fr' ? 'fr-FR' : 'pt-BR',
+          locale === 'en' ? 'en-US' : locale === 'es' ? 'es-AR' : 'pt-BR',
           { day: 'numeric', month: 'long', year: 'numeric' }
         )}
       </time>

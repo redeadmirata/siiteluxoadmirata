@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       languages: {
         'pt-BR': `${siteUrl}/condominios`,
         'en-US': `${siteUrl}/en/condominios`,
-        'fr-FR': `${siteUrl}/fr/condominios`,
+        'es-AR': `${siteUrl}/es/condominios`,
       },
     },
     openGraph: {
@@ -50,9 +50,9 @@ const TIPO_LABELS: Record<string, Record<string, string>> = {
     vertical: 'Vertical',
     resort: 'Resort / Club',
   },
-  fr: {
-    'condominio-fechado': 'Résidence Fermée',
-    'bairro-planejado': 'Quartier Planifié',
+  es: {
+    'condominio-fechado': 'Condominio cerrado',
+    'bairro-planejado': 'Barrio planificado',
     vertical: 'Vertical',
     resort: 'Resort / Club',
   },

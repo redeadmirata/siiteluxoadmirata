@@ -56,11 +56,11 @@ const CATEGORIA_LABELS: Record<string, Record<string, string>> = {
     mercado: 'Real Estate Market',
     arquitetura: 'Architecture & Design',
   },
-  fr: {
-    'lifestyle-rj': 'Art de vivre RJ',
-    'serra-gaucha': 'Serra Gaúcha',
-    mercado: 'Marché Immobilier',
-    arquitetura: 'Architecture & Design',
+  es: {
+    'lifestyle-rj': 'Estilo de vida RJ',
+    'serra-gaucha': 'Serra Gaucha',
+    mercado: 'Mercado inmobiliario',
+    arquitetura: 'Arquitectura y dise\u00f1o',
   },
 }
 
@@ -89,7 +89,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       languages: {
         'pt-BR': `${siteUrl}/blog/${params.slug}`,
         'en-US': `${siteUrl}/en/blog/${params.slug}`,
-        'fr-FR': `${siteUrl}/fr/blog/${params.slug}`,
+        'es-AR': `${siteUrl}/es/blog/${params.slug}`,
       },
     },
     openGraph: {
@@ -197,7 +197,7 @@ export default async function BlogPostPage({ params }: PageProps) {
 
   if (!post) notFound()
 
-  const dateLocale = params.locale === 'en' ? 'en-US' : params.locale === 'fr' ? 'fr-FR' : 'pt-BR'
+  const dateLocale = params.locale === 'en' ? 'en-US' : params.locale === 'es' ? 'es-AR' : 'pt-BR'
   const formattedDate = new Date(post.publicadoEm).toLocaleDateString(dateLocale, {
     day: 'numeric',
     month: 'long',
@@ -207,8 +207,8 @@ export default async function BlogPostPage({ params }: PageProps) {
   const whatsappUrl = `https://wa.me/5521998079459?text=${encodeURIComponent(
     params.locale === 'en'
       ? 'Hello, I saw the Admirata blog and would like more information.'
-      : params.locale === 'fr'
-      ? "Bonjour, j'ai vu le blog Admirata et je voudrais plus d'informations."
+      : params.locale === 'es'
+      ? 'Hola, vi el blog de Admirata y quisiera recibir mas informacion.'
       : 'Olá, vi o blog da Admirata e gostaria de mais informações.'
   )}`
 

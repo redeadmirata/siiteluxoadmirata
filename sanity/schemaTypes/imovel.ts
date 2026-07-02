@@ -462,8 +462,8 @@ export const imovel = defineType({
       group: 'storytelling',
     }),
     defineField({
-      name: 'descricaoFrFr',
-      title: 'Storytelling — fr-FR',
+      name: 'descricaoEsAr',
+      title: 'Storytelling — es-AR',
       type: 'text',
       rows: 6,
       group: 'storytelling',

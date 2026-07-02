@@ -26,9 +26,9 @@ const META_BY_LOCALE: Record<string, { title: string; description: string }> = {
     title: 'Admirata Properties | Luxury Real Estate — Rio de Janeiro & Serra Gaúcha',
     description: 'Luxury and premium real estate in Barra da Tijuca, Recreio, Leblon, Ipanema and Serra Gaúcha. Penthouses, apartments and exclusive homes.',
   },
-  fr: {
-    title: "Admirata Immobilier | Immobilier de Prestige — Rio de Janeiro & Serra Gaúcha",
-    description: "Immobilier de luxe et de prestige à Barra da Tijuca, Recreio, Leblon, Ipanema et Serra Gaúcha. Penthouses, appartements et maisons exclusives.",
+  es: {
+    title: "Admirata Inmobiliaria | Propiedades de Lujo \u2014 R\u00edo de Janeiro y Serra Ga\u00facha",
+    description: "Propiedades de lujo en Barra da Tijuca, Recreio, Leblon, Ipanema y Serra Ga\u00facha. Penthouses, departamentos y casas exclusivas.",
   },
 }
 

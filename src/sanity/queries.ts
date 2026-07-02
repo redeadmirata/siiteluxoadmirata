@@ -78,7 +78,7 @@ export const IMOVEL_PDI_QUERY = groq`
     },
     caracteristicas[] { grupo, nome },
     tourVirtual, videoUrl,
-    descricaoPtBr, descricaoEnUs, descricaoFrFr,
+    descricaoPtBr, descricaoEnUs, descricaoEsAr,
     seo, publicadoEm
   }
 `

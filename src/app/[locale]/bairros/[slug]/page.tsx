@@ -131,8 +131,8 @@ export default async function BairroPage({ params }: PageProps) {
   const whatsappText =
     params.locale === 'en'
       ? `Hello, I'm interested in properties in ${bairro.nome}`
-      : params.locale === 'fr'
-      ? `Bonjour, je suis interesse par des biens a ${bairro.nome}`
+      : params.locale === 'es'
+      ? `Hola, estoy interesado en propiedades en ${bairro.nome}`
       : `Ola, tenho interesse em imoveis no bairro ${bairro.nome}`
 
   const whatsappUrl = `https://wa.me/5521998079459?text=${encodeURIComponent(whatsappText)}`
@@ -213,8 +213,8 @@ export default async function BairroPage({ params }: PageProps) {
                   <p className="text-muted text-sm leading-relaxed max-w-lg">
                     {params.locale === 'en'
                       ? 'Premium neighborhood with exclusive property curation by Admirata.'
-                      : params.locale === 'fr'
-                      ? 'Quartier de standing avec une selection exclusive de biens par Admirata.'
+                      : params.locale === 'es'
+                      ? 'Barrio premium con una seleccion exclusiva de propiedades por Admirata.'
                       : 'Regiao de alto padrao com curadoria exclusiva de imoveis selecionados pela Admirata Imoveis.'}
                   </p>
                 )}
