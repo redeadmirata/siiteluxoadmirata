@@ -63,7 +63,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: titulo,
       description: descricao,
       type: 'website',
-      locale: params.locale === 'en' ? 'en_US' : params.locale === 'fr' ? 'fr_FR' : 'pt_BR',
+      locale: params.locale === 'en' ? 'en_US' : params.locale === 'es' ? 'es_AR' : 'pt_BR',
       ...(capaUrl && {
         images: [{ url: capaUrl, width: 1200, height: 630, alt: `${bairro.nome} — Admirata` }],
       }),
@@ -73,7 +73,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       languages: {
         'pt-BR': `${siteUrl}/imoveis/${params.slug}`,
         'en-US': `${siteUrl}/en/imoveis/${params.slug}`,
-        'fr-FR': `${siteUrl}/fr/imoveis/${params.slug}`,
+        'es-AR': `${siteUrl}/es/imoveis/${params.slug}`,
       },
     },
   }

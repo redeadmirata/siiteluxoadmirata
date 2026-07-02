@@ -154,7 +154,7 @@ export interface ImovelPDI extends ImovelCard {
   videoUrl?: string
   descricaoPtBr?: string
   descricaoEnUs?: string
-  descricaoFrFr?: string
+  descricaoEsAr?: string
   seo?: { titulo?: string; descricao?: string }
   publicadoEm?: string
 }

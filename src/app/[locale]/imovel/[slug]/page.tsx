@@ -110,7 +110,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!imovel) return { title: t('notFound') }
 
   const titulo = imovel.seo?.titulo ?? `${imovel.titulo} | Admirata Imoveis`
-  const descricao = buildMetaDescription(imovel)
+  const descricao =
+    params.locale === 'en'
+      ? imovel.descricaoEnUs?.slice(0, 160) ?? buildMetaDescription(imovel)
+      : params.locale === 'es'
+        ? imovel.descricaoEsAr?.slice(0, 160) ?? buildMetaDescription(imovel)
+        : buildMetaDescription(imovel)
 
   const imagemCapa =
     imovel.imagens?.find((i) => i.arquivo.principal)?.arquivo.asset?.url ??
@@ -127,7 +132,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: titulo,
       description: descricao,
       type: 'website',
-      locale: params.locale === 'en' ? 'en_US' : params.locale === 'fr' ? 'fr_FR' : 'pt_BR',
+      locale: params.locale === 'en' ? 'en_US' : params.locale === 'es' ? 'es_AR' : 'pt_BR',
       ...(imagemCapa && {
         images: [{ url: imagemCapa, width: 1200, height: 630, alt: imovel.titulo }],
       }),
@@ -153,7 +158,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       languages: {
         'pt-BR': `${siteUrl}${imovelPath}`,
         'en-US': `${siteUrl}/en${imovelPath}`,
-        'fr-FR': `${siteUrl}/fr${imovelPath}`,
+        'es-AR': `${siteUrl}/es${imovelPath}`,
       },
     },
   }
@@ -169,6 +174,13 @@ export default async function ImovelPDIPage({ params }: PageProps) {
   })
 
   if (!imovel) notFound()
+
+  const descricaoLocalizada =
+    params.locale === 'en'
+      ? imovel.descricaoEnUs ?? imovel.descricaoPtBr
+      : params.locale === 'es'
+        ? imovel.descricaoEsAr ?? imovel.descricaoPtBr
+        : imovel.descricaoPtBr
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://admirata.com.br'
   const localePrefix = params.locale === 'pt-BR' ? '' : `/${params.locale}`
@@ -240,9 +252,9 @@ export default async function ImovelPDIPage({ params }: PageProps) {
           <main>
             <FichaTecnica imovel={imovel} />
 
-            {imovel.descricaoPtBr && (
+            {descricaoLocalizada && (
               <StorytellingBlock
-                descricao={imovel.descricaoPtBr}
+                descricao={descricaoLocalizada}
                 titulo={t('about')}
               />
             )}
