@@ -200,6 +200,17 @@ export function CTAFinalSection({ data }: { data: EmpreendimentoData }) {
             >
               Falar pelo WhatsApp
             </a>
+            {data.virtualTourUrl && (
+              <a
+                href={data.virtualTourUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-white/30 px-9 py-4 text-sm font-semibold uppercase tracking-wider text-white transition-colors hover:border-gold hover:text-gold"
+              >
+                Fazer visita virtual
+                <span aria-hidden="true">↗</span>
+              </a>
+            )}
             {data.whatsappHrefRS && (
               <a
                 href={data.whatsappHrefRS}

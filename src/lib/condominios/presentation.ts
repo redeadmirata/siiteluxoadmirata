@@ -147,6 +147,7 @@ export function buildEmpreendimentoData(
     heroImageSrc,
     heroImageLqip,
     heroVideoMp4,
+    virtualTourUrl: condominio.tourVirtual,
     arquiteturaLogoSrc: override?.arquiteturaLogoSrc ?? condominio.logoEmpreendimento?.asset?.url,
     manifesto: textos[0],
     sobreParagrafos: textos.slice(1),

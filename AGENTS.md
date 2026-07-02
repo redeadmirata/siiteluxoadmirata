@@ -37,7 +37,7 @@ Todo novo componente deve seguir exatamente: tipografia, espaçamentos, tokens, 
 | Animações | Framer Motion + GSAP + Lenis (smooth scroll) |
 | Estado servidor | TanStack Query |
 | Validação | Zod |
-| i18n | next-intl (pt-BR, en, es, fr) |
+| i18n | next-intl (pt-BR, en e es, com conteúdo imobiliário localizado em es-AR) |
 | Mapas | Mapbox GL |
 | Analytics | Meta Pixel + camada de consentimento |
 | Qualidade | ESLint · Prettier · Husky · lint-staged · commitlint |
@@ -55,6 +55,26 @@ Evitar: duplicação, componentes gigantes, lógica repetida, estilos inline, us
 ## Estrutura dos empreendimentos
 
 Todo conteúdo deve ser orientado a dados (Sanity + `src/data/`). Nunca deixar textos hardcoded. Todo imóvel/empreendimento deve ser renderizado a partir de dados ou CMS.
+
+### Storytelling multilíngue obrigatório para imóveis
+
+Todo cadastro, importação ou atualização de imóvel deve preencher e manter sincronizados, no mesmo fluxo de trabalho, os três campos:
+
+- `descricaoPtBr` — **Storytelling — pt-BR**;
+- `descricaoEnUs` — **Storytelling — en-US**;
+- `descricaoEsAr` — **Storytelling — es-AR**.
+
+Esta regra é obrigatória para todos os imóveis dos mercados **Rio de Janeiro**, **Gramado** e **Canela**, independentemente do tipo, finalidade, status, origem do cadastro ou responsável pela edição.
+
+Regras de execução:
+
+- Não publicar nem considerar concluído um imóvel se qualquer um dos três campos estiver vazio, contiver texto provisório ou estiver desatualizado.
+- Toda alteração factual ou comercial em `descricaoPtBr` deve provocar a revisão de `descricaoEnUs` e `descricaoEsAr` antes da publicação.
+- As versões estrangeiras devem ser localizações naturais, não traduções literais: inglês americano para `en-US` e espanhol adequado ao público argentino e latino-americano para `es-AR`.
+- Preço, metragem, quantidade de quartos e vagas, endereço, condições comerciais, comodidades e demais fatos devem permanecer equivalentes nos três idiomas.
+- Scripts, seeds, importadores, integrações e automações que criem ou atualizem imóveis devem receber e persistir os três campos; devem falhar de forma explícita quando algum estiver ausente.
+- Não preencher os campos estrangeiros copiando silenciosamente o texto em português. Quando ainda não houver tradução aprovada, o imóvel deve permanecer em rascunho.
+- Imóveis legados com traduções ausentes devem ser regularizados antes da próxima publicação ou atualização.
 
 ## Performance
 

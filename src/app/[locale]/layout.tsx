@@ -51,16 +51,12 @@ export async function generateMetadata({
       template: '%s | Admirata Imóveis',
     },
     description: meta.description,
-    keywords: [
-      'imóveis alto padrão',
-      'imóveis luxo rio de janeiro',
-      'cobertura barra da tijuca',
-      'apartamento leblon',
-      'imóveis gramado',
-      'admirata imóveis',
-      'luxury real estate rio de janeiro',
-      'immobilier luxe rio',
-    ],
+    // Sem `keywords` global aqui de propósito: o Google ignora essa tag há anos
+    // e, por herdar para toda página filha que não define a própria, uma lista
+    // genérica (ex.: "apartamento leblon", "imóveis gramado") acabava aparecendo
+    // em páginas de bairros completamente diferentes (ex.: Camorim), diluindo a
+    // relevância local. Se precisar de keywords por página, defina em cada
+    // generateMetadata específico.
     authors: [{ name: 'Admirata Negócios Imobiliários Ltda' }],
     creator: 'Admirata Imóveis',
     publisher: 'Admirata Negócios Imobiliários Ltda',

@@ -1,5 +1,7 @@
 'use client'
 
+import { useEffect, useState } from 'react'
+
 /**
  * HeroMediaVideo — apenas a camada de vídeo para heróis customizados.
  *
@@ -16,6 +18,13 @@
  *   - Se url for YouTube/Vimeo → iframe embed imersivo (autoplay, muted)
  *   - Se url for MP4 → <video autoPlay muted loop>
  *   - Se não houver url → renderiza null (sem alteração ao layout)
+ *
+ * Performance / LCP:
+ *   O iframe do YouTube (autoplay, acima da dobra) só é inserido no DOM
+ *   depois do primeiro paint (`useEffect`, roda no navegador após o React
+ *   hidratar). Isso evita que o embed do YouTube compita por banda/CPU com
+ *   a imagem e o texto do hero — que são os candidatos reais a LCP — no
+ *   carregamento inicial, especialmente em mobile.
  */
 
 function getYouTubeId(url: string): string | null {
@@ -44,6 +53,17 @@ interface HeroMediaVideoProps {
 }
 
 export default function HeroMediaVideo({ url }: HeroMediaVideoProps) {
+  // Monta o embed do YouTube/Vimeo só depois do primeiro paint, para não
+  // disputar recursos com a imagem/texto do hero (candidatos a LCP). O MP4
+  // de fundo (autoplay leve, sem handshake externo) continua imediato.
+  const [prontoParaIframe, setProntoParaIframe] = useState(false)
+
+  useEffect(() => {
+    if (!url || isMp4(url)) return
+    const id = requestAnimationFrame(() => setProntoParaIframe(true))
+    return () => cancelAnimationFrame(id)
+  }, [url])
+
   if (!url) return null
 
   const ytId    = getYouTubeId(url)
@@ -83,6 +103,10 @@ export default function HeroMediaVideo({ url }: HeroMediaVideoProps) {
     )
   }
 
+  // Antes do primeiro paint, não insere o iframe — evita que o carregamento
+  // do player do YouTube/Vimeo atrase o LCP da imagem/texto do hero.
+  if (!prontoParaIframe) return null
+
   const embedSrc = ytId
     ? `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&mute=1&loop=1&playlist=${ytId}&controls=0&showinfo=0&rel=0&disablekb=1&modestbranding=1&iv_load_policy=3`
     : `https://player.vimeo.com/video/${vimeoId}?autoplay=1&muted=1&loop=1&background=1&byline=0&title=0`
@@ -91,6 +115,7 @@ export default function HeroMediaVideo({ url }: HeroMediaVideoProps) {
     <div style={layerStyle}>
       <iframe
         src={embedSrc}
+        loading="lazy"
         allow="autoplay; encrypted-media; fullscreen"
         style={{
           position: 'absolute',

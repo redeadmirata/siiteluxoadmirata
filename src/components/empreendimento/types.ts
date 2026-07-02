@@ -8,6 +8,7 @@ export interface EmpreendimentoData {
   heroImageSrc?: string
   heroImageLqip?: string
   heroVideoMp4?: string
+  virtualTourUrl?: string
   arquiteturaLogoSrc?: string
   manifesto?: string
   sobreParagrafos?: string[]

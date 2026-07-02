@@ -192,6 +192,7 @@ export interface CondominioDetalhe extends Omit<CondominioCard, 'fotoCapa'> {
   prazoEntrega?: string
   heroVideoUrl?: string
   videoTour?: string
+  tourVirtual?: string
   sobre?: unknown[]
   tipologiasDisponiveis?: ImovelTipologia[]
   forcarNoindex?: boolean

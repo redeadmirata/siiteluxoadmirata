@@ -73,7 +73,7 @@ Todo conteúdo deve ser orientado a dados (Sanity + `src/data/` + `messages/*.js
 
 ```
 src/
-├── app/[locale]/   # rotas i18n (pt-BR, en, es, fr) + /studio + /api
+├── app/[locale]/   # rotas i18n (pt-BR, en, es) + /studio + /api
 ├── components/     # ui, layout, home, pdi, cards, busca, contato, empreendimento, seo, analytics (UI oficial por domínio)
 ├── hooks/
 ├── providers/      # Theme, Query, Analytics, Motion, SmoothScroll, Favorites

@@ -184,7 +184,7 @@ export const CONDOMINIO_QUERY = groq`
     _id, nome, slug, tipo, descricao, infraestrutura, areaTotal, totalLotes,
     construtora, anoEntrega, numTorres, numUnidades, forcarNoindex,
     status, precoMinimo, precoMaximo, areaPrivativaMin, areaPrivativaMax,
-    prazoEntrega, heroVideoUrl, videoTour,
+    prazoEntrega, heroVideoUrl, videoTour, tourVirtual,
     sobre,
     bairro->{ _id, nome, slug, cidade, estado, mercado },
     "fotoCapa": fotoCapa { asset->{ _id, url, metadata { lqip, dimensions } }, hotspot, crop },

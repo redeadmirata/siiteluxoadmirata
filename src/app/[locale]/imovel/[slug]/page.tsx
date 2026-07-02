@@ -76,9 +76,21 @@ function buildImovelPath(imovel: ImovelPDI, slug: string): string {
   return `/ilhapura/condominios/${condSlug}/${finalidadeSeg}/${slug}`
 }
 
+/**
+ * Corta um texto em até `max` caracteres sem quebrar no meio de uma palavra.
+ * Recua até o último espaço antes do limite e acrescenta reticências.
+ */
+function truncateAtWord(texto: string, max: number): string {
+  if (texto.length <= max) return texto
+  const cortado = texto.slice(0, max)
+  const ultimoEspaco = cortado.lastIndexOf(' ')
+  const base = ultimoEspaco > 0 ? cortado.slice(0, ultimoEspaco) : cortado
+  return `${base.trimEnd()}…`
+}
+
 function buildMetaDescription(imovel: ImovelPDI): string {
   if (imovel.seo?.descricao) return imovel.seo.descricao
-  if (imovel.descricaoPtBr) return imovel.descricaoPtBr.slice(0, 160)
+  if (imovel.descricaoPtBr) return truncateAtWord(imovel.descricaoPtBr, 155)
 
   const partes: string[] = []
   if (imovel.tipo) partes.push(imovel.tipo)
@@ -109,12 +121,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!imovel) return { title: t('notFound') }
 
-  const titulo = imovel.seo?.titulo ?? `${imovel.titulo} | Admirata Imoveis`
+  // Não concatenar "| Admirata Imoveis" aqui: o layout raiz já aplica o
+  // template `%s | Admirata Imóveis` a todo título retornado por uma página
+  // filha. Fazer isso aqui duplicava o sufixo no <title> renderizado.
+  const titulo = imovel.seo?.titulo ?? imovel.titulo
   const descricao =
     params.locale === 'en'
-      ? imovel.descricaoEnUs?.slice(0, 160) ?? buildMetaDescription(imovel)
+      ? (imovel.descricaoEnUs ? truncateAtWord(imovel.descricaoEnUs, 155) : buildMetaDescription(imovel))
       : params.locale === 'es'
-        ? imovel.descricaoEsAr?.slice(0, 160) ?? buildMetaDescription(imovel)
+        ? (imovel.descricaoEsAr ? truncateAtWord(imovel.descricaoEsAr, 155) : buildMetaDescription(imovel))
         : buildMetaDescription(imovel)
 
   const imagemCapa =

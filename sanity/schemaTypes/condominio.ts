@@ -184,6 +184,13 @@ export const condominio = defineType({
       description: 'URL completa do YouTube. Ex: https://www.youtube.com/watch?v=xxx',
     }),
     defineField({
+      name: 'tourVirtual',
+      title: 'Visita virtual 360° (URL)',
+      type: 'url',
+      group: 'basico',
+      description: 'Link do tour virtual, como About a Visit, Matterport, Kuula ou iGuide.',
+    }),
+    defineField({
       name: 'heroVideoUrl',
       title: 'Vídeo do hero (URL)',
       type: 'url',
